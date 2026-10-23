@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KEGIATAN PENGADAAN BLUD RSUD AJI MUHAMMAD PARIKESIT</title>
+  <title>KEGIATAN PENGADAAN BLUD RSUD AJI MUHAMMAD PARIKESIT - PAGU TERINTEGRASI</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -161,7 +161,17 @@
         </div>
 
         <div>
-          <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block mb-1.5">IV. Laporan & AI</span>
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block mb-1.5">IV. Analisis Tahunan</span>
+          <div class="space-y-1">
+            <button type="button" onclick="switchWindow('win-tren-tahunan')" id="nav-tren-tahunan" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <span class="text-sm">📊</span>
+              <span>Tren Tahunan</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block mb-1.5">V. Laporan & AI</span>
           <div class="space-y-1">
             <button type="button" onclick="switchWindow('win-laporan')" id="nav-laporan" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
               <span class="text-sm">🖨️</span>
@@ -782,6 +792,63 @@
       </section>
 
       <!-- 7. AI SENIOR ADVISOR -->
+      <section id="win-tren-tahunan" class="hidden space-y-6">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
+            <div><h3 class="text-sm font-bold text-slate-900">Analisis Tren Anggaran Tahunan</h3><p class="text-xs text-slate-500 mt-1">Perbandingan pagu efektif dan realisasi berdasarkan data aktual yang tersedia.</p></div>
+            <button type="button" onclick="renderTrenTahunan()" class="px-3 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold">Muat Ulang Analisis</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div><label class="font-bold text-slate-600 block mb-1">Rentang Tahun</label><select id="trend-filter-range" onchange="renderTrenTahunan()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2"><option value="ALL">Semua tahun tersedia</option><option value="5">5 tahun terakhir</option><option value="3">3 tahun terakhir</option></select></div>
+            <div><label class="font-bold text-slate-600 block mb-1">Program</label><select id="trend-filter-program" onchange="populateTrendFilters();renderTrenTahunan()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2"><option value="ALL">Semua Program</option></select></div>
+            <div><label class="font-bold text-slate-600 block mb-1">Kegiatan</label><select id="trend-filter-kegiatan" onchange="populateTrendFilters();renderTrenTahunan()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2"><option value="ALL">Semua Kegiatan</option></select></div>
+            <div><label class="font-bold text-slate-600 block mb-1">Subkegiatan</label><select id="trend-filter-subkegiatan" onchange="renderTrenTahunan()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2"><option value="ALL">Semua Subkegiatan</option></select></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm"><span class="text-[10px] font-bold text-slate-400 uppercase">Pagu Tahun Terbaru</span><p id="trend-latest-pagu" class="text-xl font-black text-slate-900 mt-2">Rp 0</p><span id="trend-latest-year" class="text-xs text-slate-500">Belum ada data</span></div>
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm"><span class="text-[10px] font-bold text-slate-400 uppercase">Realisasi Tahun Terbaru</span><p id="trend-latest-real" class="text-xl font-black text-emerald-700 mt-2">Rp 0</p><span class="text-xs text-slate-500">Akumulasi transaksi pada tahun yang sama</span></div>
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm"><span class="text-[10px] font-bold text-slate-400 uppercase">Persentase Realisasi</span><p id="trend-latest-pct" class="text-xl font-black text-indigo-700 mt-2">0,0%</p><span class="text-xs text-slate-500">Realisasi dibagi pagu efektif</span></div>
+        </div>
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4"><div><h3 class="font-bold text-slate-900 text-sm">Grafik Pagu dan Realisasi per Tahun</h3><p class="text-xs text-slate-500">Nilai dalam rupiah; pagu menggunakan versi efektif terakhir pada setiap tahun.</p></div></div>
+          <div class="relative h-[320px] sm:h-[400px]"><canvas id="trend-annual-chart" aria-label="Grafik tren pagu dan realisasi tahunan"></canvas></div>
+          <p id="trend-empty" class="hidden text-center text-xs text-slate-500 py-6">Belum tersedia data yang sesuai filter.</p>
+        </div>
+        <!-- PROGNOSIS REALISASI: estimasi berbasis realisasi kumulatif, bukan transaksi dummy -->
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm">Prognosis Realisasi Anggaran</h3>
+              <p class="text-xs text-slate-500 mt-1">Estimasi akhir tahun dihitung dari realisasi kumulatif sampai bulan basis yang dipilih.</p>
+            </div>
+            <span class="inline-flex w-fit items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-600">PROYEKSI · BUKAN REALISASI AKTUAL</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+            <div><label for="prognosis-year" class="font-bold text-slate-600 block mb-1">Tahun Anggaran</label><select id="prognosis-year" onchange="renderPrognosis()" class="w-full bg-white border border-slate-300 rounded-xl p-2.5"></select></div>
+            <div><label for="prognosis-month" class="font-bold text-slate-600 block mb-1">Basis Realisasi s.d. Bulan</label><select id="prognosis-month" onchange="renderPrognosis()" class="w-full bg-white border border-slate-300 rounded-xl p-2.5"><option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option><option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option><option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option></select></div>
+            <div class="sm:col-span-2 flex items-end"><p id="prognosis-method-note" class="text-[11px] leading-relaxed text-slate-500">Metode: rata-rata realisasi kumulatif per bulan × 12. Pastikan periode basis sesuai dengan data yang telah direkonsiliasi.</p></div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4"><span class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Realisasi Kumulatif</span><p id="prognosis-actual" class="mt-2 text-lg sm:text-xl font-bold tracking-tight text-slate-900">—</p><span id="prognosis-cutoff" class="text-[11px] text-slate-500">Belum dihitung</span></div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4"><span class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Prognosis Akhir Tahun</span><p id="prognosis-total" class="mt-2 text-lg sm:text-xl font-bold tracking-tight text-slate-900">—</p><span class="text-[11px] text-slate-500">Proyeksi linear dari rerata bulanan</span></div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4"><span class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Proyeksi Serapan</span><p id="prognosis-percent" class="mt-2 text-lg sm:text-xl font-bold tracking-tight text-slate-900">—</p><span id="prognosis-percent-note" class="text-[11px] text-slate-500">Dibandingkan pagu efektif</span></div>
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4"><span class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Proyeksi Sisa / (Defisit)</span><p id="prognosis-remaining" class="mt-2 text-lg sm:text-xl font-bold tracking-tight text-slate-900">—</p><span id="prognosis-risk" class="text-[11px] text-slate-500">Dibandingkan pagu efektif</span></div>
+          </div>
+          <div class="rounded-xl border border-slate-200 p-3">
+            <div class="flex items-center justify-between gap-3 mb-2"><span class="text-xs font-bold text-slate-700">Realisasi aktual vs prognosis</span><span id="prognosis-status" class="text-[11px] font-semibold text-slate-500">Menunggu data</span></div>
+            <div class="h-2.5 rounded-full bg-slate-100 overflow-hidden"><div id="prognosis-progress" class="h-full rounded-full bg-slate-700" style="width:0%"></div></div>
+            <p class="mt-2 text-[11px] text-slate-500">Proyeksi mengasumsikan laju realisasi bulanan tetap. Pola musiman, jadwal kontrak, perubahan pagu, dan transaksi yang belum dicatat dapat mengubah hasil.</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm">
+          <h3 class="font-bold text-slate-900 text-sm mb-3">Ringkasan Tahunan</h3>
+          <div class="overflow-x-auto"><table class="w-full text-left text-xs min-w-[650px]"><thead class="bg-slate-50 text-slate-600"><tr><th class="p-3">Tahun</th><th class="p-3 text-right">Jumlah Rekening</th><th class="p-3 text-right">Pagu Efektif</th><th class="p-3 text-right">Realisasi</th><th class="p-3 text-right">Sisa Pagu</th><th class="p-3 text-right">Serapan</th></tr></thead><tbody id="trend-annual-table" class="divide-y divide-slate-100"></tbody></table></div>
+          <p class="text-[11px] text-slate-500 mt-3">Catatan: struktur dengan kode/uraian berbeda tidak dipadankan otomatis antar-tahun. Perbandingan menggunakan data yang tersimpan pada masing-masing tahun.</p>
+        </div>
+      </section>
+
       <section id="win-ai-decision" class="hidden space-y-6">
         <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white p-6 sm:p-7 rounded-3xl shadow-md relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div class="space-y-1 z-10">
@@ -1033,12 +1100,12 @@
         alert('Akses ditolak. Data Pejabat hanya dapat diakses oleh Superadmin.');
         return;
       }
-      ['win-dashboard', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-laporan', 'win-ai-decision'].forEach(id => {
+      ['win-dashboard', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-laporan', 'win-tren-tahunan', 'win-ai-decision'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
 
-      ['nav-dashboard', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-monitoring', 'nav-laporan', 'nav-ai-decision'].forEach(id => {
+      ['nav-dashboard', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-monitoring', 'nav-laporan', 'nav-tren-tahunan', 'nav-ai-decision'].forEach(id => {
         const nav = document.getElementById(id);
         if (nav) nav.classList.remove('nav-active');
       });
@@ -1053,6 +1120,7 @@
         'win-input-realisasi': ['Penatausahaan Belanja BLUD', 'Kartu Kendali Plafon, Formulir Realisasi, dan Register Belanja Berfilter'],
         'win-monitoring': ['Monitoring Realisasi', 'Analisis Performa Realisasi Kas Bulanan dan Pengawasan Serapan Kegiatan'],
         'win-laporan': ['Laporan Realisasi Anggaran (LRA)', 'Pertanggungjawaban Keuangan Penatausahaan Kas Akumulasi Tingkat Kegiatan (Format A4)'],
+        'win-tren-tahunan': ['Tren Tahunan', 'Perbandingan pagu efektif, realisasi, sisa anggaran, dan serapan lintas tahun'],
         'win-ai-decision': ['AI Senior Financial & Hospital Advisory', 'Konsultasi Akuntan Publik Senior (CPA), Ahli Manajemen RSUD, dan Rekomendasi SPI']
       };
 
@@ -1087,14 +1155,22 @@
         populateLRAFilterDropdowns();
         applyLRAFilters();
       }
+      if (windowId === 'win-tren-tahunan') {
+        populateTrendFilters();
+        renderTrenTahunan();
+        initializePrognosisFilters();
+        renderPrognosis();
+      }
       if (windowId === 'win-ai-decision') {
         runAIDiagnosis();
       }
     }
 
     function updateDashboardMetrics() {
-      const totalPagu = masterList.reduce((acc, c) => acc + Number(c.pagu || 0), 0);
-      const totalReal = realisasiList.reduce((acc, c) => acc + Number(c.nilai_kegiatan || 0), 0);
+      const totalPagu = effectiveMasterPagu(masterList).reduce((acc, c) => acc + Number(c.pagu || 0), 0);
+      const effectiveRows = effectiveMasterPagu(masterList);
+      const validIds = historicalMasterIds(effectiveRows, masterList);
+      const totalReal = realisasiList.filter(c => validIds.has(Number(c.master_id))).reduce((acc, c) => acc + Number(c.nilai_kegiatan || 0), 0);
       const sisa = totalPagu - totalReal;
 
       const elP = document.getElementById('dash-total-pagu');
@@ -1110,8 +1186,10 @@
       const container = document.getElementById('dash-ai-points-container');
       if (!container) return;
 
-      const totalPagu = masterList.reduce((acc, c) => acc + Number(c.pagu || 0), 0);
-      const totalReal = realisasiList.reduce((acc, c) => acc + Number(c.nilai_kegiatan || 0), 0);
+      const totalPagu = effectiveMasterPagu(masterList).reduce((acc, c) => acc + Number(c.pagu || 0), 0);
+      const effectiveRows = effectiveMasterPagu(masterList);
+      const validIds = historicalMasterIds(effectiveRows, masterList);
+      const totalReal = realisasiList.filter(c => validIds.has(Number(c.master_id))).reduce((acc, c) => acc + Number(c.nilai_kegiatan || 0), 0);
       const sisa = totalPagu - totalReal;
       const serapPct = totalPagu > 0 ? ((totalReal / totalPagu) * 100).toFixed(1) : 0;
 
@@ -1302,17 +1380,34 @@
       const fPptk = document.getElementById('cf-pptk')?.value || 'ALL';
       const searchQ = (document.getElementById('searchRealisasiInput')?.value || '').toLowerCase();
 
-      let matchedMasters = masterList.filter(m => {
+      // Kartu kendali harus memakai pagu efektif, bukan menjumlahkan semua
+      // versi master (Murni + Perubahan). Filter tahun/bulan diterapkan dahulu.
+      const yearMasters = masterList.filter(m =>
+        fTahun === 'ALL' || String(m.tahun || 2026) === String(fTahun)
+      );
+      let effectiveMasters = effectiveMasterPagu(yearMasters, fBulan);
+      let matchedMasters = effectiveMasters.filter(m => {
         if (fProg !== 'ALL' && (m.nama_program || '').trim() !== fProg) return false;
         if (fKeg !== 'ALL' && (m.nama_kegiatan || '').trim() !== fKeg) return false;
-        if (fRek !== 'ALL' && String(m.id) !== String(fRek)) return false;
         return true;
       });
 
-      const matchedMasterIds = new Set(matchedMasters.map(m => Number(m.id)));
+      // Jika pilihan rekening menunjuk ID versi lama, petakan ke versi efektif
+      // dari rekening yang sama agar plafon tidak kembali menjumlahkan versi lama.
+      if (fRek !== 'ALL') {
+        const selectedMaster = masterList.find(m => String(m.id) === String(fRek));
+        if (selectedMaster) {
+          const selectedKey = masterAccountKey(selectedMaster);
+          matchedMasters = matchedMasters.filter(m => masterAccountKey(m) === selectedKey);
+        } else {
+          matchedMasters = [];
+        }
+      }
+
+      const historicalIds = historicalMasterIds(matchedMasters, yearMasters);
 
       let filteredRealisasi = realisasiList.filter(r => {
-        if (!matchedMasterIds.has(Number(r.master_id))) return false;
+        if (!historicalIds.has(Number(r.master_id))) return false;
 
         const rThn = r.tahun || 2026;
         if (fTahun !== 'ALL' && String(rThn) !== String(fTahun)) return false;
@@ -1967,6 +2062,28 @@
     }
 
     function populateMonitoringFilterDropdowns() {
+      // Tahun dan bulan monitoring harus dibangun dari data aktual yang sedang dimuat.
+      // Pertahankan pilihan pengguna jika masih tersedia setelah penyegaran data.
+      const selYear = document.getElementById('mon-filter-tahun');
+      const selMonth = document.getElementById('mon-filter-bulan');
+      const previousYear = selYear ? selYear.value : 'ALL';
+      const previousMonth = selMonth ? selMonth.value : 'ALL';
+      const years = [...new Set([
+        ...masterList.map(m => Number(m.tahun || 2026)),
+        ...realisasiList.map(r => Number(r.tahun || 2026))
+      ])].filter(y => Number.isFinite(y) && y > 0).sort((a, b) => b - a);
+      if (selYear) {
+        selYear.innerHTML = '<option value="ALL">Semua Tahun</option>' +
+          years.map(y => `<option value="${y}">${y}</option>`).join('');
+        selYear.value = years.some(y => String(y) === previousYear) ? previousYear : 'ALL';
+      }
+      if (selMonth) {
+        const monthOptions = ['<option value="ALL">Semua Bulan</option>'] +
+          namaBulanList.map((name, i) => `<option value="${i + 1}">${name}</option>`).join('');
+        selMonth.innerHTML = monthOptions;
+        selMonth.value = previousMonth === 'ALL' || (Number(previousMonth) >= 1 && Number(previousMonth) <= 12) ? previousMonth : 'ALL';
+      }
+
       const selProg = document.getElementById('mon-filter-program');
       if (selProg) {
         const uniqueProg = [...new Set(masterList.map(m => (m.nama_program || '').trim()))].filter(Boolean);
@@ -2014,43 +2131,39 @@
     }
 
     function applyMonitoringFilters() {
+      const yr = document.getElementById('mon-filter-tahun')?.value || 'ALL';
+      const mo = document.getElementById('mon-filter-bulan')?.value || 'ALL';
       const fProg = document.getElementById('mon-filter-program')?.value || 'ALL';
       const fKeg = document.getElementById('mon-filter-kegiatan')?.value || 'ALL';
       const fSub = document.getElementById('mon-filter-subkegiatan')?.value || 'ALL';
       const fPptk = document.getElementById('mon-filter-pptk')?.value || 'ALL';
-
-      let filteredMasters = masterList.filter(m => {
-        const mProg = fProg === 'ALL' || (m.nama_program || '').trim() === fProg;
-        const mKeg = fKeg === 'ALL' || (m.nama_kegiatan || '').trim() === fKeg;
-        const mSub = fSub === 'ALL' || (m.nama_sub_kegiatan || '').trim() === fSub;
-        return mProg && mKeg && mSub;
-      });
-
-      const matchedMasterIds = new Set(filteredMasters.map(m => Number(m.id)));
-
-      let filteredRealisasi = realisasiList.filter(r => {
-        if (!matchedMasterIds.has(Number(r.master_id))) return false;
-        if (fPptk !== 'ALL' && (r.pptk || '').trim() !== fPptk) return false;
-        return true;
-      });
-
-      const totalPagu = filteredMasters.reduce((a, c) => a + Number(c.pagu || 0), 0);
+      const yearRows = masterList.filter(m => yr === 'ALL' || String(m.tahun || 2026) === yr);
+      const effectiveRows = effectiveMasterPagu(yearRows, mo).filter(m =>
+        (fProg === 'ALL' || (m.nama_program || '').trim() === fProg) &&
+        (fKeg === 'ALL' || (m.nama_kegiatan || '').trim() === fKeg) &&
+        (fSub === 'ALL' || (m.nama_sub_kegiatan || '').trim() === fSub)
+      );
+      const ids = historicalMasterIds(effectiveRows, yearRows);
+      const filteredRealisasi = realisasiList.filter(r =>
+        ids.has(Number(r.master_id)) &&
+        (yr === 'ALL' || String(r.tahun || 2026) === yr) &&
+        (mo === 'ALL' || Number(r.bulan || 1) <= Number(mo)) &&
+        (fPptk === 'ALL' || (r.pptk || '').trim() === fPptk)
+      );
+      const totalPagu = effectiveRows.reduce((a, c) => a + Number(c.pagu || 0), 0);
       const totalReal = filteredRealisasi.reduce((a, c) => a + Number(c.nilai_kegiatan || 0), 0);
       const sisa = totalPagu - totalReal;
-      const serapPct = totalPagu > 0 ? ((totalReal / totalPagu) * 100).toFixed(1) : 0;
-
+      const serapPct = totalPagu > 0 ? ((totalReal / totalPagu) * 100).toFixed(1) : '0.0';
       const elP = document.getElementById('mon-pagu');
       const elR = document.getElementById('mon-realisasi');
       const elS = document.getElementById('mon-sisa');
       const elPct = document.getElementById('mon-persen-serap');
       const elCnt = document.getElementById('mon-item-count');
-
       if (elP) elP.textContent = formatRupiah(totalPagu);
       if (elR) elR.textContent = formatRupiah(totalReal);
       if (elS) elS.textContent = formatRupiah(sisa);
       if (elPct) elPct.textContent = `Tingkat Serapan: ${serapPct}%`;
-      if (elCnt) elCnt.textContent = `${filteredMasters.length} Pos Rekening`;
-
+      if (elCnt) elCnt.textContent = `${effectiveRows.length} Pos Rekening`;
       renderMonitoringLineChart(filteredRealisasi);
     }
 
@@ -2328,8 +2441,10 @@
       const container = document.getElementById('ai-diagnosis-container');
       if (!container) return;
 
-      const totalPagu = masterList.reduce((acc, c) => acc + Number(c.pagu || 0), 0);
-      const totalReal = realisasiList.reduce((acc, c) => acc + Number(c.nilai_kegiatan || 0), 0);
+      const totalPagu = effectiveMasterPagu(masterList).reduce((acc, c) => acc + Number(c.pagu || 0), 0);
+      const effectiveRows = effectiveMasterPagu(masterList);
+      const validIds = historicalMasterIds(effectiveRows, masterList);
+      const totalReal = realisasiList.filter(c => validIds.has(Number(c.master_id))).reduce((acc, c) => acc + Number(c.nilai_kegiatan || 0), 0);
       const serapanGlobalPct = totalPagu > 0 ? ((totalReal / totalPagu) * 100).toFixed(1) : 0;
       const sisaKasGlobal = totalPagu - totalReal;
 
@@ -2382,6 +2497,104 @@
           </div>
         </div>
       `).join('');
+    }
+
+    // Tren Tahunan: hanya membaca data master dan realisasi yang sudah dimuat dari Supabase.
+    let trendAnnualChart = null;
+    function populateTrendFilters() {
+      const setOptions = (id, values, label) => {
+        const el = document.getElementById(id); if (!el) return;
+        const old = el.value; const unique = [...new Set(values.filter(v => String(v || '').trim()))].sort((a,b)=>String(a).localeCompare(String(b),'id'));
+        el.innerHTML = `<option value="ALL">${label}</option>` + unique.map(v=>`<option value="${safeText(v)}">${safeText(v)}</option>`).join('');
+        if (unique.includes(old)) el.value = old;
+      };
+      setOptions('trend-filter-program', masterList.map(m=>m.nama_program), 'Semua Program');
+      const program = document.getElementById('trend-filter-program')?.value || 'ALL';
+      setOptions('trend-filter-kegiatan', masterList.filter(m=>program==='ALL'||m.nama_program===program).map(m=>m.nama_kegiatan), 'Semua Kegiatan');
+      const kegiatan = document.getElementById('trend-filter-kegiatan')?.value || 'ALL';
+      setOptions('trend-filter-subkegiatan', masterList.filter(m=>(program==='ALL'||m.nama_program===program)&&(kegiatan==='ALL'||m.nama_kegiatan===kegiatan)).map(m=>m.nama_sub_kegiatan), 'Semua Subkegiatan');
+    }
+    function renderTrenTahunan() {
+      if (!Array.isArray(masterList) || !Array.isArray(realisasiList)) return;
+      const program = document.getElementById('trend-filter-program')?.value || 'ALL';
+      const kegiatan = document.getElementById('trend-filter-kegiatan')?.value || 'ALL';
+      const sub = document.getElementById('trend-filter-subkegiatan')?.value || 'ALL';
+      const range = document.getElementById('trend-filter-range')?.value || 'ALL';
+      const filtered = masterList.filter(m=>(program==='ALL'||m.nama_program===program)&&(kegiatan==='ALL'||m.nama_kegiatan===kegiatan)&&(sub==='ALL'||m.nama_sub_kegiatan===sub));
+      let years = [...new Set(filtered.map(m=>Number(m.tahun||2026)).filter(y=>Number.isFinite(y)&&y>1900))].sort((a,b)=>a-b);
+      if (range !== 'ALL') years = years.slice(-Number(range));
+      const rows = years.map(year=>{
+        const yearAll = filtered.filter(m=>Number(m.tahun||2026)===year);
+        const yearAllOriginal = masterList.filter(m=>Number(m.tahun||2026)===year);
+        const effective = effectiveMasterPagu(yearAll);
+        const ids = historicalMasterIds(effective, yearAllOriginal);
+        const tx = realisasiList.filter(r=>Number(r.tahun||2026)===year && ids.has(Number(r.master_id)));
+        const pagu = effective.reduce((a,m)=>a+Number(m.pagu||0),0);
+        const real = tx.reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0);
+        return {year, count:effective.length, pagu, real, sisa:pagu-real, pct:pagu?real/pagu*100:0};
+      });
+      const latest = rows.length ? rows[rows.length-1] : null;
+      const put = (id, value) => { const el=document.getElementById(id); if(el) el.textContent=value; };
+      put('trend-latest-pagu', latest?formatRupiah(latest.pagu):'Rp 0');
+      put('trend-latest-real', latest?formatRupiah(latest.real):'Rp 0');
+      put('trend-latest-pct', latest?latest.pct.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%':'0,0%');
+      put('trend-latest-year', latest?`Tahun anggaran ${latest.year}`:'Belum ada data');
+      const tbody=document.getElementById('trend-annual-table');
+      if(tbody) tbody.innerHTML=rows.map(r=>`<tr><td class="p-3 font-bold">${r.year}</td><td class="p-3 text-right">${r.count.toLocaleString('id-ID')}</td><td class="p-3 text-right">${formatRupiah(r.pagu)}</td><td class="p-3 text-right">${formatRupiah(r.real)}</td><td class="p-3 text-right ${r.sisa<0?'text-rose-700':''}">${formatRupiah(r.sisa)}</td><td class="p-3 text-right">${r.pct.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})}%</td></tr>`).join('');
+      const empty=document.getElementById('trend-empty'); if(empty) empty.classList.toggle('hidden',rows.length>0);
+      const canvas=document.getElementById('trend-annual-chart');
+      if(canvas && window.Chart){
+        if(trendAnnualChart) trendAnnualChart.destroy();
+        trendAnnualChart=new Chart(canvas,{type:'bar',data:{labels:rows.map(r=>String(r.year)),datasets:[{label:'Pagu Efektif',data:rows.map(r=>r.pagu),backgroundColor:'#64748b'},{label:'Realisasi',data:rows.map(r=>r.real),backgroundColor:'#10b981'}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${formatRupiah(ctx.raw)}`}}},scales:{y:{beginAtZero:true,ticks:{callback:value=>new Intl.NumberFormat('id-ID',{notation:'compact',maximumFractionDigits:1}).format(value)}}}}});
+      }
+    }
+
+    const prognosisMonthNames = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    function initializePrognosisFilters() {
+      const yearEl = document.getElementById('prognosis-year');
+      const monthEl = document.getElementById('prognosis-month');
+      if (!yearEl || !monthEl) return;
+      const years = [...new Set([new Date().getFullYear(), ...(Array.isArray(masterList) ? masterList.map(m=>Number(m.tahun)).filter(y=>Number.isFinite(y)&&y>1900) : []), ...(Array.isArray(realisasiList) ? realisasiList.map(r=>Number(r.tahun)).filter(y=>Number.isFinite(y)&&y>1900) : [])])].sort((a,b)=>b-a);
+      const previous = Number(yearEl.value);
+      yearEl.innerHTML = years.map(y=>`<option value="${y}">${y}</option>`).join('');
+      yearEl.value = years.includes(previous) ? String(previous) : String(years.includes(new Date().getFullYear()) ? new Date().getFullYear() : years[0]);
+      if (!monthEl.dataset.initialized) { monthEl.value = String(new Date().getMonth()+1); monthEl.dataset.initialized = '1'; }
+    }
+    function renderPrognosis() {
+      if (!Array.isArray(masterList) || !Array.isArray(realisasiList)) return;
+      initializePrognosisFilters();
+      const year = Number(document.getElementById('prognosis-year')?.value || new Date().getFullYear());
+      const month = Number(document.getElementById('prognosis-month')?.value || (new Date().getMonth()+1));
+      const put = (id, value) => { const el=document.getElementById(id); if(el) el.textContent=value; };
+      const program = document.getElementById('trend-filter-program')?.value || 'ALL';
+      const kegiatan = document.getElementById('trend-filter-kegiatan')?.value || 'ALL';
+      const sub = document.getElementById('trend-filter-subkegiatan')?.value || 'ALL';
+      const yearMasters = masterList.filter(m=>Number(m.tahun||2026)===year && (program==='ALL'||m.nama_program===program) && (kegiatan==='ALL'||m.nama_kegiatan===kegiatan) && (sub==='ALL'||m.nama_sub_kegiatan===sub));
+      const yearAllOriginal = masterList.filter(m=>Number(m.tahun||2026)===year);
+      const effective = effectiveMasterPagu(yearMasters);
+      const ids = historicalMasterIds(effective, yearAllOriginal);
+      const eligibleIds = new Set(yearMasters.map(m=>Number(m.id)));
+      const yearTx = realisasiList.filter(r=>Number(r.tahun||2026)===year && Number(r.bulan||0)<=month && ids.has(Number(r.master_id)) && (eligibleIds.has(Number(r.master_id)) || ids.has(Number(r.master_id))));
+      const actual = yearTx.reduce((sum,r)=>sum+Number(r.nilai_kegiatan||0),0);
+      const pagu = effective.reduce((sum,m)=>sum+Number(m.pagu||0),0);
+      const elapsedMonths = month;
+      const forecast = actual > 0 && elapsedMonths > 0 ? (actual/elapsedMonths)*12 : 0;
+      const projectedPct = pagu > 0 ? forecast/pagu*100 : null;
+      const remaining = pagu-forecast;
+      const formatPct = n => n===null ? '—' : n.toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+      put('prognosis-actual', formatRupiah(actual));
+      put('prognosis-total', actual>0 ? formatRupiah(forecast) : 'Belum cukup data');
+      put('prognosis-cutoff', `Tahun ${year} · s.d. ${prognosisMonthNames[month-1]}`);
+      put('prognosis-percent', formatPct(projectedPct));
+      put('prognosis-percent-note', pagu>0 ? `Pagu efektif ${formatRupiah(pagu)}` : 'Pagu efektif tidak tersedia untuk tahun ini');
+      put('prognosis-remaining', pagu>0 && actual>0 ? (remaining<0?'(Defisit) ':'')+formatRupiah(Math.abs(remaining)) : '—');
+      const risk = document.getElementById('prognosis-risk');
+      if(risk){ risk.textContent = !pagu ? 'Tidak dapat dibandingkan tanpa pagu' : !actual ? 'Belum ada realisasi untuk diproyeksikan' : remaining<0 ? 'Proyeksi melampaui pagu efektif' : 'Proyeksi masih dalam pagu efektif'; risk.className='text-[11px] '+(remaining<0?'text-rose-700 font-semibold':'text-slate-500'); }
+      const progress = document.getElementById('prognosis-progress');
+      if(progress) progress.style.width = `${Math.max(0,Math.min(100,projectedPct||0))}%`;
+      const status = document.getElementById('prognosis-status');
+      if(status){ status.textContent = !actual ? 'Belum ada realisasi pada periode basis' : !pagu ? 'Pagu tahun ini belum tersedia' : remaining<0 ? 'Perlu perhatian: proyeksi melebihi pagu' : 'Proyeksi dihitung dari data yang tersedia'; status.className='text-[11px] font-semibold '+(remaining<0?'text-rose-700':actual&&pagu?'text-slate-700':'text-slate-500'); }
+      put('prognosis-method-note', `Metode: realisasi kumulatif Rp ${new Intl.NumberFormat('id-ID').format(actual)} ÷ ${elapsedMonths} bulan × 12. Hasil merupakan estimasi sederhana, bukan target atau realisasi yang sudah terjadi.`);
     }
 
     // INISIALISASI SAAT HALAMAN DIBUKA
@@ -2466,6 +2679,8 @@
         }
         supabaseReady = true;
         if (typeof initAddedFilters === 'function') initAddedFilters();
+        populateMonitoringFilterDropdowns();
+        applyMonitoringFilters();
         updateDashboardMetrics();
         renderDashboardAIPoints();
         renderMasterTable();
@@ -2484,6 +2699,10 @@
     // Menyimpan transaksi langsung ke tabel realisasi_kegiatan_blud.
     window.handleSaveRealisasi = async function (e) {
       e.preventDefault();
+      if (!window.canInputManual) {
+        alert('Entri realisasi manual hanya dapat dilakukan oleh Admin atau Superadmin.');
+        return;
+      }
       if (!supabaseClient || !supabaseReady) {
         showDatabaseStatus('Transaksi belum disimpan: koneksi database belum berhasil. Periksa pesan koneksi terlebih dahulu.', 'error');
         return;
@@ -2562,8 +2781,15 @@
       document.body.classList.remove('overflow-hidden');
       const role=String(user.app_metadata?.role||'').toLowerCase();
       const canManage=role==='superadmin';
+      const canInputManual=role==='admin'||role==='superadmin';
       const pejabatNav=document.getElementById('nav-master-user'); if(pejabatNav){if(!canManage)pejabatNav.classList.add('hidden');else pejabatNav.classList.remove('hidden');}
+      window.currentAppRole=role;
       window.canManagePejabat=canManage;
+      window.canInputManual=canInputManual;
+      const paguButton=document.querySelector('button[onclick="openMasterModal()"]');
+      if(paguButton) paguButton.classList.toggle('hidden',!canInputManual);
+      const realisasiButton=document.querySelector('button[onclick="toggleFormInputRealisasi(true)"]');
+      if(realisasiButton) realisasiButton.classList.toggle('hidden',!canInputManual);
       renderUserTable();
     }
     window.signOutApp=async function(){ if(supabaseClient) await supabaseClient.auth.signOut(); currentAuthUser=null; lockApplication(); document.getElementById('auth-password').value=''; };
@@ -2599,11 +2825,49 @@ function safeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<
 function uniqueSorted(a){return [...new Set(a.filter(v=>v!==null&&v!==undefined&&String(v).trim()!=='').map(String))].sort((a,b)=>a.localeCompare(b,'id'));}
 function fillSelect(id, values, firstLabel){const el=document.getElementById(id);if(!el)return;const old=el.value;el.innerHTML=`<option value="ALL">${firstLabel}</option>`+values.map(v=>`<option value="${safeText(v)}">${safeText(v)}</option>`).join('');if(values.includes(old))el.value=old;}
 function initAddedFilters(){const years=uniqueSorted([...masterList.map(x=>x.tahun),...realisasiList.map(x=>x.tahun)]).sort((a,b)=>Number(b)-Number(a));['master-filter-tahun','lra-filter-tahun','ai-filter-tahun'].forEach(id=>fillSelect(id,years,'Semua Tahun'));['master-filter-bulan','lra-filter-bulan','ai-filter-bulan'].forEach((id,i)=>fillSelect(id,MONTH_LABELS.map((m,j)=>String(j+1)),i===1?'Seluruh Tahun':(i===2?'Semua Bulan':'Semua Bulan')));const prog=uniqueSorted(masterList.map(x=>x.nama_program));const keg=uniqueSorted(masterList.map(x=>x.nama_kegiatan));const sub=uniqueSorted(masterList.map(x=>x.nama_sub_kegiatan));fillSelect('master-filter-program',prog,'Semua Program');fillSelect('master-filter-kegiatan',keg,'Semua Kegiatan');fillSelect('master-filter-subkegiatan',sub,'Semua Subkegiatan');}
-function effectiveMasterPagu(rows){const groups={};rows.forEach(m=>{const key=[m.tahun||2026,m.kode_program,m.kode_kegiatan,m.kode_sub_kegiatan,m.uraian_kegiatan].join('|');const cur=groups[key];const month=Number(m.bulan||1);const kind=String(m.jenis_anggaran||'Murni').toLowerCase();const score=(kind.includes('perubahan')?100:0)+month;if(!cur||score>cur.score)groups[key]={score,row:m};});return Object.values(groups).map(x=>x.row);}
+function normalizeMasterPart(value){
+  return String(value ?? '').trim().replace(/\s+/g, ' ').replace(/[.\s]+$/g, '').toLocaleLowerCase('id');
+}
+// Identitas rekening: tahun anggaran + kode rekening/subkegiatan.
+// Bulan bukan bagian dari identitas rekening; bulan menentukan versi pagu yang
+// berlaku pada periode terpilih. Tanpa filter bulan, ambil versi terakhir setahun.
+function masterAccountKey(m){
+  // Kunci rekening efektif: tahun anggaran + kode subkegiatan + uraian objek belanja.
+  // Bulan/jenis anggaran adalah versi, bukan bagian identitas. Dengan demikian,
+  // pagu Januari dan pagu perubahan Oktober untuk objek Gas Medis yang sama
+  // menjadi satu rekening efektif; objek berbeda di subkegiatan yang sama tetap terpisah.
+  const subCode = normalizeMasterPart(m.kode_sub_kegiatan || m.nama_sub_kegiatan || '');
+  const uraian = normalizeMasterPart(m.uraian_kegiatan || m.nama_rekening || '');
+  return String(Number(m.tahun || 2026)) + '|' + subCode + '|' + uraian;
+}
+function effectiveMasterPagu(rows, asOfMonth='ALL'){
+  const cutoff = asOfMonth === 'ALL' ? 12 : Number(asOfMonth);
+  const groups = new Map();
+  rows.forEach(m => {
+    const month = Number(m.bulan || 1);
+    if (!Number.isFinite(month) || month < 1 || month > cutoff) return;
+    const key = masterAccountKey(m);
+    const current = groups.get(key);
+    const kind = normalizeMasterPart(m.jenis_anggaran || 'Murni');
+    // Pilih versi pada bulan paling akhir sampai periode yang dipilih.
+    // Jika ada beberapa versi pada bulan yang sama, Perubahan/Pergeseran mengungguli Murni.
+    const score = month * 10 + ((kind.includes('perubahan') || kind.includes('pergeseran')) ? 1 : 0);
+    if (!current || score > current.score || (score === current.score && Number(m.id || 0) > Number(current.row.id || 0))) {
+      groups.set(key, { score, row: m });
+    }
+  });
+  return Array.from(groups.values(), x => x.row);
+}
+// Ambil seluruh ID historis untuk rekening yang sama agar realisasi yang tertaut
+// ke master versi lama tetap masuk ke perhitungan pagu efektif.
+function historicalMasterIds(effectiveRows, allRows){
+  const keys = new Set(effectiveRows.map(masterAccountKey));
+  return new Set(allRows.filter(m => keys.has(masterAccountKey(m))).map(m => Number(m.id)));
+}
 const _renderMasterTableOriginal=renderMasterTable;
-renderMasterTable=function(query=''){const tbody=document.getElementById('master-table-body');if(!tbody)return;const fy=document.getElementById('master-filter-tahun')?.value||'ALL',fb=document.getElementById('master-filter-bulan')?.value||'ALL',fj=document.getElementById('master-filter-jenis')?.value||'ALL',fp=document.getElementById('master-filter-program')?.value||'ALL',fk=document.getElementById('master-filter-kegiatan')?.value||'ALL',fs=document.getElementById('master-filter-subkegiatan')?.value||'ALL';let data=masterList.filter(m=>(!query||[m.uraian_kegiatan,m.nama_kegiatan,m.nama_sub_kegiatan,m.nama_program].some(v=>String(v||'').toLowerCase().includes(query.toLowerCase())))&&(fy==='ALL'||String(m.tahun||2026)===fy)&&(fb==='ALL'||String(m.bulan||1)===fb)&&(fj==='ALL'||String(m.jenis_anggaran||'Murni').toLowerCase()===fj.toLowerCase())&&(fp==='ALL'||m.nama_program===fp)&&(fk==='ALL'||m.nama_kegiatan===fk)&&(fs==='ALL'||m.nama_sub_kegiatan===fs));const effective=effectiveMasterPagu(data);document.getElementById('master-card-count').textContent=data.length;document.getElementById('master-card-pagu').textContent=formatRupiah(effective.reduce((a,m)=>a+Number(m.pagu||0),0));tbody.innerHTML=data.map((item,idx)=>`<tr class="hover:bg-slate-50"><td class="py-3 px-3 text-slate-400">${idx+1}</td><td class="py-3 px-3"><b>${safeText(item.kode_program||'-')}</b><div>${safeText(item.nama_program||'-')}</div></td><td class="py-3 px-3"><b>${safeText(item.kode_kegiatan||'-')}</b><div>${safeText(item.nama_kegiatan||'-')}</div></td><td class="py-3 px-3"><b>${safeText(item.kode_sub_kegiatan||'-')}</b><div>${safeText(item.nama_sub_kegiatan||'-')}</div></td><td class="py-3 px-3">${safeText(item.uraian_kegiatan||'-')}</td><td class="py-3 px-3">${safeText(item.tahun||2026)} / ${safeText(MONTH_LABELS[(Number(item.bulan||1)-1)]||'-')}</td><td class="py-3 px-3"><span class="px-2 py-1 rounded-full text-[10px] ${String(item.jenis_anggaran||'Murni').toLowerCase().includes('perubahan')?'bg-amber-100 text-amber-800':'bg-sky-100 text-sky-800'}">${safeText(item.jenis_anggaran||'Murni')}</span></td><td class="py-3 px-3 text-right font-bold">${formatRupiah(item.pagu)}</td><td class="py-3 px-3"><div class="flex gap-1"><button onclick="editMasterData(${Number(item.id)})" class="px-2 py-1 bg-amber-50 text-amber-800 rounded">Edit</button><button onclick="deleteMasterData(${Number(item.id)})" class="px-2 py-1 bg-rose-50 text-rose-700 rounded">Hapus</button></div></td></tr>`).join('');};
-openMasterModal=function(editData=null){document.getElementById('form-master-crud').reset();if(editData){document.getElementById('modal-master-title').textContent='Ubah Master Kegiatan / Pagu';document.getElementById('crud-master-id').value=editData.id;document.getElementById('m-kd-prog').value=editData.kode_program||'';document.getElementById('m-nm-prog').value=editData.nama_program||'';document.getElementById('m-kd-keg').value=editData.kode_kegiatan||'';document.getElementById('m-nm-keg').value=editData.nama_kegiatan||'';document.getElementById('m-kd-sub').value=editData.kode_sub_kegiatan||'';document.getElementById('m-nm-sub').value=editData.nama_sub_kegiatan||'';document.getElementById('m-uraian').value=editData.uraian_kegiatan||'';document.getElementById('m-pagu').value=editData.pagu||0;document.getElementById('m-tahun').value=editData.tahun||2026;document.getElementById('m-bulan').value=editData.bulan||1;document.getElementById('m-jenis').value=editData.jenis_anggaran||'Murni';}else{document.getElementById('crud-master-id').value='';document.getElementById('m-tahun').value=new Date().getFullYear();}document.getElementById('modal-master-rekening').style.display='flex';};
-saveMasterData=async function(e){e.preventDefault();if(!supabaseClient||!supabaseReady){alert('Database belum terhubung. Data tidak disimpan.');return;}const id=document.getElementById('crud-master-id').value;const payload={kode_program:document.getElementById('m-kd-prog').value.trim(),nama_program:document.getElementById('m-nm-prog').value.trim(),kode_kegiatan:document.getElementById('m-kd-keg').value.trim(),nama_kegiatan:document.getElementById('m-nm-keg').value.trim(),kode_sub_kegiatan:document.getElementById('m-kd-sub').value.trim(),nama_sub_kegiatan:document.getElementById('m-nm-sub').value.trim(),uraian_kegiatan:document.getElementById('m-uraian').value.trim(),pagu:Number(document.getElementById('m-pagu').value||0),tahun:Number(document.getElementById('m-tahun').value),bulan:Number(document.getElementById('m-bulan').value),jenis_anggaran:document.getElementById('m-jenis').value};try{let q=id?supabaseClient.from('master_kegiatan_blud').update(payload).eq('id',Number(id)).select('*').single():supabaseClient.from('master_kegiatan_blud').insert(payload).select('*').single();const {data,error}=await q;if(error)throw error;if(id)masterList=masterList.map(m=>Number(m.id)===Number(id)?data:m);else masterList.push(data);closeMasterModal();initAddedFilters();renderMasterTable();updateDashboardMetrics();showDatabaseStatus('Master kegiatan berhasil disimpan ke Supabase.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Simpan master kegiatan'),'error');alert('Master belum berhasil disimpan. Periksa data dan hak akses.');}};
+renderMasterTable=function(query=''){const tbody=document.getElementById('master-table-body');if(!tbody)return;const fy=document.getElementById('master-filter-tahun')?.value||'ALL',fb=document.getElementById('master-filter-bulan')?.value||'ALL',fj=document.getElementById('master-filter-jenis')?.value||'ALL',fp=document.getElementById('master-filter-program')?.value||'ALL',fk=document.getElementById('master-filter-kegiatan')?.value||'ALL',fs=document.getElementById('master-filter-subkegiatan')?.value||'ALL';let data=masterList.filter(m=>(!query||[m.uraian_kegiatan,m.nama_kegiatan,m.nama_sub_kegiatan,m.nama_program].some(v=>String(v||'').toLowerCase().includes(query.toLowerCase())))&&(fy==='ALL'||String(m.tahun||2026)===fy)&&(fb==='ALL'||String(m.bulan||1)===fb)&&(fj==='ALL'||String(m.jenis_anggaran||'Murni').toLowerCase()===fj.toLowerCase())&&(fp==='ALL'||m.nama_program===fp)&&(fk==='ALL'||m.nama_kegiatan===fk)&&(fs==='ALL'||m.nama_sub_kegiatan===fs));const scope=masterList.filter(m=>(fy==='ALL'||String(m.tahun||2026)===fy)&&(fp==='ALL'||m.nama_program===fp)&&(fk==='ALL'||m.nama_kegiatan===fk)&&(fs==='ALL'||m.nama_sub_kegiatan===fs));const effective=effectiveMasterPagu(scope,fb);document.getElementById('master-card-count').textContent=effective.length;document.getElementById('master-card-pagu').textContent=formatRupiah(effective.reduce((a,m)=>a+Number(m.pagu||0),0));tbody.innerHTML=data.map((item,idx)=>`<tr class="hover:bg-slate-50"><td class="py-3 px-3 text-slate-400">${idx+1}</td><td class="py-3 px-3"><b>${safeText(item.kode_program||'-')}</b><div>${safeText(item.nama_program||'-')}</div></td><td class="py-3 px-3"><b>${safeText(item.kode_kegiatan||'-')}</b><div>${safeText(item.nama_kegiatan||'-')}</div></td><td class="py-3 px-3"><b>${safeText(item.kode_sub_kegiatan||'-')}</b><div>${safeText(item.nama_sub_kegiatan||'-')}</div></td><td class="py-3 px-3">${safeText(item.uraian_kegiatan||'-')}</td><td class="py-3 px-3">${safeText(item.tahun||2026)} / ${safeText(MONTH_LABELS[(Number(item.bulan||1)-1)]||'-')}</td><td class="py-3 px-3"><span class="px-2 py-1 rounded-full text-[10px] ${String(item.jenis_anggaran||'Murni').toLowerCase().includes('perubahan')?'bg-amber-100 text-amber-800':'bg-sky-100 text-sky-800'}">${safeText(item.jenis_anggaran||'Murni')}</span></td><td class="py-3 px-3 text-right font-bold">${formatRupiah(item.pagu)}</td><td class="py-3 px-3"><div class="flex gap-1"><button onclick="editMasterData(${Number(item.id)})" class="px-2 py-1 bg-amber-50 text-amber-800 rounded">Edit</button><button onclick="deleteMasterData(${Number(item.id)})" class="px-2 py-1 bg-rose-50 text-rose-700 rounded">Hapus</button></div></td></tr>`).join('');};
+openMasterModal=function(editData=null){if(!window.canInputManual){alert('Entri pagu rekening hanya dapat dilakukan oleh Admin atau Superadmin.');return;}if(editData && !window.canInputManual){alert('Akses ditolak. Hanya Admin atau Superadmin yang dapat mengubah pagu.');return;}document.getElementById('form-master-crud').reset();if(editData){document.getElementById('modal-master-title').textContent='Ubah Master Kegiatan / Pagu';document.getElementById('crud-master-id').value=editData.id;document.getElementById('m-kd-prog').value=editData.kode_program||'';document.getElementById('m-nm-prog').value=editData.nama_program||'';document.getElementById('m-kd-keg').value=editData.kode_kegiatan||'';document.getElementById('m-nm-keg').value=editData.nama_kegiatan||'';document.getElementById('m-kd-sub').value=editData.kode_sub_kegiatan||'';document.getElementById('m-nm-sub').value=editData.nama_sub_kegiatan||'';document.getElementById('m-uraian').value=editData.uraian_kegiatan||'';document.getElementById('m-pagu').value=editData.pagu||0;document.getElementById('m-tahun').value=editData.tahun||2026;document.getElementById('m-bulan').value=editData.bulan||1;document.getElementById('m-jenis').value=editData.jenis_anggaran||'Murni';}else{document.getElementById('crud-master-id').value='';document.getElementById('m-tahun').value=new Date().getFullYear();}document.getElementById('modal-master-rekening').style.display='flex';};
+saveMasterData=async function(e){e.preventDefault();if(!window.canInputManual){alert('Akses ditolak. Entri pagu hanya untuk Admin atau Superadmin.');return;}const requestedId=document.getElementById('crud-master-id').value;if(requestedId && !window.canInputManual){alert('Akses ditolak. Hanya Admin atau Superadmin yang dapat mengubah pagu.');return;}if(!supabaseClient||!supabaseReady){alert('Database belum terhubung. Data tidak disimpan.');return;}const id=document.getElementById('crud-master-id').value;const payload={kode_program:document.getElementById('m-kd-prog').value.trim(),nama_program:document.getElementById('m-nm-prog').value.trim(),kode_kegiatan:document.getElementById('m-kd-keg').value.trim(),nama_kegiatan:document.getElementById('m-nm-keg').value.trim(),kode_sub_kegiatan:document.getElementById('m-kd-sub').value.trim(),nama_sub_kegiatan:document.getElementById('m-nm-sub').value.trim(),uraian_kegiatan:document.getElementById('m-uraian').value.trim(),pagu:Number(document.getElementById('m-pagu').value||0),tahun:Number(document.getElementById('m-tahun').value),bulan:Number(document.getElementById('m-bulan').value),jenis_anggaran:document.getElementById('m-jenis').value};try{let q=id?supabaseClient.from('master_kegiatan_blud').update(payload).eq('id',Number(id)).select('*').single():supabaseClient.from('master_kegiatan_blud').insert(payload).select('*').single();const {data,error}=await q;if(error)throw error;if(id)masterList=masterList.map(m=>Number(m.id)===Number(id)?data:m);else masterList.push(data);closeMasterModal();initAddedFilters();renderMasterTable();updateDashboardMetrics();showDatabaseStatus('Master kegiatan berhasil disimpan ke Supabase.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Simpan master kegiatan'),'error');alert('Master belum berhasil disimpan. Periksa data dan hak akses.');}};
 deleteMasterData=async function(id){if(!confirm('Hapus master ini dari database? Transaksi yang terkait harus diperiksa terlebih dahulu.'))return;if(realisasiList.some(r=>Number(r.master_id)===Number(id))){alert('Master memiliki transaksi terkait. Jangan hapus agar hubungan data tidak rusak.');return;}try{const {error}=await supabaseClient.from('master_kegiatan_blud').delete().eq('id',Number(id));if(error)throw error;masterList=masterList.filter(m=>Number(m.id)!==Number(id));initAddedFilters();renderMasterTable();updateDashboardMetrics();showDatabaseStatus('Master berhasil dihapus.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Hapus master'),'error');alert('Operasi belum berhasil. Periksa data dan hak akses, lalu coba kembali.');}};
 function openUserModal(id=null){if(!window.canManagePejabat){alert('Data Pejabat hanya dapat diakses oleh Superadmin.');return;}document.getElementById('form-user-crud').reset();document.getElementById('u-id').value='';if(id){const u=userList.find(x=>Number(x.id)===Number(id));if(!u)return;document.getElementById('u-id').value=u.id;document.getElementById('u-nama').value=u.nama_lengkap||'';document.getElementById('u-nip').value=u.nip||'';document.getElementById('u-jabatan').value=u.jabatan||'';document.getElementById('u-email').value=u.email||'';document.getElementById('u-role').value=u.role||'PPTK';document.getElementById('user-modal-title').textContent='Ubah Data Pejabat';}else document.getElementById('user-modal-title').textContent='Tambah Pejabat';document.getElementById('modal-master-user').style.display='flex';}
 function closeUserModal(){document.getElementById('modal-master-user').style.display='none';}
@@ -2618,10 +2882,17 @@ applyLRAFilters=function(){
   const fProg=document.getElementById('lra-filter-program')?.value||'ALL';
   const fKeg=document.getElementById('lra-filter-kegiatan')?.value||'ALL';
   const fPptk=document.getElementById('lra-filter-pptk')?.value||'ALL';
-  let masters=masterList.filter(m=>(yr==='ALL'||String(m.tahun||2026)===yr)&&(fProg==='ALL'||m.nama_program===fProg)&&(fKeg==='ALL'||m.nama_kegiatan===fKeg));
-  masters=effectiveMasterPagu(masters);
+  const allYearMasters=masterList.filter(m=>(yr==='ALL'||String(m.tahun||2026)===yr));
+  let masters=effectiveMasterPagu(allYearMasters, mo).filter(m=>(fProg==='ALL'||m.nama_program===fProg)&&(fKeg==='ALL'||m.nama_kegiatan===fKeg));
+  const effectiveIdsByActivity={};
   const agg={};
-  masters.forEach(m=>{const key=(m.nama_program||'-')+'|'+(m.nama_kegiatan||'-');if(!agg[key])agg[key]={program:m.nama_program||'-',kegiatan:m.nama_kegiatan||'-',pagu:0,realisasi:0,master_ids:[]};agg[key].pagu+=Number(m.pagu||0);agg[key].master_ids.push(Number(m.id));});
+  masters.forEach(m=>{
+    const key=(m.nama_program||'-')+'|'+(m.nama_kegiatan||'-');
+    if(!agg[key])agg[key]={program:m.nama_program||'-',kegiatan:m.nama_kegiatan||'-',pagu:0,realisasi:0,master_ids:[]};
+    agg[key].pagu+=Number(m.pagu||0);
+    const accountKey=masterAccountKey(m);
+    allYearMasters.filter(h=>masterAccountKey(h)===accountKey).forEach(h=>agg[key].master_ids.push(Number(h.id)));
+  });
   const rows=Object.values(agg).map(g=>{
     const base=realisasiList.filter(r=>g.master_ids.includes(Number(r.master_id))&&(yr==='ALL'||String(r.tahun||2026)===yr)&&(fPptk==='ALL'||r.pptk===fPptk));
     const monthNo=mo==='ALL'?12:Number(mo);
@@ -2647,26 +2918,121 @@ applyLRAFilters=function(){
   setText('lra-persen-serap',tp?(tr/tp*100).toFixed(1)+'%':'0%');setText('lra-item-count',rows.length+' kegiatan');
 };
 const _runAIDiagnosis=runAIDiagnosis;
-runAIDiagnosis=function(){const yr=document.getElementById('ai-filter-tahun')?.value||'ALL',mo=document.getElementById('ai-filter-bulan')?.value||'ALL';const masters=effectiveMasterPagu(masterList.filter(m=>yr==='ALL'||String(m.tahun||2026)===yr));const ids=new Set(masters.map(m=>Number(m.id)));const rs=realisasiList.filter(r=>ids.has(Number(r.master_id))&&(yr==='ALL'||String(r.tahun||2026)===yr)&&(mo==='ALL'||String(r.bulan||1)===mo));const pagu=masters.reduce((a,m)=>a+Number(m.pagu||0),0),real=rs.reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0),sisa=pagu-real,pct=pagu?real/pagu*100:0;const summary=document.getElementById('ai-filter-summary');if(summary)summary.textContent=`Periode ${yr==='ALL'?'seluruh tahun':yr} · ${mo==='ALL'?'seluruh bulan':MONTH_LABELS[Number(mo)-1]} · ${rs.length} transaksi · Pagu ${formatRupiah(pagu)} · Realisasi ${formatRupiah(real)} · Sisa ${formatRupiah(sisa)}.`;const top=masters.map(m=>({...m,real:rs.filter(r=>Number(r.master_id)===Number(m.id)).reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0)})).sort((a,b)=>(b.real/(b.pagu||1))-(a.real/(a.pagu||1))).slice(0,5);const risk=top.filter(m=>m.real>m.pagu||m.pagu>0&&m.real/m.pagu>0.8);const dataText=top.length?top.map(m=>`${m.uraian_kegiatan}: pagu ${formatRupiah(m.pagu)}, realisasi ${formatRupiah(m.real)}, serapan ${m.pagu?(m.real/m.pagu*100).toFixed(1):0}%`).join('\n'):'Belum ada data master yang sesuai filter.';const recommendations=[{pakar:'Analisis Anggaran & Akuntansi',fokus:'Pagu berlaku, realisasi, dan konsistensi pencatatan',analisisData:`Filter ${yr==='ALL'?'seluruh tahun':yr}, ${mo==='ALL'?'seluruh bulan':MONTH_LABELS[Number(mo)-1]}. Total pagu yang dihitung ${formatRupiah(pagu)}, realisasi ${formatRupiah(real)}, sisa ${formatRupiah(sisa)} (${pct.toFixed(1)}% serapan). Data transaksi yang terbaca: ${rs.length}.`,temuanAudit:risk.length?`Perlu telaah pada ${risk.length} pos dengan serapan di atas 80% atau realisasi melebihi pagu. Rincian: ${risk.map(x=>x.uraian_kegiatan).join('; ')}.`:'Berdasarkan data terfilter, belum ditemukan pos dengan serapan di atas 80% atau realisasi melampaui pagu. Ini bukan pengganti audit dokumen sumber.',mitigasiRisiko:'Risiko yang perlu dikendalikan: salah pemetaan master rekening, duplikasi transaksi, keterlambatan dokumen pendukung, serta penggunaan pagu versi yang tidak berlaku. Verifikasi dengan DPA/pergeseran yang sah dan dokumen transaksi.',rekomendasiStrategis:'1. Rekonsiliasi master rekening dengan DPA/pergeseran terakhir yang sah.\n2. Periksa transaksi berulang berdasarkan nomor SP/SPM-BKU, tanggal, penyedia, dan nilai.\n3. Lakukan review bulanan oleh PPTK dan PPK; dokumentasikan koreksi.\n4. Pastikan seluruh transaksi terhubung ke master_id yang benar sebelum laporan disahkan.'},{pakar:'Manajemen Risiko & Pengendalian Internal',fokus:'Akar masalah, mitigasi, dan keputusan manajerial',analisisData:`Pos yang perlu dipantau berdasarkan nilai realisasi tertinggi/serapan: ${dataText}`,temuanAudit:'Akar masalah belum dapat dipastikan hanya dari angka agregat. Kandidat yang perlu diverifikasi: perbedaan versi pagu, pencocokan rekening saat impor, kelengkapan nomor dokumen, dan jeda pencatatan antara penyelesaian pekerjaan dengan pembayaran.',mitigasiRisiko:'Terapkan kontrol sebelum simpan: master rekening wajib dipilih, tahun dan bulan wajib valid, nomor dokumen diperiksa duplikat, dan setiap perubahan pagu dicatat sebagai versi. Jika bukti belum lengkap, tandai untuk verifikasi—jangan membuat kesimpulan audit otomatis.',rekomendasiStrategis:'1. Tetapkan pemilik data untuk master kegiatan, pergeseran pagu, dan realisasi.\n2. Buat daftar pengecualian transaksi yang tidak cocok dengan master.\n3. Lakukan rekonsiliasi pagu dan realisasi setiap bulan.\n4. Tindak lanjuti temuan dengan PIC, tenggat, bukti penyelesaian, dan status mitigasi.'}];const container=document.getElementById('ai-diagnosis-container');if(!container)return;container.innerHTML=recommendations.map(a=>`<article class="bg-white p-5 rounded-3xl border shadow-sm space-y-3"><div class="border-b pb-3"><span class="text-xs font-bold text-indigo-700">${a.pakar}</span><p class="text-[10px] text-slate-500 mt-1">${a.fokus}</p></div><div class="text-xs space-y-3"><div><b>1. Data dan analisis</b><p class="text-slate-600 whitespace-pre-line mt-1">${safeText(a.analisisData)}</p></div><div><b>2. Masalah/temuan</b><p class="text-slate-700 mt-1">${safeText(a.temuanAudit)}</p></div><div><b>3. Dugaan akar masalah (perlu verifikasi)</b><p class="text-slate-700 mt-1">${safeText(a.temuanAudit.includes('belum dapat')?a.temuanAudit:'Akar masalah harus dikonfirmasi melalui dokumen dan alur kerja; jangan menyimpulkan hanya dari agregat.')}</p></div><div class="bg-rose-50 p-3 rounded-xl"><b>4. Mitigasi risiko</b><p class="mt-1">${safeText(a.mitigasiRisiko)}</p></div><div class="bg-emerald-50 p-3 rounded-xl"><b>5. Rekomendasi</b><p class="whitespace-pre-line mt-1">${safeText(a.rekomendasiStrategis)}</p></div></div></article>`).join('');window.currentAIReport={year:yr,month:mo,pagu,real,sisa,pct,recommendations};};
+runAIDiagnosis=function(){const yr=document.getElementById('ai-filter-tahun')?.value||'ALL',mo=document.getElementById('ai-filter-bulan')?.value||'ALL';const allYearMasters=masterList.filter(m=>yr==='ALL'||String(m.tahun||2026)===yr);const masters=effectiveMasterPagu(allYearMasters,mo);const ids=historicalMasterIds(masters,allYearMasters);const rs=realisasiList.filter(r=>ids.has(Number(r.master_id))&&(yr==='ALL'||String(r.tahun||2026)===yr)&&(mo==='ALL'||String(r.bulan||1)===mo));const pagu=masters.reduce((a,m)=>a+Number(m.pagu||0),0),real=rs.reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0),sisa=pagu-real,pct=pagu?real/pagu*100:0;const summary=document.getElementById('ai-filter-summary');if(summary)summary.textContent=`Periode ${yr==='ALL'?'seluruh tahun':yr} · ${mo==='ALL'?'seluruh bulan':MONTH_LABELS[Number(mo)-1]} · ${rs.length} transaksi · Pagu ${formatRupiah(pagu)} · Realisasi ${formatRupiah(real)} · Sisa ${formatRupiah(sisa)}.`;const top=masters.map(m=>({...m,real:rs.filter(r=>Number(r.master_id)===Number(m.id)).reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0)})).sort((a,b)=>(b.real/(b.pagu||1))-(a.real/(a.pagu||1))).slice(0,5);const risk=top.filter(m=>m.real>m.pagu||m.pagu>0&&m.real/m.pagu>0.8);const dataText=top.length?top.map(m=>`${m.uraian_kegiatan}: pagu ${formatRupiah(m.pagu)}, realisasi ${formatRupiah(m.real)}, serapan ${m.pagu?(m.real/m.pagu*100).toFixed(1):0}%`).join('\n'):'Belum ada data master yang sesuai filter.';const recommendations=[{pakar:'Analisis Anggaran & Akuntansi',fokus:'Pagu berlaku, realisasi, dan konsistensi pencatatan',analisisData:`Filter ${yr==='ALL'?'seluruh tahun':yr}, ${mo==='ALL'?'seluruh bulan':MONTH_LABELS[Number(mo)-1]}. Total pagu yang dihitung ${formatRupiah(pagu)}, realisasi ${formatRupiah(real)}, sisa ${formatRupiah(sisa)} (${pct.toFixed(1)}% serapan). Data transaksi yang terbaca: ${rs.length}.`,temuanAudit:risk.length?`Perlu telaah pada ${risk.length} pos dengan serapan di atas 80% atau realisasi melebihi pagu. Rincian: ${risk.map(x=>x.uraian_kegiatan).join('; ')}.`:'Berdasarkan data terfilter, belum ditemukan pos dengan serapan di atas 80% atau realisasi melampaui pagu. Ini bukan pengganti audit dokumen sumber.',mitigasiRisiko:'Risiko yang perlu dikendalikan: salah pemetaan master rekening, duplikasi transaksi, keterlambatan dokumen pendukung, serta penggunaan pagu versi yang tidak berlaku. Verifikasi dengan DPA/pergeseran yang sah dan dokumen transaksi.',rekomendasiStrategis:'1. Rekonsiliasi master rekening dengan DPA/pergeseran terakhir yang sah.\n2. Periksa transaksi berulang berdasarkan nomor SP/SPM-BKU, tanggal, penyedia, dan nilai.\n3. Lakukan review bulanan oleh PPTK dan PPK; dokumentasikan koreksi.\n4. Pastikan seluruh transaksi terhubung ke master_id yang benar sebelum laporan disahkan.'},{pakar:'Manajemen Risiko & Pengendalian Internal',fokus:'Akar masalah, mitigasi, dan keputusan manajerial',analisisData:`Pos yang perlu dipantau berdasarkan nilai realisasi tertinggi/serapan: ${dataText}`,temuanAudit:'Akar masalah belum dapat dipastikan hanya dari angka agregat. Kandidat yang perlu diverifikasi: perbedaan versi pagu, pencocokan rekening saat impor, kelengkapan nomor dokumen, dan jeda pencatatan antara penyelesaian pekerjaan dengan pembayaran.',mitigasiRisiko:'Terapkan kontrol sebelum simpan: master rekening wajib dipilih, tahun dan bulan wajib valid, nomor dokumen diperiksa duplikat, dan setiap perubahan pagu dicatat sebagai versi. Jika bukti belum lengkap, tandai untuk verifikasi—jangan membuat kesimpulan audit otomatis.',rekomendasiStrategis:'1. Tetapkan pemilik data untuk master kegiatan, pergeseran pagu, dan realisasi.\n2. Buat daftar pengecualian transaksi yang tidak cocok dengan master.\n3. Lakukan rekonsiliasi pagu dan realisasi setiap bulan.\n4. Tindak lanjuti temuan dengan PIC, tenggat, bukti penyelesaian, dan status mitigasi.'}];const container=document.getElementById('ai-diagnosis-container');if(!container)return;container.innerHTML=recommendations.map(a=>`<article class="bg-white p-5 rounded-3xl border shadow-sm space-y-3"><div class="border-b pb-3"><span class="text-xs font-bold text-indigo-700">${a.pakar}</span><p class="text-[10px] text-slate-500 mt-1">${a.fokus}</p></div><div class="text-xs space-y-3"><div><b>1. Data dan analisis</b><p class="text-slate-600 whitespace-pre-line mt-1">${safeText(a.analisisData)}</p></div><div><b>2. Masalah/temuan</b><p class="text-slate-700 mt-1">${safeText(a.temuanAudit)}</p></div><div><b>3. Dugaan akar masalah (perlu verifikasi)</b><p class="text-slate-700 mt-1">${safeText(a.temuanAudit.includes('belum dapat')?a.temuanAudit:'Akar masalah harus dikonfirmasi melalui dokumen dan alur kerja; jangan menyimpulkan hanya dari agregat.')}</p></div><div class="bg-rose-50 p-3 rounded-xl"><b>4. Mitigasi risiko</b><p class="mt-1">${safeText(a.mitigasiRisiko)}</p></div><div class="bg-emerald-50 p-3 rounded-xl"><b>5. Rekomendasi</b><p class="whitespace-pre-line mt-1">${safeText(a.rekomendasiStrategis)}</p></div></div></article>`).join('');window.currentAIReport={year:yr,month:mo,pagu,real,sisa,pct,recommendations};};
+
+    function printAIReport() {
+      try {
+        if (!window.currentAIReport) runAIDiagnosis();
+        const report = window.currentAIReport;
+        if (!report) {
+          alert('Hasil AI Decision belum tersedia. Pastikan data dan filter telah dimuat.');
+          return;
+        }
+        const period = `${report.year === 'ALL' ? 'Seluruh Tahun Anggaran' : report.year} · ${report.month === 'ALL' ? 'Januari–Desember' : (MONTH_LABELS[Number(report.month)-1] || report.month)}`;
+        const periodEl = document.getElementById('ai-print-period');
+        const contentEl = document.getElementById('ai-print-content');
+        if (!periodEl || !contentEl) {
+          alert('Area laporan PDF AI Decision tidak ditemukan.');
+          return;
+        }
+        periodEl.textContent = `Periode analisis: ${period} | Pagu: ${formatRupiah(report.pagu)} | Realisasi: ${formatRupiah(report.real)} | Sisa: ${formatRupiah(report.sisa)} | Serapan: ${Number(report.pct || 0).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1})}%`;
+        const esc = value => String(value ?? '-').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+        const items = Array.isArray(report.recommendations) ? report.recommendations : [];
+        contentEl.innerHTML = items.map((a, i) => `
+          <article style="border:1px solid #cbd5e1;border-radius:8px;padding:14px;margin-bottom:14px;break-inside:avoid;page-break-inside:avoid;">
+            <h2 style="font-size:13pt;font-weight:700;margin:0 0 4px;">${esc(a.pakar || `Analisis ${i+1}`)}</h2>
+            <p style="font-size:9pt;color:#475569;margin:0 0 10px;">${esc(a.fokus || '')}</p>
+            <h3 style="font-size:10pt;font-weight:700;margin:8px 0 3px;">1. Data dan analisis</h3><p style="font-size:9pt;white-space:pre-wrap;margin:0;">${esc(a.analisisData)}</p>
+            <h3 style="font-size:10pt;font-weight:700;margin:8px 0 3px;">2. Masalah/temuan</h3><p style="font-size:9pt;white-space:pre-wrap;margin:0;">${esc(a.temuanAudit)}</p>
+            <h3 style="font-size:10pt;font-weight:700;margin:8px 0 3px;">3. Akar masalah / hal yang perlu diverifikasi</h3><p style="font-size:9pt;white-space:pre-wrap;margin:0;">${esc(a.temuanAudit && String(a.temuanAudit).toLowerCase().includes('belum dapat') ? a.temuanAudit : 'Akar masalah perlu diverifikasi melalui dokumen sumber, pemetaan master rekening, dan alur pencatatan. Angka agregat saja tidak membuktikan sebab.')}</p>
+            <h3 style="font-size:10pt;font-weight:700;margin:8px 0 3px;">4. Mitigasi risiko</h3><p style="font-size:9pt;white-space:pre-wrap;margin:0;">${esc(a.mitigasiRisiko)}</p>
+            <h3 style="font-size:10pt;font-weight:700;margin:8px 0 3px;">5. Rekomendasi tindakan</h3><p style="font-size:9pt;white-space:pre-wrap;margin:0;">${esc(a.rekomendasiStrategis)}</p>
+          </article>`).join('');
+        document.body.classList.add('print-ai-mode');
+        const cleanup = () => { document.body.classList.remove('print-ai-mode'); window.removeEventListener('afterprint', cleanup); };
+        window.addEventListener('afterprint', cleanup);
+        window.print();
+      } catch (error) {
+        document.body.classList.remove('print-ai-mode');
+        alert('Laporan PDF AI Decision belum dapat disiapkan. Silakan muat ulang halaman dan coba kembali.');
+      }
+    }
+
+// Multi-year layer: adds cross-year trends and a transparent, rule-based prognosis to the existing AI report.
+const _runAIDiagnosisMultiYear = runAIDiagnosis;
+runAIDiagnosis = function(){
+  _runAIDiagnosisMultiYear();
+  const report = window.currentAIReport;
+  if(!report) return;
+  const years = [...new Set([...masterList.map(x=>String(x.tahun||2026)), ...realisasiList.map(x=>String(x.tahun||2026))])].filter(x=>/^\d{4}$/.test(x)).sort((a,b)=>Number(a)-Number(b));
+  const annual = years.map(year=>{
+    const ms = masterList.filter(m=>String(m.tahun||2026)===year);
+    const effective = effectiveMasterPagu(ms);
+    const ids = historicalMasterIds(effective,ms);
+    const rs = realisasiList.filter(r=>String(r.tahun||2026)===year && ids.has(Number(r.master_id)));
+    return {year,pagu:effective.reduce((a,m)=>a+Number(m.pagu||0),0),real:rs.reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0),transactions:rs.length};
+  }).filter(x=>x.pagu!==0||x.real!==0);
+  report.annualTrend = annual;
+  const selectedYear = report.year==='ALL' ? String(Math.max(...years.map(Number).filter(Number.isFinite))||new Date().getFullYear()) : String(report.year);
+  const monthNo = report.month==='ALL' ? 12 : Number(report.month);
+  const monthlyBasis = report.month!=='ALL' && monthNo>0;
+  const projection = monthlyBasis && monthNo<12 && report.real>=0 ? (report.real/monthNo)*12 : null;
+  report.prognosis = {selectedYear,monthNo,projection,method:projection===null?'Proyeksi akhir tahun tidak dihitung karena filter bulan menunjukkan satu tahun penuh/Desember atau basis belum memadai.':'Ekstrapolasi sederhana: realisasi kumulatif pada bulan terpilih dibagi nomor bulan, lalu dikalikan 12. Ini skenario indikatif, bukan prediksi statistik.'};
+  const esc = v=>safeText(String(v??'-'));
+  const container=document.getElementById('ai-diagnosis-container');
+  if(container){
+    const trendHtml = `<article class="bg-slate-900 text-white p-5 rounded-3xl shadow-sm space-y-3"><div class="flex items-center gap-2"><span class="text-cyan-300 text-xs font-black tracking-widest">MULTI-YEAR INTELLIGENCE</span><span class="text-[10px] bg-white/10 rounded-full px-2 py-1">${annual.length} tahun tersedia</span></div><h3 class="text-lg font-black">Tren lintas tahun & prognosis</h3><div class="overflow-x-auto"><table class="w-full text-xs"><thead><tr class="text-slate-300 border-b border-white/20"><th class="text-left py-2">Tahun</th><th class="text-right py-2">Pagu terhitung</th><th class="text-right py-2">Realisasi</th><th class="text-right py-2">Serapan</th></tr></thead><tbody>${annual.map(a=>`<tr class="border-b border-white/10"><td class="py-2">${esc(a.year)}</td><td class="text-right">${esc(formatRupiah(a.pagu))}</td><td class="text-right">${esc(formatRupiah(a.real))}</td><td class="text-right">${a.pagu?(a.real/a.pagu*100).toFixed(1):'0.0'}%</td></tr>`).join('')||'<tr><td colspan="4" class="py-3">Data lintas tahun belum tersedia.</td></tr>'}</tbody></table></div><div class="rounded-2xl bg-white/10 p-3"><div class="text-[10px] uppercase tracking-wider text-cyan-200 font-bold">Prognosis indikatif ${esc(selectedYear)}</div><div class="text-xl font-black mt-1">${projection===null?'Belum dihitung':esc(formatRupiah(projection))}</div><p class="text-[11px] text-slate-200 mt-2">${esc(report.prognosis.method)}</p></div><p class="text-[10px] text-slate-300">Catatan: perbandingan pagu antar tahun dapat dipengaruhi perubahan cakupan dan versi pagu. Validasi dengan dokumen resmi sebelum keputusan.</p></article>`;
+    container.insertAdjacentHTML('afterbegin',trendHtml);
+  }
+};
+
+function aiDecisionSections(report){
+ const annual=report.annualTrend||[]; const p=report.prognosis||{};
+ const trend=annual.length?annual.map(a=>`${a.year}: pagu ${formatRupiah(a.pagu)}, realisasi ${formatRupiah(a.real)}, serapan ${a.pagu?(a.real/a.pagu*100).toFixed(1):'0.0'}% (${a.transactions} transaksi)`).join('\n'):'Data tahunan belum tersedia.';
+ const delta=annual.length>=2?(()=>{const a=annual[annual.length-2],b=annual[annual.length-1];return `Perubahan realisasi ${a.year} ke ${b.year}: ${formatRupiah(b.real-a.real)} (${a.real?((b.real-a.real)/Math.abs(a.real)*100).toFixed(1)+'%':'basis tahun sebelumnya nol/tidak tersedia'}). Perbedaan cakupan pagu/transaksi harus diperiksa sebelum menyimpulkan tren.`})():'Perbandingan perubahan antar tahun belum dapat dihitung karena diperlukan minimal dua tahun data.';
+ const prognosis=p.projection===null?'Proyeksi angka akhir tahun tidak ditampilkan untuk filter satu tahun penuh/Desember atau jika basis tidak memadai. Gunakan tren aktual dan lengkapi data bulanan sebelum memproyeksikan.':`Proyeksi indikatif realisasi akhir tahun: ${formatRupiah(p.projection)}. Metode: realisasi kumulatif pada bulan ${p.monthNo} (${formatRupiah(report.real)}) dibagi ${p.monthNo}, lalu dikalikan 12. Metode ini mengasumsikan laju rata-rata tetap; tidak menangkap pola musiman, jadwal kontrak, perubahan pagu, atau transaksi besar yang belum dibukukan.`;
+ return [
+  {title:'Executive Intelligence Brief',body:`Periode filter: ${report.year==='ALL'?'semua tahun':report.year}; ${report.month==='ALL'?'semua bulan':MONTH_LABELS[Number(report.month)-1]}. Pagu terhitung ${formatRupiah(report.pagu)}, realisasi ${formatRupiah(report.real)}, sisa ${formatRupiah(report.sisa)}, serapan ${Number(report.pct||0).toFixed(1)}%. Angka adalah hasil agregasi aplikasi dan perlu dicocokkan dengan laporan resmi.`},
+  {title:'Kinerja anggaran periode terpilih',body:`Pagu: ${formatRupiah(report.pagu)}\nRealisasi: ${formatRupiah(report.real)}\nSisa/(kelebihan): ${formatRupiah(report.sisa)}\nSerapan: ${Number(report.pct||0).toFixed(1)}%.\nInterpretasi harus mempertimbangkan apakah filter bulan merupakan kumulatif atau transaksi pada bulan tertentu sesuai struktur data aplikasi.`},
+  {title:'Analisis tren multi-year',body:trend+'\n\n'+delta},
+  {title:'Pagu, realisasi, dan sisa anggaran',body:`Sisa dihitung sebagai pagu yang terhitung dikurangi realisasi terfilter. Nilai sisa negatif berarti realisasi agregat melampaui pagu terhitung dan perlu rekonsiliasi segera. Pastikan pagu yang dipakai adalah versi sah yang berlaku dan transaksi tidak terduplikasi.`},
+  {title:'Prognosis akhir tahun',body:prognosis+'\n\nPrognosis adalah estimasi berbasis aturan sederhana, bukan kepastian dan bukan angka realisasi resmi.'},
+  {title:'Peringatan dini dan risiko',body:`Prioritas pemeriksaan: realisasi melebihi pagu, serapan tinggi lebih awal dari pola yang wajar, pagu nol dengan realisasi, transaksi tanpa master yang tepat, potensi duplikasi, dan keterlambatan pencatatan. Data agregat saja tidak membuktikan penyimpangan.`},
+  {title:'Akar masalah yang perlu diverifikasi',body:`Periksa versi DPA/pergeseran, pemetaan master rekening/kegiatan, tanggal dan nomor dokumen, konsistensi nilai, serta jeda antara pelaksanaan dan pencatatan pembayaran. Jangan menetapkan akar masalah tanpa dokumen sumber dan konfirmasi pemilik proses.`},
+  {title:'Skenario keputusan',body:`Konservatif: gunakan realisasi terverifikasi dan tunda kesimpulan sampai rekonsiliasi selesai.\nModerat: gunakan prognosis indikatif sebagai bahan pemantauan, dengan review bulanan dan pembaruan setelah transaksi baru masuk.\nOptimistis: hanya gunakan bila jadwal kegiatan, kontrak, ketersediaan kas, dan dokumen pendukung mengonfirmasi percepatan realisasi.\nSkenario ini kualitatif; tidak menambahkan angka asumsi yang tidak tersedia.`},
+  {title:'Rekomendasi strategis dan rencana aksi',body:`1. Rekonsiliasi pagu dengan dokumen anggaran terakhir yang sah.\n2. Validasi master_id dan klasifikasi transaksi.\n3. Periksa potensi duplikasi berdasarkan nomor dokumen, tanggal, pihak, dan nilai.\n4. Tetapkan PIC, tenggat, serta bukti tindak lanjut.\n5. Perbarui prognosis setiap bulan dan catat asumsi serta perubahan.\n6. Pisahkan indikator aktual, hasil hitung, proyeksi, dan rekomendasi.`},
+  {title:'Dashboard keputusan pimpinan',body:`Keputusan yang disarankan: (a) sahkan rekonsiliasi pagu/realisasi, (b) prioritaskan daftar pengecualian berisiko, (c) tentukan PIC dan tenggat, (d) tinjau prognosis pada rapat kinerja berikutnya.\nIndikator pantau: serapan aktual, deviasi terhadap pola historis, nilai transaksi yang belum terpetakan, status rekonsiliasi, serta selisih proyeksi terhadap realisasi berikutnya.\nCatatan: AI ini alat bantu keputusan, bukan pengganti penilaian pejabat berwenang atau audit resmi.`}
+ ];
+}
+function printAIReport(){
+ try{
+  runAIDiagnosis();const r=window.currentAIReport;if(!r){alert('Hasil AI Decision belum tersedia.');return;}
+  const period=`${r.year==='ALL'?'Semua Tahun':r.year} · ${r.month==='ALL'?'Semua Bulan':MONTH_LABELS[Number(r.month)-1]}`;
+  const pe=document.getElementById('ai-print-period'),ce=document.getElementById('ai-print-content');if(!pe||!ce){alert('Area cetak laporan tidak ditemukan.');return;}
+  pe.textContent=`Periode: ${period} | Pagu ${formatRupiah(r.pagu)} | Realisasi ${formatRupiah(r.real)} | Sisa ${formatRupiah(r.sisa)} | Serapan ${Number(r.pct||0).toFixed(1)}%`;
+  const esc=v=>String(v??'-').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  ce.innerHTML=`<div style="font-size:10pt;line-height:1.5;margin-bottom:16px"><b>AI Senior — Multi-Year Strategic Decision Intelligence</b><br>Dokumen penjelasan 10 slide. Data aktual dan hasil perhitungan dipisahkan dari prognosis serta rekomendasi.</div>`+aiDecisionSections(r).map((x,i)=>`<article style="border:1px solid #cbd5e1;border-radius:8px;padding:16px;margin:0 0 14px;break-inside:avoid;page-break-inside:avoid"><h2 style="font-size:14pt;color:#0f172a;margin:0 0 8px">${i+1}. ${esc(x.title)}</h2><p style="font-size:10pt;line-height:1.55;white-space:pre-wrap;margin:0">${esc(x.body)}</p></article>`).join('');
+  document.body.classList.add('print-ai-mode');const clean=()=>{document.body.classList.remove('print-ai-mode');window.removeEventListener('afterprint',clean)};window.addEventListener('afterprint',clean);window.print();
+ }catch(e){document.body.classList.remove('print-ai-mode');alert('PDF belum dapat disiapkan. Coba muat ulang aplikasi.');}
+}
 async function downloadAIPresentation(){
- if(!window.currentAIReport)runAIDiagnosis();const report=window.currentAIReport;if(!report){alert('Jalankan analisis terlebih dahulu.');return;}
+ runAIDiagnosis();const r=window.currentAIReport;if(!r){alert('Data AI Decision belum tersedia.');return;}
  try{
   if(!window.PptxGenJS){await new Promise((resolve,reject)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';sc.onload=resolve;sc.onerror=reject;document.head.appendChild(sc);});}
-  const pptx=new window.PptxGenJS();pptx.layout='LAYOUT_WIDE';pptx.author='RSUD Aji Muhammad Parikesit';pptx.subject='Telaah manajerial dan analisis anggaran BLUD';pptx.title='Telaah Anggaran BLUD';pptx.company='RSUD Aji Muhammad Parikesit';pptx.lang='id-ID';
-  const C={navy:'0F172A',blue:'2563EB',cyan:'06B6D4',mint:'10B981',amber:'F59E0B',rose:'F43F5E',white:'FFFFFF',pale:'F1F5F9',ink:'1E293B',muted:'64748B'};
-  const period=`${report.year==='ALL'?'Seluruh Tahun Anggaran':report.year} · ${report.month==='ALL'?'Januari–Desember':MONTH_LABELS[Number(report.month)-1]}`;
-  const addTitle=(sl,kicker,title,subtitle='')=>{sl.background={color:C.pale};sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.333,h:.16,fill:{color:C.cyan},line:{color:C.cyan}});sl.addText(kicker.toUpperCase(),{x:.55,y:.35,w:12,h:.25,fontSize:9,bold:true,charSpacing:1.2,color:C.blue,margin:0});sl.addText(title,{x:.55,y:.72,w:12.1,h:.52,fontSize:23,bold:true,color:C.navy,margin:0,breakLine:false});if(subtitle)sl.addText(subtitle,{x:.57,y:1.32,w:12,h:.3,fontSize:10,color:C.muted,margin:0});};
-  let sl=pptx.addSlide();sl.background={color:C.navy};sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:.22,h:7.5,fill:{color:C.cyan},line:{color:C.cyan}});sl.addShape(pptx.ShapeType.ellipse,{x:9.2,y:-1.2,w:5.2,h:5.2,fill:{color:'1D4ED8',transparency:25},line:{color:'1D4ED8',transparency:100}});sl.addShape(pptx.ShapeType.ellipse,{x:10.3,y:3.8,w:3.5,h:3.5,fill:{color:C.mint,transparency:25},line:{color:C.mint,transparency:100}});sl.addText('EXECUTIVE BRIEF  /  BLUD',{x:.8,y:.85,w:7,h:.35,fontSize:12,bold:true,color:'67E8F9',charSpacing:2,margin:0});sl.addText('TELAAH ANGGARAN\nDAN REALISASI BELANJA',{x:.8,y:1.55,w:8.4,h:1.6,fontSize:30,bold:true,color:C.white,breakLine:false,margin:0,fit:'shrink'});sl.addText('RSUD Aji Muhammad Parikesit\n'+period,{x:.82,y:3.55,w:7.5,h:.75,fontSize:16,color:'CBD5E1',breakLine:false,margin:0});sl.addText('Data terfilter · analisis berbasis aturan · perlu validasi dokumen sumber',{x:.82,y:6.65,w:10.8,h:.3,fontSize:10,color:'CBD5E1',margin:0});
-  sl=pptx.addSlide();addTitle(sl,'01 / Snapshot','Ringkasan Eksekutif',`Periode pelaporan: ${period}`);const cards=[['PAGU BERLAKU',formatRupiah(report.pagu),C.blue],['REALISASI BELANJA',formatRupiah(report.real),C.mint],['SISA ANGGARAN',formatRupiah(report.sisa),report.sisa<0?C.rose:C.cyan],['TINGKAT REALISASI',report.pct.toFixed(1)+'%',C.amber]];cards.forEach((c,i)=>{const x=.6+i*3.15;sl.addShape(pptx.ShapeType.roundRect,{x,y:2,w:2.85,h:1.45,rectRadius:.12,fill:{color:C.white},line:{color:'E2E8F0'},radius:.12});sl.addShape(pptx.ShapeType.rect,{x,y:2,w:.08,h:1.45,fill:{color:c[2]},line:{color:c[2]}});sl.addText(c[0],{x:x+.2,y:2.2,w:2.45,h:.22,fontSize:8,bold:true,color:C.muted,margin:0});sl.addText(c[1],{x:x+.2,y:2.58,w:2.45,h:.48,fontSize:17,bold:true,color:C.navy,fit:'shrink',margin:0});});sl.addText('Cara membaca',{x:.7,y:4.15,w:2,h:.3,fontSize:13,bold:true,color:C.navy,margin:0});sl.addText('Gunakan pagu terakhir yang sah dan berlaku. Realisasi harus ditautkan pada rekening/master yang benar. Sisa anggaran dihitung dari pagu berlaku dikurangi realisasi kumulatif sesuai cakupan periode.',{x:.7,y:4.58,w:11.8,h:1.05,fontSize:14,color:C.ink,breakLine:false,fit:'shrink',margin:.05});
-  const recommendations=report.recommendations||[];
-  for(let i=0;i<recommendations.length;i++){
-   const a=recommendations[i];
-   const sections=[['DATA & ANALISIS',a.analisisData,C.blue],['MASALAH / TEMUAN',a.temuanAudit,C.rose],['AKAR MASALAH (PERLU VALIDASI)',a.temuanAudit.includes('belum dapat')?a.temuanAudit:'Perlu verifikasi melalui DPA/pergeseran yang sah, dokumen transaksi, dan alur kerja. Angka agregat saja tidak membuktikan sebab.',C.amber],['MITIGASI RISIKO',a.mitigasiRisiko,C.cyan],['REKOMENDASI TINDAKAN',a.rekomendasiStrategis,C.mint]];
-   for(let j=0;j<sections.length;j+=2){sl=pptx.addSlide();addTitle(sl,`0${i+2} / Advisory ${i+1}`,a.pakar,`${a.fokus} · ${period}`);sections.slice(j,j+2).forEach((sec,k)=>{const x=.65+k*6.25;sl.addShape(pptx.ShapeType.roundRect,{x,y:2,w:5.95,h:4.25,rectRadius:.1,fill:{color:C.white},line:{color:'E2E8F0'},radius:.1});sl.addShape(pptx.ShapeType.rect,{x,y:2,w:5.95,h:.09,fill:{color:sec[2]},line:{color:sec[2]}});sl.addText(sec[0],{x:x+.25,y:2.28,w:5.45,h:.28,fontSize:10,bold:true,color:sec[2],margin:0});sl.addText(String(sec[1]||'-'),{x:x+.25,y:2.72,w:5.45,h:3.15,fontSize:12,color:C.ink,breakLine:false,fit:'shrink',valign:'top',margin:.03,paraSpaceAfterPt:5});});}
-  }
-  sl=pptx.addSlide();addTitle(sl,'Final / Next steps','Prioritas Tindak Lanjut',`Periode: ${period}`);const actions=['Rekonsiliasi pagu dengan dokumen anggaran terakhir yang sah.','Validasi pemetaan master rekening untuk seluruh transaksi impor.','Periksa potensi duplikasi berdasarkan nomor dokumen, tanggal, penyedia, dan nilai.','Tetapkan PIC, tenggat, dan bukti penyelesaian untuk setiap tindak lanjut.'];actions.forEach((a,i)=>{const y=2+i*.85;sl.addShape(pptx.ShapeType.ellipse,{x:.8,y:y+.03,w:.42,h:.42,fill:{color:[C.blue,C.cyan,C.amber,C.mint][i]},line:{color:[C.blue,C.cyan,C.amber,C.mint][i]}});sl.addText(String(i+1),{x:.8,y:y+.12,w:.42,h:.18,fontSize:11,bold:true,color:C.white,align:'center',margin:0});sl.addText(a,{x:1.45,y,w:10.9,h:.55,fontSize:15,bold:true,color:C.ink,breakLine:false,fit:'shrink',margin:0});});sl.addText('Catatan: rekomendasi berbasis data aplikasi, bukan opini audit atau pengganti verifikasi dokumen resmi.',{x:.8,y:6.55,w:11.8,h:.3,fontSize:9,color:C.muted,margin:0});
-  await pptx.writeFile({fileName:`Telaah_Anggaran_BLUD_${report.year}_${report.month}.pptx`});
- }catch(err){alert('PPT belum berhasil dibuat. Pastikan koneksi internet tersedia, lalu coba kembali.');}
+  const pptx=new window.PptxGenJS();pptx.layout='LAYOUT_WIDE';pptx.author='RSUD Aji Muhammad Parikesit';pptx.company='RSUD Aji Muhammad Parikesit';pptx.subject='AI Senior Multi-Year Decision Intelligence';pptx.title='AI Senior — Prognosis dan Keputusan Anggaran BLUD';pptx.lang='id-ID';
+  const C={navy:'0F172A',blue:'2563EB',cyan:'06B6D4',mint:'10B981',amber:'F59E0B',rose:'F43F5E',white:'FFFFFF',pale:'F1F5F9',ink:'1E293B',muted:'64748B'};const period=`${r.year==='ALL'?'Semua Tahun':r.year} · ${r.month==='ALL'?'Semua Bulan':MONTH_LABELS[Number(r.month)-1]}`;const sections=aiDecisionSections(r);
+  const addBase=(sl,n,title,sub)=>{sl.background={color:C.pale};sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:13.333,h:.14,fill:{color:C.cyan},line:{color:C.cyan}});sl.addText(`AI SENIOR  /  ${String(n).padStart(2,'0')} OF 10`,{x:.6,y:.35,w:5,h:.25,fontSize:9,bold:true,color:C.blue,charSpacing:1,margin:0});sl.addText(title,{x:.6,y:.78,w:12,h:.55,fontSize:24,bold:true,color:C.navy,fit:'shrink',margin:0});sl.addText(sub||period,{x:.62,y:1.42,w:12,h:.28,fontSize:10,color:C.muted,margin:0});sl.addShape(pptx.ShapeType.line,{x:.6,y:7.08,w:12.1,h:0,line:{color:'CBD5E1',width:1}});sl.addText('RSUD Aji Muhammad Parikesit · Bahan bantu keputusan, bukan pengganti audit resmi',{x:.62,y:7.15,w:11.8,h:.16,fontSize:7,color:C.muted,margin:0});};
+  const addBody=(sl,txt,y=1.95,h=4.75)=>sl.addText(txt,{x:.75,y,w:11.85,h,fontSize:15,color:C.ink,breakLine:false,fit:'shrink',valign:'top',margin:.12,paraSpaceAfterPt:9,bullet:{indent:16}});
+  // Slide 1
+  let sl=pptx.addSlide();sl.background={color:C.navy};sl.addShape(pptx.ShapeType.rect,{x:0,y:0,w:.22,h:7.5,fill:{color:C.cyan},line:{color:C.cyan}});sl.addText('STRATEGIC FINANCIAL INTELLIGENCE',{x:.8,y:.75,w:10,h:.3,fontSize:12,bold:true,color:'67E8F9',charSpacing:2,margin:0});sl.addText('AI SENIOR\nMULTI-YEAR DECISION INTELLIGENCE',{x:.8,y:1.5,w:10.8,h:1.55,fontSize:29,bold:true,color:C.white,fit:'shrink',breakLine:false,margin:0});sl.addText('Prognosis · Risiko · Skenario · Keputusan',{x:.82,y:3.35,w:9,h:.45,fontSize:17,color:'CBD5E1',margin:0});sl.addText(`RSUD Aji Muhammad Parikesit\n${period}`,{x:.82,y:4.15,w:9,h:.75,fontSize:15,color:C.white,breakLine:false,margin:0});sl.addText('Data aktual dipisahkan dari hasil perhitungan, proyeksi, dan rekomendasi.',{x:.82,y:6.55,w:11,h:.3,fontSize:10,color:'BAE6FD',margin:0});
+  // Slide 2: executive KPIs
+  sl=pptx.addSlide();addBase(sl,2,sections[0].title,period);[['PAGU',formatRupiah(r.pagu),C.blue],['REALISASI',formatRupiah(r.real),C.mint],['SISA',formatRupiah(r.sisa),r.sisa<0?C.rose:C.cyan],['SERAPAN',Number(r.pct||0).toFixed(1)+'%',C.amber]].forEach((c,i)=>{let x=.7+i*3.15;sl.addShape(pptx.ShapeType.roundRect,{x,y:2.05,w:2.85,h:1.35,rectRadius:.12,fill:{color:C.white},line:{color:'CBD5E1'}});sl.addShape(pptx.ShapeType.rect,{x,y:2.05,w:.08,h:1.35,fill:{color:c[2]},line:{color:c[2]}});sl.addText(c[0],{x:x+.2,y:2.25,w:2.4,h:.2,fontSize:9,bold:true,color:C.muted,margin:0});sl.addText(c[1],{x:x+.2,y:2.62,w:2.4,h:.45,fontSize:16,bold:true,color:C.navy,fit:'shrink',margin:0});});addBody(sl,sections[0].body,3.85,2.2);
+  // Slide 3 multi-year table
+  sl=pptx.addSlide();addBase(sl,3,sections[2].title,period);const annual=r.annualTrend||[];const rows=[['Tahun','Pagu terhitung','Realisasi','Serapan'],...annual.map(a=>[a.year,formatRupiah(a.pagu),formatRupiah(a.real),(a.pagu?(a.real/a.pagu*100):0).toFixed(1)+'%'])];sl.addTable(rows,{x:.7,y:1.95,w:11.9,h:Math.min(3.2,1.0+annual.length*.38),border:{type:'solid',color:'CBD5E1',pt:1},fill:C.white,color:C.ink,fontFace:'Aptos',fontSize:10,margin:.08,autoFit:false, rowH:.34, bold:false, valign:'mid'});addBody(sl,sections[2].body,5.15,1.55);
+  // Slides 4-10
+  for(let i=3;i<10;i++){sl=pptx.addSlide();addBase(sl,i+1,sections[i].title,period);addBody(sl,sections[i].body);}
+  await pptx.writeFile({fileName:`AI_Senior_MultiYear_10_Slide_${r.year}_${r.month}.pptx`});
+ }catch(e){console.error(e);alert('PPT belum berhasil dibuat. Periksa koneksi internet untuk memuat pustaka pembuat PPT, lalu coba kembali.');}
 }
 window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();renderMasterTable();renderUserTable();populateMonitoringFilterDropdowns();applyMonitoringFilters();applyLRAFilters();runAIDiagnosis();});
 </script>
