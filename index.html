@@ -38,7 +38,7 @@
       box-shadow: 0 4px 14px 0 rgba(30, 41, 59, 0.25);
     }
     @media print {
-      @page { size: A4 landscape; margin: 0; }
+      @page { size: A4 landscape; margin: 25mm; }
       html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
       body { color: #000 !important; font-size: 9.5pt; }
       aside, header, .no-print, #printable-lra-table, #supabase-connection-status,
@@ -46,16 +46,16 @@
       #print-area-only { display: block !important; margin: 0 !important; padding: 0 !important; }
       .lra-print-page {
         box-sizing: border-box !important;
-        width: 297mm !important;
-        height: 210mm !important;
-        padding: 12mm 18mm 12mm !important;
+        width: auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        padding: 0 !important;
         margin: 0 !important;
         position: relative !important;
-        overflow: hidden !important;
-        page-break-after: always !important;
-        break-after: page !important;
-        display: flex !important;
-        flex-direction: column !important;
+        overflow: visible !important;
+        page-break-after: auto !important;
+        break-after: auto !important;
+        display: block !important;
       }
       .lra-print-page:last-child { page-break-after: auto !important; break-after: auto !important; }
       .lra-print-title { text-align: center; margin-bottom: 5mm; flex: 0 0 auto; }
@@ -64,7 +64,12 @@
       .lra-print-table tr { break-inside: avoid; page-break-inside: avoid; }
       .lra-print-table th, .lra-print-table td { box-sizing: border-box !important; border: 1px solid #334155 !important; padding: 3px 4px !important; overflow-wrap: anywhere; word-break: normal; }
       .lra-print-table th { background: #F1F5F9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .lra-print-table td:nth-child(n+4), .lra-print-table th:nth-child(n+4) { white-space: nowrap !important; font-size: 8pt !important; }
+      .lra-print-table td:nth-child(n+3), .lra-print-table th:nth-child(n+3) { white-space: nowrap !important; font-size: 8pt !important; }
+      .lra-print-table td:nth-child(2), .lra-print-table th:nth-child(2) { white-space: normal !important; }
+      .lra-print-title h2 { font-size: 12pt; margin: 0 0 2px; }
+      .lra-print-title h3 { font-size: 11pt; margin: 2px 0; }
+      .lra-print-title h4 { font-size: 10pt; margin: 2px 0; }
+      .lra-print-title p { font-size: 8pt; margin: 2px 0; }
       .lra-print-signatures { display: flex; justify-content: space-between; margin-top: 8mm; padding-top: 0; font-size: 8.5pt; page-break-inside: avoid; break-inside: avoid; flex: 0 0 auto; }
       .lra-print-signatures p { margin-top: 0 !important; }
       .lra-print-footer { position: absolute; bottom: 5mm; right: 18mm; left: auto; text-align: right; font-size: 8pt; color: #475569 !important; }
@@ -803,14 +808,12 @@
             <table class="w-full text-left text-xs min-w-[700px]">
               <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-300">
                 <tr>
-                  <th class="py-2.5 px-3">No</th>
-                  <th class="py-2.5 px-3">Program</th>
-                  <th class="py-2.5 px-3">Kegiatan</th>
+                  <th class="py-2.5 px-3">Kode Rekening</th>
+                  <th class="py-2.5 px-3">Uraian Program/Kegiatan</th>
                   <th class="py-2.5 px-3 text-right">Pagu Anggaran (Rp)</th>
                   <th class="py-2.5 px-3 text-right">Realisasi Belanja (Rp)</th>
                   <th class="py-2.5 px-3 text-right">Sisa Pagu (Rp)</th>
                   <th class="py-2.5 px-3 text-center">% Capaian</th>
-                  <th class="py-2.5 px-3 text-center">Status</th>
                 </tr>
               </thead>
               <tbody id="laporan-table-body" class="divide-y divide-slate-200 font-medium"></tbody>
@@ -2381,104 +2384,71 @@
       }).join('');
     }
 
+    // Ekspor CSV membaca langsung baris tabel LRA yang sedang tampil agar hierarki,
+    // agregasi rekening, warna/tingkat baris, dan total sama dengan laporan di layar.
     function exportLRAtoCSV() {
-      if (!currentFilteredLRA || currentFilteredLRA.length === 0) return alert("Data LRA kosong!");
-      const headers = ["No.", "Program", "Kegiatan", "Pagu (Rp)", "Realisasi (Rp)", "Sisa (Rp)", "Capaian (%)"];
-      const rows = currentFilteredLRA.map((r, i) => [i + 1, `"${r.program}"`, `"${r.kegiatan}"`, r.pagu, r.realisasi, r.sisa, r.persen_serap.toFixed(2)]);
-      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-      const link = document.createElement("a");
-      link.setAttribute("href", encodeURI(csvContent));
-      link.setAttribute("download", `LRA_KEGIATAN_BLUD_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const table = document.querySelector('#win-laporan table');
+      const body = document.getElementById('laporan-table-body');
+      if (!table || !body || !body.rows.length) return alert('Data LRA kosong!');
+      const visibleRows = [
+        ...Array.from(table.querySelectorAll('thead tr')),
+        ...Array.from(body.querySelectorAll('tr'))
+      ];
+      const csvEscape = value => '"' + String(value ?? '').replace(/\r?\n/g, ' ').replace(/"/g, '""').trim() + '"';
+      const csv = '\uFEFF' + visibleRows.map(row => Array.from(row.cells).map(cell => csvEscape(cell.innerText || cell.textContent)).join(';')).join('\r\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const year = document.getElementById('lra-filter-tahun')?.value || 'ALL';
+      const month = document.getElementById('lra-filter-bulan')?.value || 'ALL';
+      link.download = `LRA_BLUD_${year}_${month}_${Date.now()}.csv`;
+      document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
     }
 
+    // Cetak A4 landscape berdasarkan tabel LRA yang sama persis dengan tampilan layar.
     function cetakLRA_A4_Landscape() {
-      if (!currentFilteredLRA || currentFilteredLRA.length === 0) return alert("Data LRA kosong!");
+      const sourceTable = document.querySelector('#win-laporan table');
+      const sourceBody = document.getElementById('laporan-table-body');
+      if (!sourceTable || !sourceBody || !sourceBody.rows.length) return alert('Data LRA kosong!');
 
-      const pageSize = 8; // Jumlah baris data per halaman; setiap halaman berukuran A4 landscape yang sama.
-      const rows = currentFilteredLRA;
-      const pageCount = Math.ceil(rows.length / pageSize);
-      const totalPagu = rows.reduce((sum, r) => sum + Number(r.pagu || 0), 0);
-      const totalReal = rows.reduce((sum, r) => sum + Number(r.realisasi || 0), 0);
-      const totalSisa = rows.reduce((sum, r) => sum + Number(r.sisa || 0), 0);
-
-      const kpa = (Array.isArray(userList) ? userList : []).find(u =>
-        /\bKPA\b/i.test(String(u.jabatan || ''))
-      );
+      const period = document.getElementById('lra-keterangan-periode')?.textContent || 'Tahun Anggaran 2026';
+      const kpa = (Array.isArray(userList) ? userList : []).find(u => /\bKPA\b/i.test(String(u.jabatan || '')));
       const kpaName = kpa?.nama_lengkap || document.getElementById('print-kpa-name')?.textContent || '-';
       const kpaNipRaw = kpa?.nip || (document.getElementById('print-kpa-nip')?.textContent || '').replace(/^NIP\.\s*/i, '') || '-';
-      const kpaNip = 'NIP. ' + kpaNipRaw;
-      const period = document.getElementById('lra-keterangan-periode')?.textContent ||
-                     document.getElementById('print-periode-label')?.textContent || 'Tahun Anggaran 2026';
-
-      const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({
-        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-      }[ch]));
-
-      const titleHtml = `
-        <div class="lra-print-title">
-          <h2 style="font-size:14pt;font-weight:bold;margin:0;text-transform:uppercase;">PEMERINTAH KABUPATEN KUTAI KARTANEGARA</h2>
-          <h3 style="font-size:13pt;font-weight:bold;margin:2px 0;text-transform:uppercase;">RSUD AJI MUHAMMAD PARIKESIT</h3>
-          <h4 style="font-size:11pt;font-weight:bold;margin:2px 0;text-transform:uppercase;">LAPORAN REALISASI ANGGARAN (LRA) PENGADAAN BLUD</h4>
-          <p style="font-size:9pt;margin:2px 0;font-family:monospace;">${escapeHtml(period)}</p>
-        </div>`;
-
-      const tableHead = `
-        <table class="lra-print-table">
-          <colgroup><col style="width:5%"><col style="width:25%"><col style="width:35%"><col style="width:12%"><col style="width:11%"><col style="width:12%"></colgroup>
-          <thead><tr>
-            <th style="text-align:center">No.</th><th style="text-align:left">Program</th><th style="text-align:left">Kegiatan</th>
-            <th style="text-align:right">Pagu (Rp)</th><th style="text-align:right">Realisasi (Rp)</th><th style="text-align:right">Sisa (Rp)</th>
-          </tr></thead><tbody>`;
-
-      const signatures = `
-        <div class="lra-print-signatures">
-          <div style="text-align:center;width:40%;">
-            <p style="margin:0 0 12mm;">Mengetahui,<br><strong>Kuasa Pengguna Anggaran (KPA)</strong></p>
-            <p style="font-weight:bold;text-decoration:underline;margin:0;">${escapeHtml(kpaName)}</p>
-            <p style="margin:0;">${escapeHtml(kpaNip)}</p>
-          </div>
-          <div style="text-align:center;width:40%;">
-            <p style="margin:0 0 12mm;">Tenggarong Seberang,<br><strong>Pejabat Pelaksana Teknis Kegiatan (PPTK)</strong></p>
-            <p style="font-weight:bold;text-decoration:underline;margin:0;">Suwoko Tya Wicaksono, S.Kep., Ns., M.M.Rs.</p>
-            <p style="margin:0;">NIP. 198501012010011001</p>
-          </div>
-        </div>`;
-
+      const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+      const sourceRows = Array.from(sourceBody.rows).map(row => row.cloneNode(true));
+      // Satu halaman menampung baris sesuai ruang cetak; header tabel diulang setiap halaman.
+      const pageSize = Math.max(sourceRows.length, 1);
+      const pageCount = Math.ceil(sourceRows.length / pageSize);
+      const sourceHead = sourceTable.querySelector('thead').cloneNode(true);
+      const signatures = `<div class="lra-print-signatures"><div style="text-align:center;width:40%"><p style="margin:0 0 12mm">Mengetahui,<br><strong>Kuasa Pengguna Anggaran (KPA)</strong></p><p style="font-weight:bold;text-decoration:underline;margin:0">${escapeHtml(kpaName)}</p><p style="margin:0">NIP. ${escapeHtml(kpaNipRaw)}</p></div><div style="text-align:center;width:40%"><p style="margin:0 0 12mm">Tenggarong,<br><strong>Pejabat Pelaksana Teknis Kegiatan (PPTK)</strong></p><p style="font-weight:bold;text-decoration:underline;margin:0">Suwoko Tya Wicaksono, S.Kep., Ns., M.M.Rs.</p><p style="margin:0">NIP. 198501012010011001</p></div></div>`;
       let pagesHtml = '';
       for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-        const chunk = rows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
-        const rowHtml = chunk.map((r, localIndex) => {
-          const rowNo = pageIndex * pageSize + localIndex + 1;
-          return `<tr>
-            <td style="text-align:center">${rowNo}</td>
-            <td>${escapeHtml(r.program)}</td>
-            <td><strong>${escapeHtml(r.kegiatan)}</strong></td>
-            <td style="text-align:right;font-family:monospace;white-space:nowrap">${formatRupiah(r.pagu)}</td>
-            <td style="text-align:right;font-family:monospace;white-space:nowrap">${formatRupiah(r.realisasi)}</td>
-            <td style="text-align:right;font-family:monospace;font-weight:bold;white-space:nowrap">${formatRupiah(r.sisa)}</td>
-          </tr>`;
+        const chunk = sourceRows.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
+        const rowsHtml = chunk.map(row => {
+          // Pertahankan warna dan indentasi yang sudah digunakan pada tabel LRA.
+          const cells = Array.from(row.cells).map(cell => {
+            const bg = cell.parentElement?.className || '';
+            const isRight = /text-right/.test(cell.className);
+            const isCenter = /text-center/.test(cell.className);
+            const weight = /font-black|font-bold/.test(bg + ' ' + cell.className) ? 'font-weight:700;' : '';
+            let background = '#ffffff';
+            if (/bg-lime-200/.test(bg)) background = '#d9f99d';
+            else if (/bg-violet-200/.test(bg)) background = '#ddd6fe';
+            else if (/bg-indigo-900/.test(bg)) background = '#312e81';
+            else if (/bg-sky-50|bg-blue-50/.test(bg)) background = '#f0f9ff';
+            const color = /bg-indigo-900/.test(bg) ? '#ffffff' : '#111827';
+            return `<td style="background:${background};color:${color};text-align:${isRight?'right':isCenter?'center':'left'};${weight}">${escapeHtml(cell.innerText || cell.textContent)}</td>`;
+          }).join('');
+          const rowClass = row.className || '';
+          return `<tr>${cells}</tr>`;
         }).join('');
-
-        const lastPage = pageIndex === pageCount - 1;
-        const totalRow = lastPage ? `<tfoot><tr>
-          <td colspan="3" style="text-align:center;font-weight:bold;">JUMLAH TOTAL</td>
-          <td style="text-align:right;font-family:monospace;font-weight:bold;white-space:nowrap">${formatRupiah(totalPagu)}</td>
-          <td style="text-align:right;font-family:monospace;font-weight:bold;white-space:nowrap">${formatRupiah(totalReal)}</td>
-          <td style="text-align:right;font-family:monospace;font-weight:bold;white-space:nowrap">${formatRupiah(totalSisa)}</td>
-        </tr></tfoot>` : '';
-
-        pagesHtml += `<section class="lra-print-page">
-          ${titleHtml}
-          ${tableHead}${rowHtml}</tbody>${totalRow}</table>
-          ${lastPage ? signatures : ''}
-          <div class="lra-print-footer">${pageIndex + 1}/${pageCount}</div>
-        </section>`;
+        const isLast = pageIndex === pageCount - 1;
+        pagesHtml += `<section class="lra-print-page"><div class="lra-print-title"><h2>PEMERINTAH KABUPATEN KUTAI KARTANEGARA</h2><h3>RSUD AJI MUHAMMAD PARIKESIT</h3><h4>LAPORAN REALISASI ANGGARAN (LRA) BELANJA PER KEGIATAN</h4><p>${escapeHtml(period)}</p></div><table class="lra-print-table"><colgroup><col style="width:15%"><col style="width:31%"><col style="width:14%"><col style="width:15%"><col style="width:15%"><col style="width:10%"></colgroup>${sourceHead.outerHTML}<tbody>${rowsHtml}</tbody></table>${isLast?signatures:''}</section>`;
       }
-
       const printArea = document.getElementById('print-area-only');
+      if (!printArea) return alert('Area cetak LRA tidak ditemukan.');
       printArea.innerHTML = pagesHtml;
       document.body.classList.remove('print-ai-mode');
       window.print();
@@ -2952,39 +2922,58 @@ applyLRAFilters=function(){
   const fKeg=document.getElementById('lra-filter-kegiatan')?.value||'ALL';
   const fPptk=document.getElementById('lra-filter-pptk')?.value||'ALL';
   const allYearMasters=masterList.filter(m=>(yr==='ALL'||String(m.tahun||2026)===yr));
-  let masters=effectiveMasterPagu(allYearMasters, mo).filter(m=>(fProg==='ALL'||m.nama_program===fProg)&&(fKeg==='ALL'||m.nama_kegiatan===fKeg));
-  const effectiveIdsByActivity={};
-  const agg={};
+  const masters=effectiveMasterPagu(allYearMasters,mo).filter(m=>(fProg==='ALL'||m.nama_program===fProg)&&(fKeg==='ALL'||m.nama_kegiatan===fKeg));
+  const monthNo=mo==='ALL'?12:Number(mo);
+  const accountIds=(m)=>allYearMasters.filter(h=>masterAccountKey(h)===masterAccountKey(m)).map(h=>Number(h.id));
+  const detailMap=new Map();
   masters.forEach(m=>{
-    const key=(m.nama_program||'-')+'|'+(m.nama_kegiatan||'-');
-    if(!agg[key])agg[key]={program:m.nama_program||'-',kegiatan:m.nama_kegiatan||'-',pagu:0,realisasi:0,master_ids:[]};
-    agg[key].pagu+=Number(m.pagu||0);
-    const accountKey=masterAccountKey(m);
-    allYearMasters.filter(h=>masterAccountKey(h)===accountKey).forEach(h=>agg[key].master_ids.push(Number(h.id)));
+    const program=m.nama_program||'-',kegiatan=m.nama_kegiatan||'-';
+    // LRA menampilkan agregasi per rekening; uraian detail tidak dibuat sebagai baris tersendiri.
+    const code=m.kode_rekening||m.kode_akun||m.kode_sub_kegiatan||'';
+    const account=m.nama_rekening||m.uraian_rekening||m.uraian_pos_rekening||m.nama_sub_kegiatan||m.uraian_kegiatan||'Tanpa uraian rekening';
+    const key=[program,kegiatan,code,account].join('|');
+    if(!detailMap.has(key))detailMap.set(key,{program,kegiatan,code,account,pagu:0,real:0,realKumulatif:0,master_ids:[]});
+    const d=detailMap.get(key);d.pagu+=Number(m.pagu||0);d.master_ids.push(...accountIds(m));
   });
-  const rows=Object.values(agg).map(g=>{
-    const base=realisasiList.filter(r=>g.master_ids.includes(Number(r.master_id))&&(yr==='ALL'||String(r.tahun||2026)===yr)&&(fPptk==='ALL'||r.pptk===fPptk));
-    const monthNo=mo==='ALL'?12:Number(mo);
+  const detailRows=Array.from(detailMap.values()).map(d=>{
+    const ids=new Set(d.master_ids);
+    const base=realisasiList.filter(r=>ids.has(Number(r.master_id))&&(yr==='ALL'||String(r.tahun||2026)===yr)&&(fPptk==='ALL'||r.pptk===fPptk));
+    const cum=base.filter(r=>Number(r.bulan||1)<=monthNo);
     const selected=mo==='ALL'?base:base.filter(r=>Number(r.bulan||1)===monthNo);
-    const cumulative=mo==='ALL'?base:base.filter(r=>Number(r.bulan||1)<=monthNo);
-    const shown=cakupan==='bulan'&&mo!=='ALL'?selected:cumulative;
-    const real=shown.reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0);
-    const realCumulative=cumulative.reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0);
-    g.realisasi=real;g.sisa=g.pagu-realCumulative;g.persen_serap=g.pagu?real/g.pagu*100:0;
-    g.sisa_kumulatif=g.pagu-realCumulative;g.realisasi_kumulatif=realCumulative;
-    return g;
+    d.realKumulatif=cum.reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0);
+    d.real=(cakupan==='bulan'&&mo!=='ALL'?selected:cum).reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0);
+    d.sisa=d.pagu-d.realKumulatif;d.persen_serap=d.pagu?d.real/d.pagu*100:0;return d;
   });
-  currentFilteredLRA=rows;
-  const tp=rows.reduce((a,r)=>a+r.pagu,0),tr=rows.reduce((a,r)=>a+r.realisasi,0),ts=rows.reduce((a,r)=>a+r.sisa_kumulatif,0);
+  const activityMap=new Map();detailRows.forEach(d=>{const k=d.program+'|'+d.kegiatan;if(!activityMap.has(k))activityMap.set(k,{program:d.program,kegiatan:d.kegiatan,pagu:0,realisasi:0,sisa:0,persen_serap:0});const a=activityMap.get(k);a.pagu+=d.pagu;a.realisasi+=d.real;a.sisa+=d.sisa;});
+  currentFilteredLRA=Array.from(activityMap.values()).map(a=>({...a,persen_serap:a.pagu?a.realisasi/a.pagu*100:0}));
+  const totalPagu=detailRows.reduce((a,r)=>a+r.pagu,0),totalReal=detailRows.reduce((a,r)=>a+r.real,0),totalSisa=detailRows.reduce((a,r)=>a+r.sisa,0);
   const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  setText('lra-card-pagu',formatRupiah(tp));setText('lra-card-realisasi',formatRupiah(tr));setText('lra-card-sisa',formatRupiah(ts));
+  setText('lra-card-pagu',formatRupiah(totalPagu));setText('lra-card-realisasi',formatRupiah(totalReal));setText('lra-card-sisa',formatRupiah(totalSisa));
   const body=document.getElementById('laporan-table-body');
-  if(body)body.innerHTML=rows.map((r,i)=>`<tr><td class="py-2 px-3">${i+1}</td><td class="py-2 px-3">${safeText(r.program)}</td><td class="py-2 px-3">${safeText(r.kegiatan)}</td><td class="py-2 px-3 text-right">${formatRupiah(r.pagu)}</td><td class="py-2 px-3 text-right">${formatRupiah(r.realisasi)}</td><td class="py-2 px-3 text-right">${formatRupiah(r.sisa_kumulatif)}</td><td class="py-2 px-3 text-center">${r.persen_serap.toFixed(1)}%</td><td class="py-2 px-3 text-center">${r.sisa_kumulatif<0?'Melebihi pagu':r.persen_serap>=80?'Serapan tinggi':'Dalam pemantauan'}</td></tr>`).join('');
-  const period=mo==='ALL'?'Januari–Desember':(cakupan==='bulan'?MONTH_LABELS[Number(mo)-1]:'Januari–'+MONTH_LABELS[Number(mo)-1]);
-  const yearLabel=yr==='ALL'?'Seluruh Tahun Anggaran':yr;
-  setText('lra-keterangan-periode',`Tahun Anggaran ${yearLabel} · Periode ${period} · ${cakupan==='bulan'&&mo!=='ALL'?'Realisasi bulan berjalan':'Realisasi kumulatif'}`);
-  ['lra-header-pagu','lra-header-realisasi','lra-header-sisa'].forEach((id,i)=>setText(id,formatRupiah([tp,tr,ts][i])));
-  setText('lra-persen-serap',tp?(tr/tp*100).toFixed(1)+'%':'0%');setText('lra-item-count',rows.length+' kegiatan');
+  if(body){
+    const byProgram=new Map();detailRows.forEach(d=>{if(!byProgram.has(d.program))byProgram.set(d.program,new Map());const pm=byProgram.get(d.program);if(!pm.has(d.kegiatan))pm.set(d.kegiatan,[]);pm.get(d.kegiatan).push(d);});
+    let html='';
+    const moneyCells=(p,r,s,pct)=>`<td class="py-2 px-3 text-right font-mono whitespace-nowrap">${formatRupiah(p)}</td><td class="py-2 px-3 text-right font-mono whitespace-nowrap">${formatRupiah(r)}</td><td class="py-2 px-3 text-right font-mono whitespace-nowrap">${formatRupiah(s)}</td><td class="py-2 px-3 text-center whitespace-nowrap">${pct.toFixed(1)}%</td>`;
+    byProgram.forEach((kegiatanMap,program)=>{
+      const programRows=[...kegiatanMap.values()].flat();
+      const pp=programRows.reduce((a,d)=>a+d.pagu,0),pr=programRows.reduce((a,d)=>a+d.real,0),ps=programRows.reduce((a,d)=>a+d.sisa,0);
+      const pCode=(masters.find(m=>(m.nama_program||'-')===program)?.kode_program)||'';
+      html+=`<tr class="bg-lime-200 text-slate-900 font-black"><td class="py-2 px-3 whitespace-nowrap">${safeText(pCode)}</td><td class="py-2 px-3">${safeText(program)}</td>${moneyCells(pp,pr,ps,pp?pr/pp*100:0)}</tr>`;
+      kegiatanMap.forEach((rows,kegiatan)=>{
+        const kp=rows.reduce((a,d)=>a+d.pagu,0),kr=rows.reduce((a,d)=>a+d.real,0),ks=rows.reduce((a,d)=>a+d.sisa,0);
+        const kCode=(masters.find(m=>(m.nama_kegiatan||'-')===kegiatan)?.kode_kegiatan)||'';
+        html+=`<tr class="bg-violet-200 text-slate-900 font-bold"><td class="py-2 px-3 whitespace-nowrap">${safeText(kCode)}</td><td class="py-2 px-3">${safeText(kegiatan)}</td>${moneyCells(kp,kr,ks,kp?kr/kp*100:0)}</tr>`;
+        rows.forEach(d=>{html+=`<tr class="bg-white hover:bg-slate-50"><td class="py-2 px-3 whitespace-nowrap text-slate-600">${safeText(d.code)}</td><td class="py-2 px-3 pl-6 text-slate-600 font-normal">${safeText(d.account)}</td>${moneyCells(d.pagu,d.real,d.sisa,d.persen_serap)}</tr>`;});
+      });
+    });
+    const totalPct=totalPagu?totalReal/totalPagu*100:0;
+    html+=`<tr class="bg-indigo-900 text-white font-black"><td class="py-3 px-3"></td><td class="py-3 px-3">TOTAL AKHIR LRA</td>${moneyCells(totalPagu,totalReal,totalSisa,totalPct)}</tr>`;
+    body.innerHTML=html;
+  }
+  const period=mo==='ALL'?'Januari–Desember':(cakupan==='bulan'?MONTH_LABELS[monthNo-1]:'Januari–'+MONTH_LABELS[monthNo-1]);
+  setText('lra-keterangan-periode',`Tahun Anggaran ${yr==='ALL'?'Seluruh Tahun Anggaran':yr} · Periode ${period} · ${cakupan==='bulan'&&mo!=='ALL'?'Realisasi bulan berjalan':'Realisasi kumulatif'}`);
+  ['lra-header-pagu','lra-header-realisasi','lra-header-sisa'].forEach((id,i)=>setText(id,formatRupiah([totalPagu,totalReal,totalSisa][i])));
+  setText('lra-persen-serap',totalPagu?(totalReal/totalPagu*100).toFixed(1)+'%':'0%');setText('lra-item-count',currentFilteredLRA.length+' kegiatan');
 };
 /* Removed stale runAIDiagnosis override: the report renderer below is the single source of truth. */
 
