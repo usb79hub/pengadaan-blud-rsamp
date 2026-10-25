@@ -210,6 +210,10 @@
               <span class="text-sm">🖨️</span>
               <span>Laporan LRA Kegiatan</span>
             </button>
+            <button type="button" onclick="switchWindow('win-buku-besar-blud'); renderBukuBesarBLUD();" id="nav-buku-besar-blud" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <span class="text-sm">📚</span>
+              <span>Laporan Buku Besar BLUD</span>
+            </button>
             <button type="button" onclick="switchWindow('win-ai-decision')" id="nav-ai-decision" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-indigo-700 bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-200 cursor-pointer">
               <span class="text-sm">🤖</span>
               <span>AI Senior Advisor (CPA/SPI)</span>
@@ -822,6 +826,30 @@
         </div>
       </section>
 
+      <!-- LAPORAN BUKU BESAR BLUD -->
+      <section id="win-buku-besar-blud" class="hidden space-y-6">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 no-print">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div><h3 class="text-sm font-bold text-slate-900">Laporan Buku Besar BLUD</h3><p class="text-xs text-slate-400">Akumulasi pagu dan realisasi berdasarkan kelompok kode rekening DPA</p></div>
+            <button type="button" onclick="cetakBukuBesarBLUD()" class="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold">🖨️ Unduh PDF / Cetak A4</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div><label class="text-[10px] font-bold text-slate-500">TAHUN</label><select id="bbblud-filter-tahun" onchange="renderBukuBesarBLUD()" class="w-full mt-1 border rounded-lg p-2 text-xs"><option value="ALL">Semua Tahun</option></select></div>
+            <div><label class="text-[10px] font-bold text-slate-500">BULAN</label><select id="bbblud-filter-bulan" onchange="renderBukuBesarBLUD()" class="w-full mt-1 border rounded-lg p-2 text-xs"><option value="ALL">Seluruh Tahun</option></select></div>
+            <div><label class="text-[10px] font-bold text-slate-500">CAKUPAN PERIODE</label><select id="bbblud-filter-cakupan" onchange="renderBukuBesarBLUD()" class="w-full mt-1 border rounded-lg p-2 text-xs"><option value="bulan">Bulan yang Dipilih</option><option value="sampai">Akumulasi s.d. Bulan yang Dipilih</option></select></div>
+          </div>
+        </div>
+        <div id="bbblud-report-area" class="bg-white rounded-3xl border border-slate-200/80 shadow-sm p-5 sm:p-6 space-y-4">
+          <div class="text-center pb-4 border-b border-slate-200 space-y-1">
+            <h2 class="text-base font-black text-slate-900 uppercase">RSUD AJI MUHAMMAD PARIKESIT</h2>
+            <h3 class="text-xs font-bold text-slate-700 uppercase">LAPORAN BUKU BESAR BLUD</h3>
+            <p id="bbblud-keterangan-periode" class="text-[11px] text-slate-500">Tahun Anggaran</p>
+          </div>
+          <div class="overflow-x-auto"><table class="w-full text-left text-xs min-w-[700px]"><thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-300"><tr><th class="py-2.5 px-3">Kode Rekening</th><th class="py-2.5 px-3">Uraian Kelompok Belanja</th><th class="py-2.5 px-3 text-right">Pagu DPA (Rp)</th><th class="py-2.5 px-3 text-right">Realisasi (Rp)</th><th class="py-2.5 px-3 text-right">Sisa Anggaran (Rp)</th><th class="py-2.5 px-3 text-center">% Serapan</th></tr></thead><tbody id="bbblud-table-body" class="divide-y divide-slate-200 font-medium"></tbody><tfoot id="bbblud-table-foot" class="font-black bg-slate-50"></tfoot></table></div>
+          <p class="text-[10px] text-slate-500">Pagu bersumber dari master rekening DPA yang digunakan aplikasi. Realisasi dihitung dari transaksi realisasi yang tersedia dan ditautkan ke master rekening.</p>
+        </div>
+      </section>
+
       <!-- 7. AI SENIOR ADVISOR -->
       <section id="win-tren-tahunan" class="hidden space-y-6">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
@@ -1146,12 +1174,12 @@
         alert('Akses ditolak. Data Pejabat hanya dapat diakses oleh Superadmin.');
         return;
       }
-      ['win-dashboard', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-laporan', 'win-tren-tahunan', 'win-prognosis', 'win-ai-decision'].forEach(id => {
+      ['win-dashboard', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-laporan', 'win-tren-tahunan', 'win-prognosis', 'win-ai-decision', 'win-buku-besar-blud'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
 
-      ['nav-dashboard', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-monitoring', 'nav-laporan', 'nav-tren-tahunan', 'nav-prognosis', 'nav-ai-decision'].forEach(id => {
+      ['nav-dashboard', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-monitoring', 'nav-laporan', 'nav-tren-tahunan', 'nav-prognosis', 'nav-ai-decision', 'nav-buku-besar-blud'].forEach(id => {
         const nav = document.getElementById(id);
         if (nav) nav.classList.remove('nav-active');
       });
@@ -1168,7 +1196,8 @@
         'win-laporan': ['Laporan Realisasi Anggaran (LRA)', 'Pertanggungjawaban Keuangan Penatausahaan Kas Akumulasi Tingkat Kegiatan (Format A4)'],
         'win-tren-tahunan': ['Tren Tahunan', 'Perbandingan pagu efektif, realisasi, sisa anggaran, dan serapan lintas tahun'],
         'win-prognosis': ['Prognosis Anggaran', 'Estimasi realisasi akhir tahun berdasarkan data aktual dan filter Program, Kegiatan, serta Subkegiatan'],
-        'win-ai-decision': ['AI Senior Financial & Hospital Advisory', 'Konsultasi Akuntan Publik Senior (CPA), Ahli Manajemen RSUD, dan Rekomendasi SPI']
+        'win-ai-decision': ['AI Senior Financial & Hospital Advisory', 'Konsultasi Akuntan Publik Senior (CPA), Ahli Manajemen RSUD, dan Rekomendasi SPI'],
+        'win-buku-besar-blud': ['Laporan Buku Besar BLUD', 'Rekapitulasi buku besar berdasarkan rekening, tahun, dan periode bulan']
       };
 
       if (titles[windowId]) {
@@ -2382,6 +2411,119 @@
           </tr>
         `;
       }).join('');
+    }
+
+    // Buku Besar BLUD: gunakan aturan pagu efektif, ID historis, dan periode yang sama dengan LRA.
+    const BB_BLUD_GROUPS = [
+      {prefix:'5.2.1', code:'5.2.1', label:'Belanja Pegawai'},
+      {prefix:'5.2.2', code:'5.2.2', label:'Belanja Barang dan Jasa'},
+      {prefix:'5.2.3.1', code:'5.2.3.1', label:'Belanja Modal Peralatan dan Mesin'},
+      {prefix:'5.2.3.2', code:'5.2.3.2', label:'Belanja Modal Gedung dan Bangunan'},
+      {prefix:'5.2.3.3', code:'5.2.3.3', label:'Belanja Modal Jalan, Jaringan dan Irigasi'},
+      {prefix:'5.2.3.4', code:'5.2.3.4', label:'Belanja Modal Aset Lainnya'}
+    ];
+    function bbbludNormalizeCode(value) {
+      return String(value || '').trim().replace(/\s+/g,'').replace(/[.]+$/,'');
+    }
+    // Klasifikasi kode 5.2.3 berdasarkan uraian rekening/subkegiatan.
+    // Kata kunci diperlakukan sebagai OR: cukup salah satu kata ditemukan.
+    // Kode 5.2.3 yang tidak cocok dengan tiga kelompok kata kunci masuk Aset Lainnya.
+    function bbbludGroupForMaster(m) {
+      const code = bbbludNormalizeCode(m.kode_rekening || m.kode_akun || m.kode_sub_kegiatan || '');
+      if (code === '5.2.1' || code.startsWith('5.2.1.')) return '5.2.1';
+      if (code === '5.2.2' || code.startsWith('5.2.2.')) return '5.2.2';
+      if (!(code === '5.2.3' || code.startsWith('5.2.3.'))) return null;
+
+      const description = [
+        m.nama_rekening, m.uraian_rekening, m.nama_akun, m.uraian_akun,
+        m.nama_sub_kegiatan, m.uraian_sub_kegiatan, m.nama_kegiatan,
+        m.uraian_kegiatan, m.keterangan, m.deskripsi, m.nama
+      ].filter(Boolean).join(' ').toLocaleLowerCase('id-ID');
+
+      if (/gedung|bangunan/.test(description)) return '5.2.3.2';
+      if (/peralatan|mesin/.test(description)) return '5.2.3.1';
+      if (/jalan|jaringan|irigasi/.test(description)) return '5.2.3.3';
+      return '5.2.3.4';
+    }
+    function populateBukuBesarBLUDFilters() {
+      const yearSel=document.getElementById('bbblud-filter-tahun');
+      const monthSel=document.getElementById('bbblud-filter-bulan');
+      if(yearSel && yearSel.options.length<=1) {
+        const years=[...new Set((Array.isArray(masterList)?masterList:[]).map(m=>String(m.tahun||2026)))].sort();
+        yearSel.innerHTML='<option value="ALL">Semua Tahun</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');
+        yearSel.value=years.includes('2026')?'2026':'ALL';
+      }
+      if(monthSel && monthSel.options.length<=1) {
+        monthSel.innerHTML='<option value="ALL">Seluruh Tahun</option>'+namaBulanList.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+      }
+    }
+    function renderBukuBesarBLUD() {
+      if(!Array.isArray(masterList)||!Array.isArray(realisasiList)) return;
+      populateBukuBesarBLUDFilters();
+      const year=document.getElementById('bbblud-filter-tahun')?.value||'ALL';
+      const month=document.getElementById('bbblud-filter-bulan')?.value||'ALL';
+      const cakupan=document.getElementById('bbblud-filter-cakupan')?.value||'sampai';
+      const monthNo=month==='ALL'?12:Number(month);
+      const period=month==='ALL'?'Januari–Desember':(cakupan==='bulan'?namaBulanList[monthNo-1]:'Januari–'+namaBulanList[monthNo-1]);
+      // Menyamakan basis pagu dengan LRA: pilih satu pagu efektif per rekening.
+      const allYearMasters=masterList.filter(m=>year==='ALL'||String(m.tahun||2026)===year);
+      const effective=effectiveMasterPagu(allYearMasters,month);
+      const historicalIds=historicalMasterIds(effective,allYearMasters);
+      const rows=BB_BLUD_GROUPS.map(g=>{
+        const accounts=effective.filter(m=>bbbludGroupForMaster(m)===g.code);
+        const keys=new Set(accounts.map(masterAccountKey));
+        const ids=new Set([...historicalIds].filter(id=>{
+          const m=allYearMasters.find(x=>Number(x.id)===Number(id));
+          return m && keys.has(masterAccountKey(m));
+        }));
+        const pagu=accounts.reduce((sum,m)=>sum+Number(m.pagu||0),0);
+        const tx=realisasiList.filter(r=>{
+          if(!ids.has(Number(r.master_id))) return false;
+          if(year!=='ALL' && String(r.tahun||2026)!==year) return false;
+          const rm=Number(r.bulan||1);
+          return month==='ALL' || (cakupan==='bulan'?rm===monthNo:rm<=monthNo);
+        });
+        const real=tx.reduce((sum,r)=>sum+Number(r.nilai_kegiatan||0),0);
+        return {...g,pagu,real,sisa:pagu-real,pct:pagu?real/pagu*100:0,count:accounts.length};
+      });
+      // Rekening yang kodenya tidak cocok dengan enam kelompok tetap ditampilkan
+      // agar TOTAL Buku Besar dapat direkonsiliasi dengan TOTAL LRA.
+      const mappedKeys=new Set(effective.filter(m=>
+        BB_BLUD_GROUPS.some(g=>bbbludGroupForMaster(m)===g.code)
+      ).map(masterAccountKey));
+      const otherAccounts=effective.filter(m=>!mappedKeys.has(masterAccountKey(m)));
+      const otherIds=new Set([...historicalIds].filter(id=>{
+        const m=allYearMasters.find(x=>Number(x.id)===Number(id));
+        return m && !mappedKeys.has(masterAccountKey(m));
+      }));
+      const otherTx=realisasiList.filter(r=>{
+        if(!otherIds.has(Number(r.master_id))) return false;
+        if(year!=='ALL' && String(r.tahun||2026)!==year) return false;
+        const rm=Number(r.bulan||1);
+        return month==='ALL' || (cakupan==='bulan'?rm===monthNo:rm<=monthNo);
+      });
+      const otherPagu=otherAccounts.reduce((sum,m)=>sum+Number(m.pagu||0),0);
+      const otherReal=otherTx.reduce((sum,r)=>sum+Number(r.nilai_kegiatan||0),0);
+      if(otherPagu!==0 || otherReal!==0) rows.push({code:'Lainnya',label:'Rekening lain / kode belum terpetakan',pagu:otherPagu,real:otherReal,sisa:otherPagu-otherReal,pct:otherPagu?otherReal/otherPagu*100:0,count:otherAccounts.length});
+      const fmt=v=>typeof formatRupiah==='function'?formatRupiah(v):'Rp '+Number(v||0).toLocaleString('id-ID');
+      const periodEl=document.getElementById('bbblud-keterangan-periode');
+      if(periodEl) periodEl.textContent=`Tahun Anggaran ${year==='ALL'?'Semua Tahun':year} | Periode ${period} | ${month!=='ALL'&&cakupan==='bulan'?'Realisasi bulan berjalan':'Realisasi kumulatif'}`;
+      const body=document.getElementById('bbblud-table-body');
+      if(body) body.innerHTML=rows.map(r=>`<tr><td class="py-2.5 px-3 font-mono">${r.code}</td><td class="py-2.5 px-3 font-semibold">${r.label}<div class="text-[10px] text-slate-400 font-normal">${r.count} rekening/subkegiatan</div></td><td class="py-2.5 px-3 text-right font-mono">${fmt(r.pagu)}</td><td class="py-2.5 px-3 text-right font-mono">${fmt(r.real)}</td><td class="py-2.5 px-3 text-right font-mono ${r.sisa<0?'text-rose-700 font-black':''}">${fmt(r.sisa)}</td><td class="py-2.5 px-3 text-center">${r.pct.toLocaleString('id-ID',{maximumFractionDigits:1,minimumFractionDigits:1})}%</td></tr>`).join('');
+      const total=rows.reduce((a,r)=>({pagu:a.pagu+r.pagu,real:a.real+r.real}),{pagu:0,real:0});
+      const foot=document.getElementById('bbblud-table-foot');
+      if(foot) foot.innerHTML=`<tr><td colspan="2" class="py-3 px-3">TOTAL BUKU BESAR</td><td class="py-3 px-3 text-right">${fmt(total.pagu)}</td><td class="py-3 px-3 text-right">${fmt(total.real)}</td><td class="py-3 px-3 text-right">${fmt(total.pagu-total.real)}</td><td class="py-3 px-3 text-center">${total.pagu?(total.real/total.pagu*100).toLocaleString('id-ID',{maximumFractionDigits:1,minimumFractionDigits:1}):'0,0'}%</td></tr>`;
+    }
+    function cetakBukuBesarBLUD() {
+      renderBukuBesarBLUD();
+      const area=document.getElementById('bbblud-report-area');
+      if(!area) return alert('Area laporan Buku Besar BLUD tidak ditemukan.');
+      const clone=area.cloneNode(true);
+      const period=document.getElementById('bbblud-keterangan-periode')?.textContent||'';
+      const win=window.open('','_blank');
+      if(!win) return alert('Popup diblokir. Izinkan pop-up untuk mengunduh PDF.');
+      win.document.write(`<!doctype html><html lang="id"><head><meta charset="utf-8"><title>Laporan Buku Besar BLUD</title><style>@page{size:A4 landscape;margin:25mm}body{font-family:Arial,sans-serif;color:#111;font-size:9pt}.no-print{display:none!important}h2,h3,p{text-align:center;margin:4px}table{width:100%;border-collapse:collapse;font-size:9pt;margin-top:12px}th,td{border:1px solid #333;padding:6px 5px}th{background:#eee;text-align:left}td:nth-child(n+3),th:nth-child(n+3){text-align:right}td:last-child,th:last-child{text-align:center}.text-slate-400{color:#555}.text-rose-700{font-weight:bold}button,select{display:none!important}</style></head><body><h2>RSUD AJI MUHAMMAD PARIKESIT</h2><h3>LAPORAN BUKU BESAR BLUD</h3><p>${period.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}</p>${clone.querySelector('table').outerHTML}<script>window.onload=()=>{window.print()}<\\/script></body></html>`);
+      win.document.close();
     }
 
     // Ekspor CSV membaca langsung baris tabel LRA yang sedang tampil agar hierarki,
