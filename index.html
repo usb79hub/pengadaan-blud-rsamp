@@ -2877,7 +2877,8 @@
       }
     }
 
-    // Menyimpan transaksi langsung ke tabel realisasi_kegiatan_blud.
+    // Menyimpan transaksi baru (INSERT) atau memperbarui transaksi terpilih (UPDATE).
+    // Mode edit ditentukan dari hidden field trans-edit-id dan tidak dihapus sebelum database berhasil.
     window.handleSaveRealisasi = async function (e) {
       e.preventDefault();
       if (!window.canInputManual) {
@@ -2888,6 +2889,19 @@
         showDatabaseStatus('Transaksi belum disimpan: koneksi database belum berhasil. Periksa pesan koneksi terlebih dahulu.', 'error');
         return;
       }
+
+      const editField = document.getElementById('trans-edit-id');
+      const editIdRaw = editField ? String(editField.value || '').trim() : '';
+      const editId = editIdRaw ? Number(editIdRaw) : null;
+      if (editIdRaw && (!Number.isSafeInteger(editId) || editId <= 0)) {
+        alert('ID transaksi yang akan diedit tidak valid. Tutup formulir dan buka kembali tombol Edit pada transaksi tersebut.');
+        return;
+      }
+      if (editId !== null && !realisasiList.some(r => Number(r.id) === editId)) {
+        alert('Transaksi yang akan diedit tidak ditemukan pada daftar yang sedang dimuat. Data tidak dikirim. Muat ulang data lalu buka kembali tombol Edit.');
+        return;
+      }
+
       const payload = {
         master_id: Number(document.getElementById('trans-uraian').value) || null,
         tahun: Number(document.getElementById('trans-tahun').value || 2026),
@@ -2903,23 +2917,75 @@
         alert('Lengkapi uraian pekerjaan dan nama penyedia.');
         return;
       }
+      if (!Number.isFinite(payload.nilai_kegiatan) || payload.nilai_kegiatan < 0) {
+        alert('Nilai realisasi harus berupa angka nol atau lebih.');
+        return;
+      }
+
       const submitButton = document.querySelector('#form-transaksi button[type="submit"]');
+      const originalButtonText = editId !== null ? 'Simpan Perubahan' : 'Simpan Transaksi';
       if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'Menyimpan…'; }
       try {
-        const { data, error } = await supabaseClient.from('realisasi_kegiatan_blud').insert(payload).select('*').single();
-        if (error) throw error;
-        realisasiList.unshift({ ...data, id: Number(data.id), master_id: data.master_id == null ? null : Number(data.master_id), nilai_kegiatan: Number(data.nilai_kegiatan || 0) });
-        alert('Transaksi berhasil disimpan.');
+        let data;
+        if (editId !== null) {
+          const result = await supabaseClient
+            .from('realisasi_kegiatan_blud')
+            .update(payload)
+            .eq('id', editId)
+            .select('*')
+            .single();
+          if (result.error) throw result.error;
+          data = result.data;
+          if (!data) throw new Error('Database tidak mengembalikan baris hasil perubahan.');
+
+          const updatedItem = {
+            ...data,
+            id: Number(data.id),
+            master_id: data.master_id == null ? null : Number(data.master_id),
+            nilai_kegiatan: Number(data.nilai_kegiatan || 0)
+          };
+          const index = realisasiList.findIndex(r => Number(r.id) === editId);
+          if (index < 0) throw new Error('Transaksi berhasil diproses tetapi baris lokal tidak ditemukan. Muat ulang data untuk memastikan hasilnya.');
+          realisasiList[index] = updatedItem;
+          alert('Perubahan realisasi berhasil diperbarui.');
+          showDatabaseStatus('Perubahan realisasi berhasil diperbarui di Supabase.', 'ok');
+        } else {
+          const result = await supabaseClient
+            .from('realisasi_kegiatan_blud')
+            .insert(payload)
+            .select('*')
+            .single();
+          if (result.error) throw result.error;
+          data = result.data;
+          realisasiList.unshift({
+            ...data,
+            id: Number(data.id),
+            master_id: data.master_id == null ? null : Number(data.master_id),
+            nilai_kegiatan: Number(data.nilai_kegiatan || 0)
+          });
+          alert('Transaksi berhasil disimpan.');
+          showDatabaseStatus('Transaksi berhasil disimpan di Supabase.', 'ok');
+        }
+
+        // Bersihkan mode edit hanya setelah operasi database berhasil.
+        if (editField) editField.value = '';
+        const heading = document.getElementById('form-realisasi-heading');
+        if (heading) heading.textContent = 'Formulir Pengakuan Realisasi Belanja BLUD';
+        if (submitButton) submitButton.textContent = 'Simpan Transaksi Belanja';
         toggleFormInputRealisasi(false);
         document.getElementById('form-transaksi').reset();
         updateDashboardMetrics();
         applyCascadingFilter();
-        showDatabaseStatus('Transaksi berhasil disimpan.', 'ok');
       } catch (error) {
-        showDatabaseStatus(supabaseErrorMessage(error, 'Menyimpan transaksi'), 'error');
-        alert('Transaksi belum berhasil disimpan. Periksa data dan hak akses, lalu coba kembali.');
+        showDatabaseStatus(supabaseErrorMessage(error, editId !== null ? 'Memperbarui transaksi' : 'Menyimpan transaksi'), 'error');
+        alert(editId !== null
+          ? 'Perubahan belum berhasil disimpan. Mode edit tetap dipertahankan. Periksa hak akses UPDATE (RLS) atau pesan koneksi, lalu coba kembali.'
+          : 'Transaksi belum berhasil disimpan. Periksa data dan hak akses, lalu coba kembali.');
       } finally {
-        if (submitButton) { submitButton.disabled = false; submitButton.textContent = 'Simpan Transaksi'; }
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.textContent = editField && editField.value ? 'Simpan Perubahan' : 'Simpan Transaksi Belanja';
+        }
       }
     };
 
