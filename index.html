@@ -470,7 +470,7 @@
             <button type="button" onclick="toggleFormInputRealisasi(false)" class="text-slate-400 hover:text-slate-600 font-bold text-sm cursor-pointer">✕ Tutup</button>
           </div>
 
-          <form id="form-transaksi" onsubmit="handleSaveRealisasi(event)" class="space-y-4 text-xs">
+          <form id="form-transaksi" onsubmit="return false;" class="space-y-4 text-xs">
             <input type="hidden" id="trans-edit-id" value="">
 
             <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -673,7 +673,7 @@
                 type="text" 
                 id="searchRealisasiInput" 
                 oninput="applyCascadingFilter()"
-                placeholder="Cari rincian / SPM / penyedia..." 
+                placeholder="Ketik 2–3 kata: uraian, SPM, penyedia..." 
                 class="bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs w-full sm:w-56"
               >
             </div>
@@ -1457,7 +1457,21 @@
       const fPen = document.getElementById('cf-penyedia')?.value || 'ALL';
       const fProgres = document.getElementById('cf-progres')?.value || 'ALL';
       const fPptk = document.getElementById('cf-pptk')?.value || 'ALL';
-      const searchQ = (document.getElementById('searchRealisasiInput')?.value || '').toLowerCase();
+      const searchRaw = (document.getElementById('searchRealisasiInput')?.value || '').toLowerCase().trim();
+      // Pencarian multi-kata: setiap kata boleh ditemukan pada bagian teks yang
+      // berbeda (uraian, penyedia, SPM/BKU, atau uraian master).
+      const searchTerms = searchRaw.split(/\\s+/).filter(Boolean);
+
+      // Saat pengguna mulai mencari, tampilkan tabel hasil otomatis sehingga
+      // pengguna tidak perlu membuka tabel atau menelusuri daftar panjang.
+      if (searchTerms.length && !isRegisterTableVisible) {
+        isRegisterTableVisible = true;
+        document.getElementById('wrapper-register-table')?.classList.remove('hidden');
+        const icon = document.getElementById('toggle-icon');
+        const text = document.getElementById('toggle-text');
+        if (icon) icon.textContent = '🙈';
+        if (text) text.textContent = 'Sembunyikan / Tutup Tabel';
+      }
 
       // Kartu kendali harus memakai pagu efektif, bukan menjumlahkan semua
       // versi master (Murni + Perubahan). Filter tahun/bulan diterapkan dahulu.
@@ -1501,13 +1515,20 @@
         const progress = String(r.nomor_spm_bku || '').trim() ? 'FINAL' : 'PROSES';
         if (fProgres !== 'ALL' && progress !== fProgres) return false;
 
-        if (searchQ) {
+        if (searchTerms.length) {
           const master = masterList.find(m => Number(m.id) === Number(r.master_id)) || {};
-          const matchText = (r.pekerjaan || '').toLowerCase().includes(searchQ) ||
-                            (r.penyedia || '').toLowerCase().includes(searchQ) ||
-                            (r.nomor_spm_bku || '').toLowerCase().includes(searchQ) ||
-                            (master.uraian_kegiatan || '').toLowerCase().includes(searchQ);
-          if (!matchText) return false;
+          const searchableText = [
+            r.pekerjaan, r.penyedia, r.nomor_spm_bku, r.pptk,
+            master.uraian_kegiatan, master.nama_program,
+            master.nama_kegiatan, master.nama_sub_kegiatan,
+            master.kode_program, master.kode_kegiatan,
+            master.kode_sub_kegiatan, master.kode_rekening
+          ].filter(Boolean).join(' ').toLowerCase();
+
+          // Semua kata yang diketik harus ditemukan, tetapi tidak harus
+          // berurutan dan tidak harus berada dalam kolom yang sama.
+          const allTermsMatch = searchTerms.every(term => searchableText.includes(term));
+          if (!allTermsMatch) return false;
         }
 
         return true;
@@ -2989,6 +3010,18 @@
       }
     };
 
+    // Ikat submit form secara eksplisit ke handler Supabase (INSERT/UPDATE).
+    // Ini mencegah browser memanggil fungsi handleSaveRealisasi lama yang masih
+    // tertinggal pada script utama.
+    const realisasiForm = document.getElementById('form-transaksi');
+    if (realisasiForm) {
+      realisasiForm.onsubmit = null;
+      realisasiForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        window.handleSaveRealisasi(event);
+      });
+    }
+
     // Menghapus transaksi dari database lalu menyegarkan tampilan.
     window.deleteRealisasiItem = async function (id) {
       if (!confirm('Hapus data realisasi belanja ini dari database?')) return;
@@ -3419,4 +3452,3 @@ window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();renderMasterT
 
 </body>
 </html>
-
