@@ -612,30 +612,38 @@
 
             <div>
               <label class="font-bold text-slate-700 block mb-1">3. Program</label>
-              <select id="cf-program" onchange="onFilterProgramChange(true)" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500 truncate">
+              <input type="text" id="cf-search-program" list="cf-options-program" oninput="searchCascadingOptions('cf-program','cf-search-program')" placeholder="Ketik nama program..." class="w-full bg-white border border-slate-200 rounded-xl p-2 font-medium" autocomplete="off">
+              <select id="cf-program" onchange="onFilterProgramChange(true)" class="hidden w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500 truncate">
                 <option value="ALL">Semua Program</option>
               </select>
+              <datalist id="cf-options-program"></datalist>
             </div>
 
             <div>
               <label class="font-bold text-slate-700 block mb-1">4. Kegiatan</label>
-              <select id="cf-kegiatan" onchange="onFilterKegiatanChange(true)" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500 truncate">
+              <input type="text" id="cf-search-kegiatan" list="cf-options-kegiatan" oninput="searchCascadingOptions('cf-kegiatan','cf-search-kegiatan')" placeholder="Ketik nama kegiatan..." class="w-full bg-white border border-slate-200 rounded-xl p-2 font-medium" autocomplete="off">
+              <select id="cf-kegiatan" onchange="onFilterKegiatanChange(true)" class="hidden w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500 truncate">
                 <option value="ALL">Semua Kegiatan</option>
               </select>
+              <datalist id="cf-options-kegiatan"></datalist>
             </div>
 
             <div>
               <label class="font-bold text-slate-700 block mb-1">5. Objek Rekening</label>
-              <select id="cf-rekening" onchange="applyCascadingFilter()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500 truncate">
+              <input type="text" id="cf-search-rekening" list="cf-options-rekening" oninput="searchCascadingOptions('cf-rekening','cf-search-rekening')" placeholder="Ketik objek rekening..." class="w-full bg-white border border-slate-200 rounded-xl p-2 font-medium" autocomplete="off">
+              <select id="cf-rekening" onchange="onFilterRekeningChange()" class="hidden w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500 truncate">
                 <option value="ALL">Semua Pos Rekening</option>
               </select>
+              <datalist id="cf-options-rekening"></datalist>
             </div>
 
             <div>
               <label class="font-bold text-slate-700 block mb-1">6. Rekanan / Penyedia</label>
-              <select id="cf-penyedia" onchange="applyCascadingFilter()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500 truncate">
+              <input type="text" id="cf-search-penyedia" list="cf-options-penyedia" oninput="searchCascadingOptions('cf-penyedia','cf-search-penyedia')" placeholder="Ketik nama rekanan / penyedia..." class="w-full bg-white border border-slate-200 rounded-xl p-2 font-medium" autocomplete="off">
+              <select id="cf-penyedia" onchange="onFilterPenyediaChange()" class="hidden w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500 truncate">
                 <option value="ALL">Semua Rekanan</option>
               </select>
+              <datalist id="cf-options-penyedia"></datalist>
             </div>
             <div>
               <label class="font-bold text-slate-700 block mb-1">7. Progres BKU/SPM</label>
@@ -647,9 +655,11 @@
             </div>
             <div>
               <label class="font-bold text-slate-700 block mb-1">8. PPTK</label>
-              <select id="cf-pptk" onchange="applyCascadingFilter()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500">
+              <input type="text" id="cf-search-pptk" list="cf-options-pptk" oninput="searchCascadingOptions('cf-pptk','cf-search-pptk')" placeholder="Ketik nama PPTK..." class="w-full bg-white border border-slate-200 rounded-xl p-2 font-medium" autocomplete="off">
+              <select id="cf-pptk" onchange="applyCascadingFilter()" class="hidden w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500">
                 <option value="ALL">Semua PPTK</option>
               </select>
+              <datalist id="cf-options-pptk"></datalist>
             </div>
           </div>
         </div>
@@ -721,12 +731,14 @@
             <div><label class="font-bold text-slate-600 block mb-1">Bulan Pelaporan</label><select id="mon-filter-bulan" onchange="applyMonitoringFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-medium"><option value="ALL">Semua Bulan</option></select></div>
             <div>
               <label class="font-bold text-slate-600 block mb-1">Filter Program</label>
+              <input type="search" id="mon-search-program" oninput="filterMonitoringSelect('mon-filter-program','mon-search-program')" placeholder="Ketik 2–3 kata nama program..." class="w-full mb-1 bg-white border border-slate-200 rounded-xl p-2 font-medium" autocomplete="off">
               <select id="mon-filter-program" onchange="applyMonitoringFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-medium">
                 <option value="ALL">Semua Program</option>
               </select>
             </div>
             <div>
               <label class="font-bold text-slate-600 block mb-1">Filter Kegiatan</label>
+              <input type="search" id="mon-search-kegiatan" oninput="filterMonitoringSelect('mon-filter-kegiatan','mon-search-kegiatan')" placeholder="Ketik 2–3 kata nama kegiatan..." class="w-full mb-1 bg-white border border-slate-200 rounded-xl p-2 font-medium" autocomplete="off">
               <select id="mon-filter-kegiatan" onchange="onMonKegiatanChange(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-medium">
                 <option value="ALL">Semua Kegiatan</option>
               </select>
@@ -1340,106 +1352,211 @@
       refreshCascadingOptions(true);
     }
 
-    function onFilterBulanChange() { applyCascadingFilter(); }
+    function onFilterBulanChange() { onFilterProgramChange(false); }
+
+    function getCascadingBaseRows() {
+      const year = document.getElementById('cf-tahun')?.value || '2026';
+      const month = document.getElementById('cf-bulan')?.value || 'ALL';
+      return realisasiList.filter(r =>
+        (year === 'ALL' || String(r.tahun || 2026) === String(year)) &&
+        (month === 'ALL' || String(Number(r.bulan) || 1) === String(month))
+      );
+    }
+
+    function setCascadingOptions(select, allLabel, values, previousValue = 'ALL') {
+      if (!select) return;
+      const unique = [...new Set(values.filter(v => String(v ?? '').trim() !== ''))];
+      const esc = v => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      select.innerHTML = `<option value="ALL">${allLabel}</option>` +
+        unique.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+      select.dataset.fullOptions = JSON.stringify(Array.from(select.options).map(o => ({value:o.value,text:o.textContent})));
+      select.value = unique.some(v => String(v) === String(previousValue)) ? previousValue : 'ALL';
+      syncAllCascadingSearchInputs();
+    }
+
+    function syncCascadingSearchInput(selectId, inputId, listId) {
+      const select = document.getElementById(selectId);
+      const input = document.getElementById(inputId);
+      const datalist = document.getElementById(listId);
+      if (!select || !input || !datalist) return;
+      datalist.innerHTML = '';
+      Array.from(select.options).filter(o => o.value !== 'ALL').forEach(o => {
+        const option = document.createElement('option');
+        option.value = o.textContent;
+        datalist.appendChild(option);
+      });
+      if (!input.dataset.typing) {
+        const selected = select.selectedOptions?.[0];
+        input.value = select.value === 'ALL' ? '' : (selected?.textContent || '');
+      }
+    }
+
+    function syncAllCascadingSearchInputs() {
+      syncCascadingSearchInput('cf-program','cf-search-program','cf-options-program');
+      syncCascadingSearchInput('cf-kegiatan','cf-search-kegiatan','cf-options-kegiatan');
+      syncCascadingSearchInput('cf-rekening','cf-search-rekening','cf-options-rekening');
+      syncCascadingSearchInput('cf-penyedia','cf-search-penyedia','cf-options-penyedia');
+      syncCascadingSearchInput('cf-pptk','cf-search-pptk','cf-options-pptk');
+    }
+
+    function searchCascadingOptions(selectId, inputId) {
+      const select = document.getElementById(selectId);
+      const input = document.getElementById(inputId);
+      if (!select || !input) return;
+      const typed = input.value.trim();
+      const match = Array.from(select.options).find(o =>
+        o.value !== 'ALL' &&
+        o.textContent.trim().toLocaleLowerCase('id-ID') === typed.toLocaleLowerCase('id-ID')
+      );
+      if (match) {
+        input.dataset.typing = '';
+        select.value = match.value;
+        if (selectId === 'cf-program') onFilterProgramChange(true);
+        else if (selectId === 'cf-kegiatan') onFilterKegiatanChange(true);
+        else if (selectId === 'cf-rekening') onFilterRekeningChange();
+        else if (selectId === 'cf-penyedia') onFilterPenyediaChange();
+        else applyCascadingFilter();
+      } else if (!typed) {
+        input.dataset.typing = '';
+        select.value = 'ALL';
+        if (selectId === 'cf-program') onFilterProgramChange(true);
+        else if (selectId === 'cf-kegiatan') onFilterKegiatanChange(true);
+        else if (selectId === 'cf-rekening') onFilterRekeningChange();
+        else if (selectId === 'cf-penyedia') onFilterPenyediaChange();
+        else applyCascadingFilter();
+      } else {
+        input.dataset.typing = '1';
+        // Keep the current applied selection until the user chooses an exact datalist suggestion.
+      }
+    }
+
+        function onFilterTahunChange() {
+      refreshCascadingOptions(true);
+    }
+
+    function onFilterBulanChange() {
+      onFilterProgramChange(false);
+    }
 
     function refreshCascadingOptions(resetChildren = false) {
-      const year = document.getElementById('cf-tahun')?.value || '2026';
       const rowsYear = getRealizationRowsForYear();
-      const months = [...new Set(rowsYear.map(r => String(Number(r.bulan) || 1)))].sort((a,b) => Number(a)-Number(b));
+      const monthNames = {1:'Januari',2:'Februari',3:'Maret',4:'April',5:'Mei',6:'Juni',7:'Juli',8:'Agustus',9:'September',10:'Oktober',11:'November',12:'Desember'};
       const selMonth = document.getElementById('cf-bulan');
       if (selMonth) {
         const oldMonth = resetChildren ? 'ALL' : selMonth.value;
-        const monthNames = {1:'Januari',2:'Februari',3:'Maret',4:'April',5:'Mei',6:'Juni',7:'Juli',8:'Agustus',9:'September',10:'Oktober',11:'November',12:'Desember'};
+        const months = [...new Set(rowsYear.map(r => String(Number(r.bulan) || 1)))].sort((a,b) => Number(a)-Number(b));
         selMonth.innerHTML = '<option value="ALL">Semua Bulan</option>' +
           months.map(m => `<option value="${m}">${monthNames[m] || m}</option>`).join('');
         selMonth.value = months.includes(oldMonth) ? oldMonth : 'ALL';
       }
-
-      const validMasterIds = new Set(rowsYear.map(r => Number(r.master_id)));
-      const yearMasters = masterList.filter(m => validMasterIds.has(Number(m.id)));
-      const selProg = document.getElementById('cf-program');
-      if (selProg) {
-        const oldProg = resetChildren ? 'ALL' : selProg.value;
-        const programs = [...new Set(yearMasters.map(m => (m.nama_program || '').trim()))].filter(Boolean).sort();
-        selProg.innerHTML = '<option value="ALL">Semua Program</option>' +
-          programs.map(p => `<option value="${p}">${p}</option>`).join('');
-        selProg.value = programs.includes(oldProg) ? oldProg : 'ALL';
-      }
+      ['cf-search-program','cf-search-kegiatan','cf-search-rekening','cf-search-penyedia','cf-search-pptk'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input && resetChildren) input.value = '';
+      });
       onFilterProgramChange(resetChildren);
-      populatePenyediaFilter();
-      populatePptkFilter();
-      applyCascadingFilter();
     }
 
     function onFilterProgramChange(resetChildren = false) {
-      const year = document.getElementById('cf-tahun')?.value || '2026';
-      const fProg = document.getElementById('cf-program')?.value || 'ALL';
-      const rowsYear = getRealizationRowsForYear();
-      const validMasterIds = new Set(rowsYear.map(r => Number(r.master_id)));
-      let filtered = masterList.filter(m => validMasterIds.has(Number(m.id)));
-      if (fProg !== 'ALL') filtered = filtered.filter(m => (m.nama_program || '').trim() === fProg);
+      const rows = getCascadingBaseRows();
+      const validMasterIds = new Set(rows.map(r => Number(r.master_id)));
+      let masters = masterList.filter(m => validMasterIds.has(Number(m.id)));
+      const selProg = document.getElementById('cf-program');
+      const oldProg = resetChildren ? 'ALL' : (selProg?.value || 'ALL');
+      const programs = [...new Set(masters.map(m => (m.nama_program || '').trim()))].filter(Boolean).sort();
+      setCascadingOptions(selProg, 'Semua Program', programs, oldProg);
+      const fProg = selProg?.value || 'ALL';
+      if (fProg !== 'ALL') masters = masters.filter(m => (m.nama_program || '').trim() === fProg);
 
       const selKeg = document.getElementById('cf-kegiatan');
-      if (!selKeg) return;
-      const oldKeg = resetChildren ? 'ALL' : selKeg.value;
-      const uniqueKegs = [...new Set(filtered.map(m => (m.nama_kegiatan || '').trim()))].filter(Boolean).sort();
-      selKeg.innerHTML = '<option value="ALL">Semua Kegiatan</option>' +
-        uniqueKegs.map(k => `<option value="${k}">${k}</option>`).join('');
-      selKeg.value = uniqueKegs.includes(oldKeg) ? oldKeg : 'ALL';
+      const oldKeg = resetChildren ? 'ALL' : (selKeg?.value || 'ALL');
+      const activities = [...new Set(masters.map(m => (m.nama_kegiatan || '').trim()))].filter(Boolean).sort();
+      setCascadingOptions(selKeg, 'Semua Kegiatan', activities, oldKeg);
       onFilterKegiatanChange(resetChildren);
     }
 
     function onFilterKegiatanChange(resetChildren = false) {
-      const yearRows = getRealizationRowsForYear();
-      const validMasterIds = new Set(yearRows.map(r => Number(r.master_id)));
+      const rows = getCascadingBaseRows();
+      const validMasterIds = new Set(rows.map(r => Number(r.master_id)));
+      let masters = masterList.filter(m => validMasterIds.has(Number(m.id)));
       const fProg = document.getElementById('cf-program')?.value || 'ALL';
       const fKeg = document.getElementById('cf-kegiatan')?.value || 'ALL';
-      let filtered = masterList.filter(m => validMasterIds.has(Number(m.id)));
-      if (fProg !== 'ALL') filtered = filtered.filter(m => (m.nama_program || '').trim() === fProg);
-      if (fKeg !== 'ALL') filtered = filtered.filter(m => (m.nama_kegiatan || '').trim() === fKeg);
+      if (fProg !== 'ALL') masters = masters.filter(m => (m.nama_program || '').trim() === fProg);
+      if (fKeg !== 'ALL') masters = masters.filter(m => (m.nama_kegiatan || '').trim() === fKeg);
 
       const selRek = document.getElementById('cf-rekening');
+      const oldRek = resetChildren ? 'ALL' : (selRek?.value || 'ALL');
+      const accountOptions = masters.map(m => ({value:String(m.id), label:m.uraian_kegiatan || m.nama_kegiatan || ('Rekening ' + m.id)}));
       if (selRek) {
-        const oldRek = resetChildren ? 'ALL' : selRek.value;
+        const esc = v => String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         selRek.innerHTML = '<option value="ALL">Semua Pos Rekening</option>' +
-          filtered.map(m => `<option value="${m.id}">${m.uraian_kegiatan || m.nama_kegiatan || ('Rekening ' + m.id)}</option>`).join('');
-        selRek.value = filtered.some(m => String(m.id) === oldRek) ? oldRek : 'ALL';
+          accountOptions.map(o => `<option value="${o.value}">${esc(o.label)}</option>`).join('');
+        selRek.dataset.fullOptions = JSON.stringify(Array.from(selRek.options).map(o => ({value:o.value,text:o.textContent})));
+        selRek.value = accountOptions.some(o => o.value === String(oldRek)) ? oldRek : 'ALL';
+        syncAllCascadingSearchInputs();
       }
       populatePenyediaFilter();
       populatePptkFilter();
       applyCascadingFilter();
+    }
+
+    function getCascadingScopedRows(includePptk = false, includeProvider = true) {
+      const rows = getCascadingBaseRows();
+      const fProg = document.getElementById('cf-program')?.value || 'ALL';
+      const fKeg = document.getElementById('cf-kegiatan')?.value || 'ALL';
+      const fRek = document.getElementById('cf-rekening')?.value || 'ALL';
+      const fPen = includeProvider ? (document.getElementById('cf-penyedia')?.value || 'ALL') : 'ALL';
+      const fProgres = document.getElementById('cf-progres')?.value || 'ALL';
+      const fPptk = includePptk ? (document.getElementById('cf-pptk')?.value || 'ALL') : 'ALL';
+      const masters = masterList.filter(m =>
+        (fProg === 'ALL' || (m.nama_program || '').trim() === fProg) &&
+        (fKeg === 'ALL' || (m.nama_kegiatan || '').trim() === fKeg) &&
+        (fRek === 'ALL' || String(m.id) === String(fRek))
+      );
+      const ids = new Set(masters.map(m => Number(m.id)));
+      return rows.filter(r => {
+        if (!ids.has(Number(r.master_id))) return false;
+        if (fPen !== 'ALL' && (r.penyedia || '').trim() !== fPen) return false;
+        if (fPptk !== 'ALL' && (r.pptk || '').trim() !== fPptk) return false;
+        const progress = String(r.nomor_spm_bku || '').trim() ? 'FINAL' : 'PROSES';
+        if (fProgres !== 'ALL' && progress !== fProgres) return false;
+        return true;
+      });
     }
 
     function populatePenyediaFilter() {
       const sel = document.getElementById('cf-penyedia');
       if (!sel) return;
-      const rows = getRealizationRowsForYear();
-      const validMasterIds = new Set(rows.map(r => Number(r.master_id)));
-      const fProg = document.getElementById('cf-program')?.value || 'ALL';
-      const fKeg = document.getElementById('cf-kegiatan')?.value || 'ALL';
-      const fRek = document.getElementById('cf-rekening')?.value || 'ALL';
-      const masters = masterList.filter(m => validMasterIds.has(Number(m.id)) &&
-        (fProg === 'ALL' || (m.nama_program || '').trim() === fProg) &&
-        (fKeg === 'ALL' || (m.nama_kegiatan || '').trim() === fKeg) &&
-        (fRek === 'ALL' || String(m.id) === String(fRek)));
-      const ids = new Set(masters.map(m => Number(m.id)));
       const current = sel.value || 'ALL';
-      const providers = [...new Set(rows.filter(r => ids.has(Number(r.master_id))).map(r => (r.penyedia || '').trim()).filter(Boolean))].sort();
-      sel.innerHTML = '<option value="ALL">Semua Rekanan</option>' + providers.map(p => `<option value="${p}">${p}</option>`).join('');
-      sel.value = providers.includes(current) ? current : 'ALL';
+      const rows = getCascadingScopedRows(false, false);
+      const providers = [...new Set(rows.map(r => (r.penyedia || '').trim()).filter(Boolean))].sort();
+      setCascadingOptions(sel, 'Semua Rekanan', providers, current);
     }
 
     function populatePptkFilter() {
       const sel = document.getElementById('cf-pptk');
       if (!sel) return;
-      const rows = getRealizationRowsForYear();
       const current = sel.value || 'ALL';
+      const rows = getCascadingScopedRows(false, true);
       const names = [...new Set(rows.map(r => (r.pptk || '').trim()).filter(Boolean))].sort();
-      sel.innerHTML = '<option value="ALL">Semua PPTK</option>' + names.map(n => `<option value="${n}">${n}</option>`).join('');
-      sel.value = names.includes(current) ? current : 'ALL';
+      setCascadingOptions(sel, 'Semua PPTK', names, current);
     }
 
-    function resetCascadingFilter() {
+    function onFilterRekeningChange() {
+      populatePenyediaFilter();
+      populatePptkFilter();
+      applyCascadingFilter();
+    }
+
+    function onFilterPenyediaChange() {
+      populatePptkFilter();
+      applyCascadingFilter();
+    }
+
+        function resetCascadingFilter() {
+      ['cf-search-program','cf-search-kegiatan','cf-search-rekening','cf-search-penyedia','cf-search-pptk'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) { input.value = ''; input.dataset.typing = ''; }
+      });
       if (document.getElementById('cf-tahun')) document.getElementById('cf-tahun').value = '2026';
       if (document.getElementById('cf-bulan')) document.getElementById('cf-bulan').value = 'ALL';
       if (document.getElementById('cf-program')) document.getElementById('cf-program').value = 'ALL';
@@ -2198,12 +2315,61 @@
         uniqueKeg.forEach(k => selKeg.innerHTML += `<option value="${k}">${k}</option>`);
       }
 
+      // Simpan daftar lengkap agar pencarian berulang tidak kehilangan opsi.
+      if (selProg) selProg.dataset.fullOptions = JSON.stringify(
+        Array.from(selProg.options).map(o => ({ value: o.value, text: o.text }))
+      );
+      if (selKeg) selKeg.dataset.fullOptions = JSON.stringify(
+        Array.from(selKeg.options).map(o => ({ value: o.value, text: o.text }))
+      );
+
       onMonKegiatanChange('ALL');
 
       const selPptk = document.getElementById('mon-filter-pptk');
       if (selPptk) {
         selPptk.innerHTML = '<option value="ALL">Semua PPTK</option>';
         userList.forEach(u => selPptk.innerHTML += `<option value="${u.nama_lengkap}">${u.nama_lengkap}</option>`);
+      }
+    }
+
+    function filterMonitoringSelect(selectId, inputId) {
+      const select = document.getElementById(selectId);
+      const input = document.getElementById(inputId);
+      if (!select || !input) return;
+
+      let allOptions = [];
+      try {
+        allOptions = JSON.parse(select.dataset.fullOptions || '[]');
+      } catch (_) {
+        allOptions = Array.from(select.options).map(o => ({ value: o.value, text: o.text }));
+      }
+      if (!allOptions.length) {
+        allOptions = Array.from(select.options).map(o => ({ value: o.value, text: o.text }));
+        select.dataset.fullOptions = JSON.stringify(allOptions);
+      }
+
+      const terms = input.value.toLocaleLowerCase('id-ID').trim().split(/\\s+/).filter(Boolean);
+      const previousValue = select.value;
+      const filtered = allOptions.filter(option => {
+        if (option.value === 'ALL') return true;
+        const label = String(option.text || '').toLocaleLowerCase('id-ID');
+        return terms.every(term => label.includes(term));
+      });
+
+      select.innerHTML = '';
+      filtered.forEach(option => {
+        const node = document.createElement('option');
+        node.value = option.value;
+        node.textContent = option.text;
+        select.appendChild(node);
+      });
+
+      if (filtered.some(option => option.value === previousValue)) {
+        select.value = previousValue;
+      } else {
+        select.value = 'ALL';
+        if (selectId === 'mon-filter-kegiatan') onMonKegiatanChange('ALL');
+        else applyMonitoringFilters();
       }
     }
 
@@ -2223,6 +2389,8 @@
     }
 
     function resetMonitoringFilters() {
+      if (document.getElementById('mon-search-program')) document.getElementById('mon-search-program').value = '';
+      if (document.getElementById('mon-search-kegiatan')) document.getElementById('mon-search-kegiatan').value = '';
       if (document.getElementById('mon-filter-program')) document.getElementById('mon-filter-program').value = 'ALL';
       if (document.getElementById('mon-filter-kegiatan')) document.getElementById('mon-filter-kegiatan').value = 'ALL';
       if (document.getElementById('mon-filter-subkegiatan')) document.getElementById('mon-filter-subkegiatan').value = 'ALL';
