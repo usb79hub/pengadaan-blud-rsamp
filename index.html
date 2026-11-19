@@ -229,6 +229,9 @@
               <span class="text-sm">🤖</span>
               <span>AI Senior Advisor (CPA/SPI)</span>
             </button>
+            <button type="button" onclick="switchWindow('win-spp-ls');refreshSPPLSCascade('init')" id="nav-spp-ls" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <span class="text-sm">📄</span><span>SPP-LS BLUD</span>
+            </button>
           </div>
         </div>
       </nav>
@@ -928,6 +931,23 @@
         </div>
       </section>
 
+      <section id="win-spp-ls" class="hidden space-y-6">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6 space-y-4">
+          <div><h3 class="font-black text-slate-900">Surat Permintaan Pembayaran Langsung BLUD (SPP-LS BLUD)</h3><p class="text-xs text-slate-500 mt-1">Pilih register pengajuan, lengkapi informasi pada popup, kemudian cetak dokumen dua halaman mengikuti format contoh.</p></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-xs bg-slate-50 border rounded-2xl p-3">
+            <div><label class="font-bold text-slate-600 block mb-1">Tahun Register</label><select id="spp-filter-tahun" onchange="refreshSPPLSCascade('tahun')" class="w-full border rounded-lg p-2"><option value="ALL">Semua Tahun</option></select></div>
+            <div><label class="font-bold text-slate-600 block mb-1">Bulan Register</label><select id="spp-filter-bulan" onchange="refreshSPPLSCascade('bulan')" class="w-full border rounded-lg p-2"><option value="ALL">Semua Bulan</option></select></div>
+            <div><label class="font-bold text-slate-600 block mb-1">Program</label><select id="spp-filter-program" onchange="refreshSPPLSCascade('program')" class="w-full border rounded-lg p-2"><option value="ALL">Semua Program</option></select></div>
+            <div><label class="font-bold text-slate-600 block mb-1">Kegiatan</label><select id="spp-filter-kegiatan" onchange="refreshSPPLSCascade('kegiatan')" class="w-full border rounded-lg p-2"><option value="ALL">Semua Kegiatan</option></select></div>
+            <div><label class="font-bold text-slate-600 block mb-1">Sub Kegiatan</label><select id="spp-filter-subkegiatan" onchange="refreshSPPLSCascade('subkegiatan')" class="w-full border rounded-lg p-2"><option value="ALL">Semua Sub Kegiatan</option></select></div>
+            <div><label class="font-bold text-slate-600 block mb-1">PPTK</label><select id="spp-filter-pptk" onchange="renderSPPLSList()" class="w-full border rounded-lg p-2"><option value="ALL">Semua PPTK</option></select></div>
+            <div class="sm:col-span-2 lg:col-span-5"><input id="spp-ls-search" oninput="renderSPPLSList()" placeholder="Cari nomor register, penyedia, atau uraian pekerjaan..." class="w-full border rounded-xl px-3 py-2"></div>
+            <div class="flex items-end"><button type="button" onclick="resetSPPLSFilters()" class="w-full px-4 py-2 rounded-xl bg-white border text-slate-700 font-bold">Reset Filter</button></div>
+          </div>
+          <div class="overflow-x-auto"><table class="w-full min-w-[1250px] text-xs"><thead class="bg-slate-50"><tr><th class="p-3 text-center">No.</th><th class="p-3 text-left">Tanggal Transaksi</th><th class="p-3 text-left">No. Register</th><th class="p-3 text-left">Program</th><th class="p-3 text-left">Kegiatan / Sub Kegiatan</th><th class="p-3 text-left">PPTK</th><th class="p-3 text-left">Penyedia</th><th class="p-3 text-left">Uraian Belanja</th><th class="p-3 text-right">Jumlah</th><th class="p-3 text-center">Aksi</th></tr></thead><tbody id="spp-ls-list-body"><tr><td colspan="10" class="p-4 text-center text-slate-400">Memuat data...</td></tr></tbody></table></div>
+        </div>
+      </section>
+
       <section id="win-laporan" class="hidden space-y-6">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 no-print">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
@@ -1326,12 +1346,12 @@
         alert('Akses ditolak. Data Pejabat hanya dapat diakses oleh Superadmin.');
         return;
       }
-      ['win-dashboard', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-abk', 'win-laporan', 'win-tren-tahunan', 'win-prognosis', 'win-ai-decision', 'win-buku-besar-blud'].forEach(id => {
+      ['win-dashboard', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-abk', 'win-laporan', 'win-tren-tahunan', 'win-prognosis', 'win-ai-decision', 'win-buku-besar-blud', 'win-spp-ls'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
 
-      ['nav-dashboard', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-monitoring', 'nav-abk', 'nav-laporan', 'nav-tren-tahunan', 'nav-prognosis', 'nav-ai-decision', 'nav-buku-besar-blud'].forEach(id => {
+      ['nav-dashboard', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-monitoring', 'nav-abk', 'nav-laporan', 'nav-tren-tahunan', 'nav-prognosis', 'nav-ai-decision', 'nav-buku-besar-blud', 'nav-spp-ls'].forEach(id => {
         const nav = document.getElementById(id);
         if (nav) nav.classList.remove('nav-active');
       });
@@ -1350,7 +1370,8 @@
         'win-tren-tahunan': ['Tren Tahunan', 'Perbandingan pagu efektif, realisasi, sisa anggaran, dan serapan lintas tahun'],
         'win-prognosis': ['Prognosis Anggaran', 'Estimasi realisasi akhir tahun berdasarkan data aktual dan filter Program, Kegiatan, serta Subkegiatan'],
         'win-ai-decision': ['AI Senior Financial & Hospital Advisory', 'Konsultasi Akuntan Publik Senior (CPA), Ahli Manajemen RSUD, dan Rekomendasi SPI'],
-        'win-buku-besar-blud': ['Laporan Buku Besar BLUD', 'Rekapitulasi buku besar berdasarkan rekening, tahun, dan periode bulan']
+        'win-buku-besar-blud': ['Laporan Buku Besar BLUD', 'Rekapitulasi buku besar berdasarkan rekening, tahun, dan periode bulan'],
+        'win-spp-ls': ['SPP-LS BLUD', 'Surat Permintaan Pembayaran Langsung BLUD — format dua halaman']
       };
 
       if (titles[windowId]) {
@@ -4640,8 +4661,90 @@ function initRealisasiSearchableFilters(){
   });
 }
 
+function sppEsc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function sppNum(v){return Number(v||0);}
+function sppMoney(v){return new Intl.NumberFormat('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2}).format(sppNum(v));}
+function sppTerbilang(n){
+ n=Math.floor(Math.abs(Number(n)||0)); if(n===0)return 'nol rupiah';
+ const a=['','satu','dua','tiga','empat','lima','enam','tujuh','delapan','sembilan','sepuluh','sebelas'];
+ function f(x){if(x<12)return a[x];if(x<20)return f(x-10)+' belas';if(x<100)return f(Math.floor(x/10))+' puluh '+f(x%10);if(x<200)return 'seratus '+f(x-100);if(x<1000)return f(Math.floor(x/100))+' ratus '+f(x%100);if(x<2000)return 'seribu '+f(x-1000);if(x<1e6)return f(Math.floor(x/1000))+' ribu '+f(x%1000);if(x<1e9)return f(Math.floor(x/1e6))+' juta '+f(x%1e6);if(x<1e12)return f(Math.floor(x/1e9))+' miliar '+f(x%1e9);return f(Math.floor(x/1e12))+' triliun '+f(x%1e12);}
+ return f(n).replace(/\s+/g,' ').trim()+' rupiah';
+}
+function sppGetRegister(r){const value=String(r?.kode_unik_realisasi||'').trim();return /^\d{4}\/\d{2}\/\d{4}$/.test(value)?value:'';}
+function sppRegisterParts(r){const value=sppGetRegister(r);if(!value)return {seq:'',month:'',year:''};const a=value.split('/');return {seq:a[0],month:String(Number(a[1])),year:a[2]};}
+function sppMaster(r){return (masterList||[]).find(m=>Number(m.id)===Number(r.master_id))||{};}
+function sppTransactionDate(r){const raw=r?.tanggal_pengajuan||r?.tanggal_transaksi||r?.created_at||r?.tanggal||'';if(!raw)return '-';const d=new Date(raw);return Number.isNaN(d.getTime())?String(raw):d.toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});}
+function sppSetOptions(id,items,label,keep='ALL'){const el=document.getElementById(id);if(!el)return;const prev=el.value||keep;el.innerHTML=`<option value="ALL">${label}</option>`+items.filter(x=>x!==''&&x!=null).map(x=>`<option value="${sppEsc(x)}">${sppEsc(x)}</option>`).join('');el.value=items.includes(prev)?prev:'ALL';}
+function refreshSPPLSCascade(changed='init'){
+ const rows=(realisasiList||[]).filter(r=>sppGetRegister(r)),yearEl=document.getElementById('spp-filter-tahun'),monthEl=document.getElementById('spp-filter-bulan');if(!yearEl||!monthEl)return;
+ const years=[...new Set(rows.map(r=>sppRegisterParts(r).year).filter(Boolean))].sort().reverse();sppSetOptions('spp-filter-tahun',years,'Semua Tahun');
+ let base=rows.filter(r=>yearEl.value==='ALL'||sppRegisterParts(r).year===yearEl.value);
+ const months=[...new Set(base.map(r=>sppRegisterParts(r).month).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));sppSetOptions('spp-filter-bulan',months.map(m=>({1:'Januari',2:'Februari',3:'Maret',4:'April',5:'Mei',6:'Juni',7:'Juli',8:'Agustus',9:'September',10:'Oktober',11:'November',12:'Desember'}[m]||m)).map((name,i)=>months[i]),'Semua Bulan');
+ if(monthEl.value!=='ALL')base=base.filter(r=>sppRegisterParts(r).month===monthEl.value);
+ const fProg=document.getElementById('spp-filter-program'),fKeg=document.getElementById('spp-filter-kegiatan'),fSub=document.getElementById('spp-filter-subkegiatan'),fPptk=document.getElementById('spp-filter-pptk');
+ const progVals=[...new Set(base.map(r=>sppMaster(r).nama_program).filter(Boolean))].sort();sppSetOptions('spp-filter-program',progVals,'Semua Program');
+ if(fProg.value!=='ALL')base=base.filter(r=>(sppMaster(r).nama_program||'')===fProg.value);
+ const kegVals=[...new Set(base.map(r=>sppMaster(r).nama_kegiatan).filter(Boolean))].sort();sppSetOptions('spp-filter-kegiatan',kegVals,'Semua Kegiatan');
+ if(fKeg.value!=='ALL')base=base.filter(r=>(sppMaster(r).nama_kegiatan||'')===fKeg.value);
+ const subVals=[...new Set(base.map(r=>sppMaster(r).nama_sub_kegiatan).filter(Boolean))].sort();sppSetOptions('spp-filter-subkegiatan',subVals,'Semua Sub Kegiatan');
+ if(fSub.value!=='ALL')base=base.filter(r=>(sppMaster(r).nama_sub_kegiatan||'')===fSub.value);
+ const pptkVals=[...new Set(base.map(r=>r.pptk).filter(Boolean))].sort();sppSetOptions('spp-filter-pptk',pptkVals,'Semua PPTK');
+ renderSPPLSList();
+}
+function resetSPPLSFilters(){['spp-filter-tahun','spp-filter-bulan','spp-filter-program','spp-filter-kegiatan','spp-filter-subkegiatan','spp-filter-pptk'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='ALL';});const q=document.getElementById('spp-ls-search');if(q)q.value='';refreshSPPLSCascade('reset');}
+function renderSPPLSList(){const body=document.getElementById('spp-ls-list-body');if(!body)return;const q=(document.getElementById('spp-ls-search')?.value||'').toLowerCase();let rows=(realisasiList||[]).filter(r=>sppGetRegister(r));
+ const val=id=>document.getElementById(id)?.value||'ALL';rows=rows.filter(r=>{const p=sppRegisterParts(r),m=sppMaster(r);return (val('spp-filter-tahun')==='ALL'||p.year===val('spp-filter-tahun'))&&(val('spp-filter-bulan')==='ALL'||p.month===val('spp-filter-bulan'))&&(val('spp-filter-program')==='ALL'||m.nama_program===val('spp-filter-program'))&&(val('spp-filter-kegiatan')==='ALL'||m.nama_kegiatan===val('spp-filter-kegiatan'))&&(val('spp-filter-subkegiatan')==='ALL'||m.nama_sub_kegiatan===val('spp-filter-subkegiatan'))&&(val('spp-filter-pptk')==='ALL'||r.pptk===val('spp-filter-pptk'))&&[sppGetRegister(r),r.penyedia,r.pekerjaan,r.pptk,m.nama_program,m.nama_kegiatan,m.nama_sub_kegiatan].join(' ').toLowerCase().includes(q);});
+ rows.sort((a,b)=>{const pa=sppRegisterParts(a),pb=sppRegisterParts(b);return (pb.year+pb.month.padStart(2,'0')+pb.seq).localeCompare(pa.year+pa.month.padStart(2,'0')+pa.seq);});
+ body.innerHTML=rows.length?rows.map((r,i)=>{const m=sppMaster(r);return `<tr class="border-t hover:bg-slate-50"><td class="p-3 text-center">${i+1}</td><td class="p-3 whitespace-nowrap">${sppEsc(sppTransactionDate(r))}</td><td class="p-3 font-bold whitespace-nowrap">${sppEsc(sppGetRegister(r))}</td><td class="p-3">${sppEsc(m.nama_program||'-')}</td><td class="p-3">${sppEsc([m.nama_kegiatan,m.nama_sub_kegiatan].filter(Boolean).join(' / ')||'-')}</td><td class="p-3">${sppEsc(r.pptk||'-')}</td><td class="p-3">${sppEsc(r.penyedia||'-')}</td><td class="p-3 min-w-[280px]">${sppEsc(r.pekerjaan||'-')}</td><td class="p-3 text-right font-bold whitespace-nowrap">Rp ${sppMoney(r.nilai_kegiatan)}</td><td class="p-3 text-center"><button type="button" onclick="openSPPLSModal(${Number(r.id)})" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white font-bold">Lengkapi & Cetak</button></td></tr>`;}).join(''):'<tr><td colspan="10" class="p-5 text-center text-slate-400">Tidak ada transaksi dengan nomor register valid. Nomor internal tidak ditampilkan sebagai nomor register.</td></tr>';}
+
+function openSPPLSModal(id){const r=(realisasiList||[]).find(x=>Number(x.id)===Number(id));if(!r){alert('Data register tidak ditemukan.');return;}const m=(masterList||[]).find(x=>Number(x.id)===Number(r.master_id))||{};const put=(k,v)=>{const el=document.getElementById('spp-'+k);if(el)el.value=v??'';};
+ if(!sppGetRegister(r)){alert('Nomor register belum tersedia atau tidak valid. Periksa Pengajuan Pembayaran terlebih dahulu.');return;}put('record-id',r.id);put('register',sppGetRegister(r));put('tanggal-cetak',new Date().toISOString().slice(0,10));put('penyedia',r.penyedia);put('pptk',r.pptk);put('uraian',r.pekerjaan);put('kode-rekening',m.kode_sub_kegiatan||m.kode_rekening||'');put('jumlah',sppMoney(r.nilai_kegiatan));
+ put('program',m.nama_program||'');put('kegiatan',m.nama_kegiatan||'');put('deskripsi',r.pekerjaan||m.uraian_kegiatan||'');put('ttd-pptk',r.pptk||'');put('ttd-bendahara',userList.find(u=>String(u.jabatan||'').toLowerCase().includes('bendahara'))?.nama_lengkap||'');
+ const modal=document.getElementById('spp-ls-modal');modal.classList.remove('hidden');modal.classList.add('flex');}
+function closeSPPLSModal(){const m=document.getElementById('spp-ls-modal');m.classList.add('hidden');m.classList.remove('flex');}
+function printSPPLSDocument(e){e.preventDefault();const v=id=>document.getElementById('spp-'+id)?.value||'';const r=(realisasiList||[]).find(x=>Number(x.id)===Number(v('record-id')));if(!r){alert('Register tidak ditemukan.');return;}const m=(masterList||[]).find(x=>Number(x.id)===Number(r.master_id))||{};const jumlah=sppNum(r.nilai_kegiatan),dpa=sppNum(v('dpa-jumlah')),spd=sppNum(v('spd-jumlah')),gu=sppNum(v('belanja-gu')),tu=sppNum(v('belanja-tu')),ls=sppNum(v('belanja-ls')),total=gu+tu+ls,sisaSPD=spd-total,sisaDPA=dpa-spd;const date=v('tanggal-cetak')?new Date(v('tanggal-cetak')+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'';const esc=sppEsc;
+const page1=`<section class="page"><header><div class="logo">LOGO</div><div><b>PEMERINTAH KABUPATEN KUTAI KARTANEGARA</b><br><b>RSUD AM. PARIKESIT</b><h2>SURAT PERMINTAAN PEMBAYARAN LANGSUNG BLUD<br>(SPP-LS BLUD)</h2><div>Nomor: ${esc(v('register'))}</div><h3>RINGKASAN</h3></div></header><h4>RINGKASAN KEGIATAN</h4><table class="ident"><tr><td>1. Program</td><td>:</td><td>${esc(v('program'))}</td></tr><tr><td>2. Kegiatan</td><td>:</td><td>${esc(v('kegiatan'))}</td></tr><tr><td>3. Nomor dan Tanggal DPA</td><td>:</td><td>${esc(v('dpa'))}</td></tr><tr><td>4. Nama Perusahaan/Bendahara</td><td>:</td><td>${esc(v('nama-bendahara'))}</td></tr><tr><td>5. Bentuk Perusahaan/Bendahara</td><td>:</td><td>${esc(v('bentuk'))}</td></tr><tr><td>6. Alamat Perusahaan/Bendahara</td><td>:</td><td>${esc(v('alamat'))}</td></tr><tr><td>7. Pimpinan Perusahaan/Bendahara</td><td>:</td><td>${esc(v('pimpinan'))}</td></tr><tr><td>8. Nama dan No. Rekening Bank</td><td>:</td><td>${esc(v('bank'))}</td></tr><tr><td>9. Nomor Kontrak</td><td>:</td><td>${esc(v('kontrak'))}</td></tr><tr><td>10. Kegiatan Lanjutan</td><td>:</td><td>${esc(v('lanjutan'))}</td></tr><tr><td>11. Waktu Pelaksanaan Pekerjaan</td><td>:</td><td>${esc(v('waktu'))}</td></tr><tr><td>12. Deskripsi Pekerjaan</td><td>:</td><td>${esc(v('deskripsi'))}</td></tr></table><h4>RINGKASAN DPA-/DPPA-/DPAL-SKPD (BLUD)</h4><table class="sum"><tr><td>Jumlah dana DPA-SKPD/DPPA-SKPD/DPAL-SKPD (BLUD)</td><td>Rp</td><td>${sppMoney(dpa)}</td></tr></table><h4>RINGKASAN SPD</h4><table class="sum"><tr><th>No.Urut</th><th>Nomor SPD</th><th>Tanggal SPD</th><th>Jumlah Dana</th></tr><tr><td>1</td><td>${esc(v('spd-nomor'))}</td><td>${esc(v('spd-tanggal'))}</td><td>Rp ${sppMoney(spd)}</td></tr><tr><td colspan="3" class="right">JUMLAH</td><td>Rp ${sppMoney(spd)}</td></tr><tr><td colspan="3" class="right">Sisa dana yang belum di SPD-kan</td><td>Rp ${sppMoney(sisaDPA)}</td></tr></table><h4>RINGKASAN BELANJA</h4><table class="sum"><tr><td>Belanja UP/GU</td><td>Rp</td><td>${sppMoney(gu)}</td></tr><tr><td>Belanja TU</td><td>Rp</td><td>${sppMoney(tu)}</td></tr><tr><td>Belanja LS Gaji, Tunjangan, Pengadaan Barang dan Jasa</td><td>Rp</td><td>${sppMoney(ls)}</td></tr><tr><td class="right">JUMLAH</td><td>Rp</td><td>${sppMoney(total)}</td></tr><tr><td>Sisa SPD yang telah diterbitkan, belum dibelanjakan</td><td>Rp</td><td>${sppMoney(sisaSPD)}</td></tr></table><div class="sign"><div>Mengetahui<br>Pejabat Pelaksana Teknis Kegiatan<br><br><br><u>${esc(v('ttd-pptk'))}</u><br>NIP. ${esc(v('nip-pptk'))}</div><div>Tenggarong, ${esc(date)}<br>Bendahara Pengeluaran BLUD<br><br><br><u>${esc(v('ttd-bendahara'))}</u><br>NIP. ${esc(v('nip-bendahara'))}</div></div></section>`;
+const page2=`<section class="page"><header><div class="logo">LOGO</div><div><b>PEMERINTAH KABUPATEN KUTAI KARTANEGARA</b><br><b>RSUD AM. PARIKESIT</b><h2>SURAT PERMINTAAN PEMBAYARAN LANGSUNG BLUD<br>(SPP-LS BLUD)</h2><div>Nomor: ${esc(v('register'))}</div><h3>RINGKASAN</h3></div></header><h4>RINGKASAN</h4><table class="detail"><thead><tr><th>No</th><th>Kode Rekening</th><th>Uraian</th><th>Jumlah</th></tr></thead><tbody><tr><td>1</td><td>${esc(m.kode_sub_kegiatan||m.kode_rekening||'')}</td><td>${esc(r.pekerjaan||'')}</td><td>${sppMoney(jumlah)}</td></tr><tr><td colspan="3" class="right">JUMLAH</td><td>${sppMoney(jumlah)}</td></tr></tbody></table><p class="terbilang"><b>Terbilang:</b> ${esc(sppTerbilang(jumlah))}</p><div class="sign sign2"><div>Mengetahui<br>Pejabat Pelaksana Teknis Kegiatan<br><br><br><u>${esc(v('ttd-pptk'))}</u><br>NIP. ${esc(v('nip-pptk'))}</div><div>Tenggarong, ${esc(date)}<br>Bendahara Pengeluaran BLUD<br><br><br><u>${esc(v('ttd-bendahara'))}</u><br>NIP. ${esc(v('nip-bendahara'))}</div></div></section>`;
+const w=window.open('','_blank');if(!w){alert('Popup diblokir browser. Izinkan pop-up untuk mencetak PDF.');return;}w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SPP-LS BLUD ${esc(v('register'))}</title><style>@page{size:A4 portrait;margin:16mm 15mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#111;font-size:10pt}.page{min-height:265mm;page-break-after:always;position:relative}.page:last-child{page-break-after:auto}header{display:grid;grid-template-columns:65px 1fr;text-align:center;align-items:center;margin-bottom:12px;font-size:11pt}.logo{width:52px;height:52px;border:1px solid #bbb;border-radius:50%;font-size:8pt;display:flex;align-items:center;justify-content:center;color:#777}h2{font-size:13pt;margin:13px 0 4px}h3{font-size:12pt;margin:18px 0 12px}h4{text-align:center;font-size:10pt;margin:10px 0 4px;padding:4px;border:1px solid #555}.ident,.sum,.detail{width:100%;border-collapse:collapse;font-size:9pt}.ident td{padding:3px 4px;vertical-align:top}.ident td:first-child{width:34%}.ident td:nth-child(2){width:12px}.sum td,.sum th,.detail td,.detail th{border:1px solid #555;padding:5px}.sum td:last-child,.detail td:last-child{text-align:right;white-space:nowrap}.sum td:nth-child(2){width:25px;text-align:center}.sum .right,.detail .right{text-align:right}.detail th{background:#f4f4f4}.detail td{vertical-align:top}.detail td:nth-child(1){width:7%;text-align:center}.detail td:nth-child(2){width:22%}.detail td:nth-child(4){width:22%}.terbilang{margin-top:12px;font-size:10pt}.sign{display:grid;grid-template-columns:1fr 1fr;gap:30px;text-align:center;margin-top:25px;line-height:1.55;font-size:9pt}.sign2{margin-top:48px}@media print{body{margin:0}}</style></head><body>${page1}${page2}<script>window.onload=()=>setTimeout(()=>window.print(),350);<\/script></body></html>`);w.document.close();closeSPPLSModal();}
+
 window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();initRealisasiSearchableFilters();document.getElementById('trans-tahun')?.addEventListener('change',refreshKodeUnikRealisasi);document.getElementById('trans-bulan')?.addEventListener('change',refreshKodeUnikRealisasi);refreshMasterSearchFilters();renderMasterTable();renderUserTable();populateMonitoringFilterDropdowns();applyMonitoringFilters();applyLRAFilters();runAIDiagnosis();});
 </script>
 
+
+<div id="spp-ls-modal" class="hidden fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm items-center justify-center p-3 sm:p-6">
+ <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[94vh] overflow-y-auto">
+  <div class="sticky top-0 z-10 bg-white border-b p-5 flex items-center justify-between"><div><h3 class="font-black text-lg">Lengkapi Data SPP-LS BLUD</h3><p class="text-xs text-slate-500">Data transaksi diambil dari register terpilih; kolom lain dapat dilengkapi sebelum dicetak.</p></div><button type="button" onclick="closeSPPLSModal()" class="text-xl px-2">✕</button></div>
+  <form id="spp-ls-form" onsubmit="printSPPLSDocument(event)" class="p-5 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+   <input type="hidden" id="spp-record-id">
+   <div class="md:col-span-2 rounded-2xl bg-indigo-50 p-3"><div class="font-extrabold text-indigo-900 mb-2">DATA OTOMATIS DARI PENGAJUAN</div><div class="grid grid-cols-1 sm:grid-cols-2 gap-2"><div><label class="font-bold">Nomor Register</label><input id="spp-register" readonly class="w-full mt-1 p-2 border rounded-lg bg-white"></div><div><label class="font-bold">Tanggal Cetak</label><input id="spp-tanggal-cetak" type="date" required class="w-full mt-1 p-2 border rounded-lg"></div><div><label class="font-bold">Penyedia</label><input id="spp-penyedia" readonly class="w-full mt-1 p-2 border rounded-lg bg-white"></div><div><label class="font-bold">PPTK</label><input id="spp-pptk" readonly class="w-full mt-1 p-2 border rounded-lg bg-white"></div><div class="sm:col-span-2"><label class="font-bold">Uraian Pekerjaan</label><textarea id="spp-uraian" rows="2" readonly class="w-full mt-1 p-2 border rounded-lg bg-white"></textarea></div><div><label class="font-bold">Kode Rekening</label><input id="spp-kode-rekening" readonly class="w-full mt-1 p-2 border rounded-lg bg-white"></div><div><label class="font-bold">Jumlah (Rp)</label><input id="spp-jumlah" readonly class="w-full mt-1 p-2 border rounded-lg bg-white"></div></div></div>
+   <div class="md:col-span-2 font-extrabold text-slate-800 border-b pb-1">RINGKASAN KEGIATAN — LENGKAPI DATA</div>
+   <label class="font-bold">Program<input id="spp-program" class="w-full mt-1 p-2 border rounded-lg" placeholder="Nama program"></label>
+   <label class="font-bold">Kegiatan<input id="spp-kegiatan" class="w-full mt-1 p-2 border rounded-lg" placeholder="Nama kegiatan"></label>
+   <label class="font-bold">Nomor dan Tanggal DPA<input id="spp-dpa" class="w-full mt-1 p-2 border rounded-lg" placeholder="Contoh: 1.02... , Tgl. 30/12/2025"></label>
+   <label class="font-bold">Nama Perusahaan/Bendahara<input id="spp-nama-bendahara" class="w-full mt-1 p-2 border rounded-lg" value="Bendahara Pengeluaran BLUD"></label>
+   <label class="font-bold">Bentuk Perusahaan/Bendahara<input id="spp-bentuk" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">Alamat Perusahaan/Bendahara<input id="spp-alamat" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">Pimpinan Perusahaan/Bendahara<input id="spp-pimpinan" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">Nama dan No. Rekening Bank<input id="spp-bank" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">Nomor Kontrak<input id="spp-kontrak" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">Kegiatan Lanjutan<select id="spp-lanjutan" class="w-full mt-1 p-2 border rounded-lg"><option>Tidak</option><option>Ya</option></select></label>
+   <label class="font-bold">Waktu Pelaksanaan Pekerjaan<input id="spp-waktu" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold md:col-span-2">Deskripsi Pekerjaan<textarea id="spp-deskripsi" rows="2" class="w-full mt-1 p-2 border rounded-lg"></textarea></label>
+   <div class="md:col-span-2 font-extrabold text-slate-800 border-b pb-1 mt-2">RINGKASAN DPA, SPD, DAN BELANJA</div>
+   <label class="font-bold">Jumlah Dana DPA-SKPD/DPPA-SKPD/DPAL-SKPD<input id="spp-dpa-jumlah" type="number" min="0" class="w-full mt-1 p-2 border rounded-lg" value="0"></label>
+   <label class="font-bold">Nomor SPD<input id="spp-spd-nomor" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">Tanggal SPD<input id="spp-spd-tanggal" type="date" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">Jumlah Dana SPD<input id="spp-spd-jumlah" type="number" min="0" class="w-full mt-1 p-2 border rounded-lg" value="0"></label>
+   <label class="font-bold">Belanja UP/GU<input id="spp-belanja-gu" type="number" min="0" class="w-full mt-1 p-2 border rounded-lg" value="0"></label>
+   <label class="font-bold">Belanja TU<input id="spp-belanja-tu" type="number" min="0" class="w-full mt-1 p-2 border rounded-lg" value="0"></label>
+   <label class="font-bold">Belanja LS Gaji, Tunjangan, Pengadaan Barang dan Jasa<input id="spp-belanja-ls" type="number" min="0" class="w-full mt-1 p-2 border rounded-lg" value="0"></label>
+   <label class="font-bold">Nama PPTK penandatangan<input id="spp-ttd-pptk" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">NIP PPTK<input id="spp-nip-pptk" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">Nama Bendahara penandatangan<input id="spp-ttd-bendahara" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <label class="font-bold">NIP Bendahara<input id="spp-nip-bendahara" class="w-full mt-1 p-2 border rounded-lg"></label>
+   <div class="md:col-span-2 flex justify-end gap-2 pt-3 border-t"><button type="button" onclick="closeSPPLSModal()" class="px-4 py-2 rounded-xl bg-slate-100 font-bold">Batal</button><button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold">Simpan Isian & Cetak PDF</button></div>
+  </form>
+ </div>
+</div>
 </body>
 </html>
