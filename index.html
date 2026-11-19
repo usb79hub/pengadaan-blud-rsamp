@@ -3371,7 +3371,7 @@ const MONTH_LABELS=['Januari','Februari','Maret','April','Mei','Juni','Juli','Ag
 function safeText(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function uniqueSorted(a){return [...new Set(a.filter(v=>v!==null&&v!==undefined&&String(v).trim()!=='').map(String))].sort((a,b)=>a.localeCompare(b,'id'));}
 function fillSelect(id, values, firstLabel){const el=document.getElementById(id);if(!el)return;const old=el.value;el.innerHTML=`<option value="ALL">${firstLabel}</option>`+values.map(v=>`<option value="${safeText(v)}">${safeText(v)}</option>`).join('');if(values.includes(old))el.value=old;}
-function initAddedFilters(){const years=uniqueSorted([...masterList.map(x=>x.tahun),...realisasiList.map(x=>x.tahun)]).sort((a,b)=>Number(b)-Number(a));['master-filter-tahun','lra-filter-tahun','ai-filter-tahun'].forEach(id=>fillSelect(id,years,'Semua Tahun'));['master-filter-bulan','lra-filter-bulan','ai-filter-bulan'].forEach((id,i)=>fillSelect(id,MONTH_LABELS.map((m,j)=>String(j+1)),i===1?'Seluruh Tahun':(i===2?'Semua Bulan':'Semua Bulan')));const prog=uniqueSorted(masterList.map(x=>x.nama_program));const keg=uniqueSorted(masterList.map(x=>x.nama_kegiatan));const sub=uniqueSorted(masterList.map(x=>x.nama_sub_kegiatan));fillSelect('master-filter-program',prog,'Semua Program');fillSelect('master-filter-kegiatan',keg,'Semua Kegiatan');fillSelect('master-filter-subkegiatan',sub,'Semua Subkegiatan');}
+function initAddedFilters(){const years=uniqueSorted([...masterList.map(x=>x.tahun),...realisasiList.map(x=>x.tahun)]).sort((a,b)=>Number(b)-Number(a));['master-filter-tahun','lra-filter-tahun','ai-filter-tahun'].forEach(id=>fillSelect(id,years,'Semua Tahun'));['master-filter-bulan','lra-filter-bulan','ai-filter-bulan'].forEach((id,i)=>fillSelect(id,MONTH_LABELS.map((m,j)=>String(j+1)),i===1?'Seluruh Tahun':(i===2?'Semua Bulan':'Semua Bulan')));const prog=uniqueSorted(masterList.map(x=>x.nama_program));const keg=uniqueSorted(masterList.map(x=>x.nama_kegiatan));const sub=uniqueSorted(masterList.map(x=>x.nama_sub_kegiatan));fillSelect('master-filter-program',prog,'Semua Program');fillSelect('master-filter-kegiatan',keg,'Semua Kegiatan');fillSelect('master-filter-subkegiatan',sub,'Semua Subkegiatan');refreshMasterSearchFilters();}
 function normalizeMasterPart(value){
   return String(value ?? '').trim().replace(/\s+/g, ' ').replace(/[.\s]+$/g, '').toLocaleLowerCase('id');
 }
@@ -3411,11 +3411,115 @@ function historicalMasterIds(effectiveRows, allRows){
   const keys = new Set(effectiveRows.map(masterAccountKey));
   return new Set(allRows.filter(m => keys.has(masterAccountKey(m))).map(m => Number(m.id)));
 }
+
+function refreshMasterSearchFilters(){
+ const ids=['master-filter-tahun','master-filter-bulan','master-filter-jenis','master-filter-program','master-filter-kegiatan','master-filter-subkegiatan'];
+ ids.forEach(id=>{const sel=document.getElementById(id);if(!sel)return;let box=document.getElementById(id+'-searchbox');if(!box){box=document.createElement('div');box.id=id+'-searchbox';box.className='relative mt-1';box.innerHTML='<input type="text" autocomplete="off" aria-label="Cari pilihan filter" placeholder="Cari / pilih..." class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-white focus:ring-2 focus:ring-blue-200 focus:border-blue-400"><div class="hidden absolute z-50 top-full left-0 right-0 mt-1 max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl"></div>';sel.parentNode.insertBefore(box,sel);sel.classList.add('hidden');sel.dataset.searchUi='1';const input=box.querySelector('input'),menu=box.querySelector('div');const draw=()=>{const q=input.value.toLocaleLowerCase('id');const opts=[...sel.options].filter(o=>o.text.toLocaleLowerCase('id').includes(q));menu.innerHTML=opts.map(o=>`<button type="button" data-value="${safeText(o.value)}" class="block w-full text-left px-3 py-2 text-xs hover:bg-blue-50 ${o.value===sel.value?'bg-blue-50 font-bold':''}">${safeText(o.text)}</button>`).join('')||'<div class="px-3 py-2 text-xs text-slate-400">Tidak ada pilihan</div>';menu.classList.remove('hidden');};input.addEventListener('focus',draw);input.addEventListener('input',draw);menu.addEventListener('click',e=>{const b=e.target.closest('button[data-value]');if(!b)return;sel.value=b.dataset.value;input.value=sel.options[sel.selectedIndex]?.text||'';menu.classList.add('hidden');sel.dispatchEvent(new Event('change',{bubbles:true}));});document.addEventListener('click',e=>{if(!box.contains(e.target))menu.classList.add('hidden');});input.addEventListener('keydown',e=>{if(e.key==='Escape')menu.classList.add('hidden');if(e.key==='Enter'){e.preventDefault();const first=menu.querySelector('button[data-value]');if(first)first.click();}});}
+ const input=box.querySelector('input');input.value=sel.options[sel.selectedIndex]?.text||sel.options[0]?.text||'';
+ });
+}
+
 const _renderMasterTableOriginal=renderMasterTable;
 renderMasterTable=function(query=''){const tbody=document.getElementById('master-table-body');if(!tbody)return;const fy=document.getElementById('master-filter-tahun')?.value||'ALL',fb=document.getElementById('master-filter-bulan')?.value||'ALL',fj=document.getElementById('master-filter-jenis')?.value||'ALL',fp=document.getElementById('master-filter-program')?.value||'ALL',fk=document.getElementById('master-filter-kegiatan')?.value||'ALL',fs=document.getElementById('master-filter-subkegiatan')?.value||'ALL';let data=masterList.filter(m=>(!query||[m.uraian_kegiatan,m.nama_kegiatan,m.nama_sub_kegiatan,m.nama_program].some(v=>String(v||'').toLowerCase().includes(query.toLowerCase())))&&(fy==='ALL'||String(m.tahun||2026)===fy)&&(fb==='ALL'||String(m.bulan||1)===fb)&&(fj==='ALL'||String(m.jenis_anggaran||'Murni').toLowerCase()===fj.toLowerCase())&&(fp==='ALL'||m.nama_program===fp)&&(fk==='ALL'||m.nama_kegiatan===fk)&&(fs==='ALL'||m.nama_sub_kegiatan===fs));const scope=masterList.filter(m=>(fy==='ALL'||String(m.tahun||2026)===fy)&&(fp==='ALL'||m.nama_program===fp)&&(fk==='ALL'||m.nama_kegiatan===fk)&&(fs==='ALL'||m.nama_sub_kegiatan===fs));const effective=effectiveMasterPagu(scope,fb);document.getElementById('master-card-count').textContent=effective.length;document.getElementById('master-card-pagu').textContent=formatRupiah(effective.reduce((a,m)=>a+Number(m.pagu||0),0));tbody.innerHTML=data.map((item,idx)=>`<tr class="hover:bg-slate-50"><td class="py-3 px-3 text-slate-400">${idx+1}</td><td class="py-3 px-3"><b>${safeText(item.kode_program||'-')}</b><div>${safeText(item.nama_program||'-')}</div></td><td class="py-3 px-3"><b>${safeText(item.kode_kegiatan||'-')}</b><div>${safeText(item.nama_kegiatan||'-')}</div></td><td class="py-3 px-3"><b>${safeText(item.kode_sub_kegiatan||'-')}</b><div>${safeText(item.nama_sub_kegiatan||'-')}</div></td><td class="py-3 px-3">${safeText(item.uraian_kegiatan||'-')}</td><td class="py-3 px-3">${safeText(item.tahun||2026)} / ${safeText(MONTH_LABELS[(Number(item.bulan||1)-1)]||'-')}</td><td class="py-3 px-3"><span class="px-2 py-1 rounded-full text-[10px] ${String(item.jenis_anggaran||'Murni').toLowerCase().includes('perubahan')?'bg-amber-100 text-amber-800':'bg-sky-100 text-sky-800'}">${safeText(item.jenis_anggaran||'Murni')}</span></td><td class="py-3 px-3 text-right font-bold">${formatRupiah(item.pagu)}</td><td class="py-3 px-3"><div class="flex gap-1"><button onclick="editMasterData(${Number(item.id)})" class="px-2 py-1 bg-amber-50 text-amber-800 rounded">Edit</button><button onclick="deleteMasterData(${Number(item.id)})" class="px-2 py-1 bg-rose-50 text-rose-700 rounded">Hapus</button></div></td></tr>`).join('');};
-openMasterModal=function(editData=null){if(!window.canInputManual){alert('Entri pagu rekening hanya dapat dilakukan oleh Admin atau Superadmin.');return;}if(editData && !window.canInputManual){alert('Akses ditolak. Hanya Admin atau Superadmin yang dapat mengubah pagu.');return;}document.getElementById('form-master-crud').reset();if(editData){document.getElementById('modal-master-title').textContent='Ubah Master Kegiatan / Pagu';document.getElementById('crud-master-id').value=editData.id;document.getElementById('m-kd-prog').value=editData.kode_program||'';document.getElementById('m-nm-prog').value=editData.nama_program||'';document.getElementById('m-kd-keg').value=editData.kode_kegiatan||'';document.getElementById('m-nm-keg').value=editData.nama_kegiatan||'';document.getElementById('m-kd-sub').value=editData.kode_sub_kegiatan||'';document.getElementById('m-nm-sub').value=editData.nama_sub_kegiatan||'';document.getElementById('m-uraian').value=editData.uraian_kegiatan||'';document.getElementById('m-pagu').value=editData.pagu||0;document.getElementById('m-tahun').value=editData.tahun||2026;document.getElementById('m-bulan').value=editData.bulan||1;document.getElementById('m-jenis').value=editData.jenis_anggaran||'Murni';}else{document.getElementById('crud-master-id').value='';document.getElementById('m-tahun').value=new Date().getFullYear();}document.getElementById('modal-master-rekening').style.display='flex';};
-saveMasterData=async function(e){e.preventDefault();if(!window.canInputManual){alert('Akses ditolak. Entri pagu hanya untuk Admin atau Superadmin.');return;}const requestedId=document.getElementById('crud-master-id').value;if(requestedId && !window.canInputManual){alert('Akses ditolak. Hanya Admin atau Superadmin yang dapat mengubah pagu.');return;}if(!supabaseClient||!supabaseReady){alert('Database belum terhubung. Data tidak disimpan.');return;}const id=document.getElementById('crud-master-id').value;const payload={kode_program:document.getElementById('m-kd-prog').value.trim(),nama_program:document.getElementById('m-nm-prog').value.trim(),kode_kegiatan:document.getElementById('m-kd-keg').value.trim(),nama_kegiatan:document.getElementById('m-nm-keg').value.trim(),kode_sub_kegiatan:document.getElementById('m-kd-sub').value.trim(),nama_sub_kegiatan:document.getElementById('m-nm-sub').value.trim(),uraian_kegiatan:document.getElementById('m-uraian').value.trim(),pagu:Number(document.getElementById('m-pagu').value||0),tahun:Number(document.getElementById('m-tahun').value),bulan:Number(document.getElementById('m-bulan').value),jenis_anggaran:document.getElementById('m-jenis').value};try{let q=id?supabaseClient.from('master_kegiatan_blud').update(payload).eq('id',Number(id)).select('*').single():supabaseClient.from('master_kegiatan_blud').insert(payload).select('*').single();const {data,error}=await q;if(error)throw error;if(id)masterList=masterList.map(m=>Number(m.id)===Number(id)?data:m);else masterList.push(data);closeMasterModal();initAddedFilters();renderMasterTable();updateDashboardMetrics();showDatabaseStatus('Master kegiatan berhasil disimpan ke Supabase.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Simpan master kegiatan'),'error');alert('Master belum berhasil disimpan. Periksa data dan hak akses.');}};
-deleteMasterData=async function(id){if(!confirm('Hapus master ini dari database? Transaksi yang terkait harus diperiksa terlebih dahulu.'))return;if(realisasiList.some(r=>Number(r.master_id)===Number(id))){alert('Master memiliki transaksi terkait. Jangan hapus agar hubungan data tidak rusak.');return;}try{const {error}=await supabaseClient.from('master_kegiatan_blud').delete().eq('id',Number(id));if(error)throw error;masterList=masterList.filter(m=>Number(m.id)!==Number(id));initAddedFilters();renderMasterTable();updateDashboardMetrics();showDatabaseStatus('Master berhasil dihapus.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Hapus master'),'error');alert('Operasi belum berhasil. Periksa data dan hak akses, lalu coba kembali.');}};
+openMasterModal=function(editData=null){
+ if(!window.canInputManual){alert('Akses ditolak. Entri, koreksi, dan penghapusan pagu hanya untuk Admin atau Superadmin.');return;}
+ if(!supabaseClient||!supabaseReady){alert('Database belum siap. Muat ulang aplikasi dan pastikan sudah login.');return;}
+ const form=document.getElementById('form-master-crud');form.reset();
+ document.getElementById('crud-master-id').value='';
+ if(editData){
+  const row=masterList.find(x=>Number(x.id)===Number(editData.id))||editData;
+  document.getElementById('modal-master-title').textContent='Koreksi Rekening & Pagu DPA';
+  document.getElementById('crud-master-id').value=row.id;
+  document.getElementById('m-kd-prog').value=row.kode_program||'';
+  document.getElementById('m-nm-prog').value=row.nama_program||'';
+  document.getElementById('m-kd-keg').value=row.kode_kegiatan||'';
+  document.getElementById('m-nm-keg').value=row.nama_kegiatan||'';
+  document.getElementById('m-kd-sub').value=row.kode_sub_kegiatan||'';
+  document.getElementById('m-nm-sub').value=row.nama_sub_kegiatan||'';
+  document.getElementById('m-uraian').value=row.uraian_kegiatan||'';
+  document.getElementById('m-pagu').value=Number(row.pagu||0);
+  document.getElementById('m-tahun').value=row.tahun||new Date().getFullYear();
+  document.getElementById('m-bulan').value=String(row.bulan||1);
+  document.getElementById('m-jenis').value=row.jenis_anggaran||'Murni';
+ }else{
+  document.getElementById('modal-master-title').textContent='Entri Rekening & Pagu DPA Baru';
+  document.getElementById('m-tahun').value=new Date().getFullYear();
+  document.getElementById('m-bulan').value='1';
+  document.getElementById('m-jenis').value='Murni';
+ }
+ document.getElementById('modal-master-rekening').style.display='flex';
+};
+editMasterData=function(id){
+ if(!window.canInputManual){alert('Akses ditolak. Hanya Admin atau Superadmin yang dapat mengoreksi rekening.');return;}
+ const item=masterList.find(m=>Number(m.id)===Number(id));
+ if(!item){alert('Data rekening tidak ditemukan. Muat ulang daftar rekening.');return;}
+ openMasterModal(item);
+};
+saveMasterData=async function(e){
+ e.preventDefault();
+ if(!window.canInputManual){alert('Akses ditolak. Hanya Admin atau Superadmin yang dapat menyimpan data rekening.');return;}
+ if(!supabaseClient||!supabaseReady){alert('Database belum terhubung. Data belum disimpan.');return;}
+ const form=document.getElementById('form-master-crud');
+ if(!form.reportValidity())return;
+ const id=document.getElementById('crud-master-id').value.trim();
+ const payload={
+  kode_program:document.getElementById('m-kd-prog').value.trim(),
+  nama_program:document.getElementById('m-nm-prog').value.trim(),
+  kode_kegiatan:document.getElementById('m-kd-keg').value.trim(),
+  nama_kegiatan:document.getElementById('m-nm-keg').value.trim(),
+  kode_sub_kegiatan:document.getElementById('m-kd-sub').value.trim(),
+  nama_sub_kegiatan:document.getElementById('m-nm-sub').value.trim(),
+  uraian_kegiatan:document.getElementById('m-uraian').value.trim(),
+  pagu:Number(document.getElementById('m-pagu').value),
+  tahun:Number(document.getElementById('m-tahun').value),
+  bulan:Number(document.getElementById('m-bulan').value),
+  jenis_anggaran:document.getElementById('m-jenis').value
+ };
+ if(!Number.isFinite(payload.pagu)||payload.pagu<0||!Number.isInteger(payload.tahun)||payload.tahun<2000||payload.tahun>2100||!Number.isInteger(payload.bulan)||payload.bulan<1||payload.bulan>12){alert('Periksa nilai pagu, tahun, dan bulan.');return;}
+ const submit=form.querySelector('button[type="submit"]');
+ if(submit){submit.disabled=true;submit.textContent='Menyimpan…';}
+ try{
+  let result;
+  if(id){
+   result=await supabaseClient.from('master_kegiatan_blud').update(payload).eq('id',Number(id)).select('*').maybeSingle();
+  }else{
+   result=await supabaseClient.from('master_kegiatan_blud').insert(payload).select('*').single();
+  }
+  if(result.error)throw result.error;
+  if(!result.data)throw new Error('NO_ROW_RETURNED');
+  const saved={...result.data,id:Number(result.data.id),pagu:Number(result.data.pagu||0)};
+  if(id){const idx=masterList.findIndex(m=>Number(m.id)===Number(id));if(idx<0)masterList.push(saved);else masterList[idx]=saved;}
+  else masterList.push(saved);
+  closeMasterModal();
+  initAddedFilters();renderMasterTable(document.getElementById('searchMasterField')?.value||'');
+  updateDashboardMetrics();
+  showDatabaseStatus(id?'Perubahan rekening berhasil disimpan.':'Rekening baru berhasil disimpan.','ok');
+ }catch(err){
+  console.error('CRUD master rekening gagal:',err);
+  const msg=err?.code==='42501'?'Simpan ditolak oleh kebijakan akses database (RLS). Minta administrator memeriksa izin INSERT/UPDATE.':err?.code==='23502'?'Ada kolom wajib database yang belum terisi. Periksa struktur kolom dan form.':err?.code==='23503'?'Data terkait tidak valid menurut relasi database.':err?.code==='NO_ROW_RETURNED'?'Tidak ada baris yang berubah. Periksa ID data dan izin UPDATE.':'Simpan belum berhasil. Periksa izin database (RLS), nama kolom, dan koneksi, lalu lihat detail error di Console browser.';
+  showDatabaseStatus(msg,'error');alert(msg);
+ }finally{if(submit){submit.disabled=false;submit.textContent='Simpan Pagu';}}
+};
+deleteMasterData=async function(id){
+ if(!window.canInputManual){alert('Akses ditolak. Hanya Admin atau Superadmin yang dapat menghapus rekening.');return;}
+ if(!supabaseClient||!supabaseReady){alert('Database belum terhubung. Data belum dihapus.');return;}
+ const target=masterList.find(m=>Number(m.id)===Number(id));
+ if(!target){alert('Data rekening tidak ditemukan. Muat ulang daftar rekening.');return;}
+ if(realisasiList.some(r=>Number(r.master_id)===Number(id))){alert('Rekening memiliki transaksi realisasi terkait. Hapus atau pindahkan transaksi melalui prosedur yang sah terlebih dahulu.');return;}
+ if(!confirm('Hapus rekening “'+(target.uraian_kegiatan||target.nama_sub_kegiatan||'ini')+'” dari database? Tindakan ini tidak dapat dibatalkan.'))return;
+ try{
+  const {data,error}=await supabaseClient.from('master_kegiatan_blud').delete().eq('id',Number(id)).select('id').maybeSingle();
+  if(error)throw error;
+  if(!data)throw new Error('NO_ROW_DELETED');
+  masterList=masterList.filter(m=>Number(m.id)!==Number(id));
+  initAddedFilters();renderMasterTable(document.getElementById('searchMasterField')?.value||'');updateDashboardMetrics();
+  showDatabaseStatus('Rekening berhasil dihapus dari database.','ok');
+ }catch(err){
+  console.error('Hapus master rekening gagal:',err);
+  const msg=err?.code==='42501'?'Hapus ditolak oleh kebijakan akses database (RLS). Minta administrator memeriksa izin DELETE.':err?.message==='NO_ROW_DELETED'?'Data tidak terhapus. Periksa ID dan izin DELETE pada database.':'Penghapusan belum berhasil. Periksa izin database (RLS), relasi transaksi, dan detail error di Console browser.';
+  showDatabaseStatus(msg,'error');alert(msg);
+ }
+};
 function openUserModal(id=null){if(!window.canManagePejabat){alert('Data Pejabat hanya dapat diakses oleh Superadmin.');return;}document.getElementById('form-user-crud').reset();document.getElementById('u-id').value='';if(id){const u=userList.find(x=>Number(x.id)===Number(id));if(!u)return;document.getElementById('u-id').value=u.id;document.getElementById('u-nama').value=u.nama_lengkap||'';document.getElementById('u-nip').value=u.nip||'';document.getElementById('u-jabatan').value=u.jabatan||'';document.getElementById('u-email').value=u.email||'';document.getElementById('u-role').value=u.role||'PPTK';document.getElementById('user-modal-title').textContent='Ubah Data Pejabat';}else document.getElementById('user-modal-title').textContent='Tambah Pejabat';document.getElementById('modal-master-user').style.display='flex';}
 function closeUserModal(){document.getElementById('modal-master-user').style.display='none';}
 async function saveUserData(e){e.preventDefault();if(!window.canManagePejabat){alert('Akses ditolak. Hanya Superadmin yang dapat mengubah data pejabat.');return;}if(!supabaseClient||!supabaseReady){alert('Database belum terhubung.');return;}const id=document.getElementById('u-id').value;const payload={nama_lengkap:document.getElementById('u-nama').value.trim(),nip:document.getElementById('u-nip').value.trim()||null,jabatan:document.getElementById('u-jabatan').value.trim(),email:document.getElementById('u-email').value.trim()||null,role:document.getElementById('u-role').value};try{const {data,error}=await (id?supabaseClient.from('master_users_blud').update(payload).eq('id',Number(id)).select('*').single():supabaseClient.from('master_users_blud').insert(payload).select('*').single());if(error)throw error;if(id)userList=userList.map(u=>Number(u.id)===Number(id)?data:u);else userList.push(data);closeUserModal();renderUserTable();showDatabaseStatus('Data pejabat tersimpan.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Simpan pejabat'),'error');alert('Data pejabat belum berhasil disimpan. Periksa data dan hak akses.');}}
@@ -3714,8 +3818,9 @@ async function downloadAIPresentation(){
   await pptx.writeFile({fileName:filename});
  }catch(e){console.error('PPT AI Decision:',e);alert('PPT gagal dibuat: '+(e?.message||'kesalahan tidak diketahui')+'. Data aplikasi tidak diubah.');}
 }
-window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();renderMasterTable();renderUserTable();populateMonitoringFilterDropdowns();applyMonitoringFilters();applyLRAFilters();runAIDiagnosis();});
+window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();refreshMasterSearchFilters();renderMasterTable();renderUserTable();populateMonitoringFilterDropdowns();applyMonitoringFilters();applyLRAFilters();runAIDiagnosis();});
 </script>
 
 </body>
 </html>
+
