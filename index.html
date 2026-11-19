@@ -171,10 +171,18 @@
 
         <div>
           <span class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block mb-1.5">II. Penatausahaan Belanja</span>
-          <div class="space-y-1">
-            <button type="button" onclick="switchWindow('win-input-realisasi')" id="nav-input-realisasi" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
-              <span class="text-sm">📝</span>
-              <span>Realisasi Belanja & SPK</span>
+          <div class="space-y-1 pl-2">
+            <button type="button" onclick="switchWindow('win-input-realisasi');setPenatausahaanView('pengajuan')" id="nav-input-realisasi" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <span class="text-sm">📝</span><span>Pengajuan Pembayaran</span>
+            </button>
+            <button type="button" onclick="switchWindow('win-input-realisasi');setPenatausahaanView('verifikasi')" id="nav-pt-verifikasi" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <span class="text-sm">📋</span><span>Verifikasi</span>
+            </button>
+            <button type="button" onclick="switchWindow('win-input-realisasi');setPenatausahaanView('pembayaran')" id="nav-pt-pembayaran" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <span class="text-sm">💳</span><span>Pembayaran</span>
+            </button>
+            <button type="button" onclick="switchWindow('win-input-realisasi');setPenatausahaanView('spj')" id="nav-pt-spj" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <span class="text-sm">📁</span><span>SPJ</span>
             </button>
           </div>
         </div>
@@ -185,6 +193,9 @@
             <button type="button" onclick="switchWindow('win-monitoring')" id="nav-monitoring" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
               <span class="text-sm">📈</span>
               <span>Monitoring Realisasi</span>
+            </button>
+            <button type="button" onclick="switchWindow('win-abk');loadABK()" id="nav-abk" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <span class="text-sm">📋</span><span>Analisis Beban Kerja (ABK)</span>
             </button>
           </div>
         </div>
@@ -435,22 +446,22 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            <div class="bg-white/5 p-3.5 rounded-2xl border border-white/10">
+            <div onclick="openControlDetail('pagu')" role="button" tabindex="0" class="bg-white/5 p-3.5 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition" title="Klik untuk melihat rincian transaksi">
               <span class="text-slate-400 block text-[10px] font-bold">PLAFON PAGU TERPILIH</span>
               <p id="ctrl-pagu" class="text-base sm:text-lg font-black font-mono text-white mt-1">Rp 0</p>
               <span id="ctrl-rek-code" class="text-[10px] text-indigo-300 truncate block mt-0.5">DPA-BLUD 2026</span>
             </div>
-            <div class="bg-white/5 p-3.5 rounded-2xl border border-white/10">
+            <div onclick="openControlDetail('realisasi')" role="button" tabindex="0" class="bg-white/5 p-3.5 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition" title="Klik untuk melihat rincian transaksi">
               <span class="text-slate-400 block text-[10px] font-bold">REALISASI KAS TERSERAP</span>
               <p id="ctrl-realisasi" class="text-base sm:text-lg font-black font-mono text-emerald-400 mt-1">Rp 0</p>
               <span id="ctrl-trans-count" class="text-[10px] text-emerald-300 block mt-0.5">0 Transaksi Sah</span>
             </div>
-            <div class="bg-white/5 p-3.5 rounded-2xl border border-white/10">
+            <div onclick="openControlDetail('sisa')" role="button" tabindex="0" class="bg-white/5 p-3.5 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition" title="Klik untuk melihat rincian transaksi">
               <span class="text-slate-400 block text-[10px] font-bold">SISA PLAFON ANGGARAN</span>
               <p id="ctrl-sisa" class="text-base sm:text-lg font-black font-mono text-indigo-300 mt-1">Rp 0</p>
               <span id="ctrl-status-safety" class="text-[10px] text-slate-300 block mt-0.5 font-bold">Status: Aman</span>
             </div>
-            <div class="bg-white/5 p-3.5 rounded-2xl border border-white/10">
+            <div onclick="openControlDetail('serapan')" role="button" tabindex="0" class="bg-white/5 p-3.5 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition" title="Klik untuk melihat rincian transaksi">
               <span class="text-slate-400 block text-[10px] font-bold">DAYA SERAP KOMITMEN</span>
               <p id="ctrl-persen" class="text-base sm:text-lg font-black font-mono text-amber-300 mt-1">0.0%</p>
               <div class="w-full bg-white/10 h-1.5 rounded-full mt-1.5 overflow-hidden">
@@ -460,18 +471,124 @@
           </div>
         </div>
 
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3" id="penatausahaan-summary">
+          <button type="button" onclick="filterByVerificationSummary('all')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-indigo-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Total Pengajuan</div><div id="pt-total" class="text-xl font-black mt-1">0</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk melihat semua pengajuan</div></button>
+          <button type="button" onclick="filterByVerificationSummary('submitted')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-sky-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Pengajuan</div><div id="pt-verif-submitted" class="text-xl font-black mt-1">0</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk melihat yang belum diproses</div></button>
+          <button type="button" onclick="filterByVerificationSummary('process')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-amber-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Proses Verifikasi</div><div id="pt-verif-process" class="text-xl font-black mt-1">0</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk melihat yang sedang diproses</div></button>
+          <button type="button" onclick="filterByVerificationSummary('complete')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-emerald-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Verifikasi Lengkap</div><div id="pt-verif-complete" class="text-xl font-black mt-1">0</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk melihat yang sudah lengkap</div></button>
+        </div>
+
+        <div id="verification-modal" class="hidden fixed inset-0 z-[120] bg-slate-950/50 backdrop-blur-sm items-center justify-center p-4">
+          <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+              <div><h3 class="font-extrabold text-slate-900">Pemeriksaan Dokumen Pengajuan</h3><p class="text-xs text-slate-500">Catat hasil pemeriksaan dan tindak lanjut perbaikan</p></div>
+              <button type="button" onclick="closeVerificationModal()" class="text-slate-400 hover:text-slate-700 text-xl">×</button>
+            </div>
+            <div id="verification-modal-detail" class="rounded-xl bg-slate-50 border p-3 text-xs space-y-1"></div>
+            <form id="verification-modal-form" class="space-y-3" onsubmit="saveVerificationDecision(event)">
+              <input type="hidden" id="verification-record-id">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><label class="block text-xs font-bold mb-1">Tanggal Verifikasi</label>
+                  <input type="date" id="verification-date" class="w-full border rounded-xl p-2.5 text-sm bg-slate-100" required readonly>
+                </div>
+                <div><label class="block text-xs font-bold mb-1">Verifikator</label>
+                  <select id="verification-officer" class="w-full border rounded-xl p-2.5 text-sm" required></select>
+                </div>
+              </div>
+              <div><label class="block text-xs font-bold mb-1">Catatan Perbaikan / Hasil Verifikasi</label>
+                <textarea id="verification-note" rows="3" class="w-full border rounded-xl p-3 text-sm" placeholder="Contoh: Tanda tangan PPK belum ada..." required></textarea>
+              </div>
+              <div class="border rounded-xl p-3 space-y-2">
+                <div class="text-xs font-bold text-slate-700">Histori Verifikasi</div>
+                <div id="verification-history" class="space-y-2 max-h-48 overflow-y-auto text-xs"><div class="text-slate-400">Belum ada histori verifikasi.</div></div>
+              </div>
+              <div><label class="block text-xs font-bold mb-2">Status Verifikasi</label>
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="border rounded-xl p-3 flex items-center gap-2 cursor-pointer"><input type="radio" name="verification-decision" value="Perbaikan" checked><span class="text-sm font-semibold">Perbaikan</span></label>
+                  <label class="border rounded-xl p-3 flex items-center gap-2 cursor-pointer"><input type="radio" name="verification-decision" value="Lengkap"><span class="text-sm font-semibold">Lengkap</span></label>
+                </div>
+              </div>
+              <div class="flex justify-end gap-2 pt-2"><button type="button" onclick="closeVerificationModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">Batal</button><button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">Simpan Hasil Verifikasi</button></div>
+            </form>
+          </div>
+        </div>
+
+
+        <div id="payment-modal" class="hidden fixed inset-0 z-[125] bg-slate-950/50 backdrop-blur-sm items-center justify-center p-4">
+          <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b pb-3">
+              <div><h3 class="font-extrabold text-slate-900">Pemeriksaan Pembayaran</h3><p class="text-xs text-slate-500">Periksa informasi pengajuan dan catat status pelunasan</p></div>
+              <button type="button" onclick="closePaymentModal()" class="text-slate-400 hover:text-slate-700 text-xl">×</button>
+            </div>
+            <div id="payment-modal-detail" class="rounded-xl bg-slate-50 border p-3 text-xs space-y-1"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="block text-xs font-bold mb-1">Tanggal Pembayaran</label><input type="date" id="payment-date" readonly class="w-full border rounded-xl p-2.5 text-sm bg-slate-100"></div>
+              <div><label class="block text-xs font-bold mb-1">Nama Bendahara</label><select id="payment-treasurer" class="w-full border rounded-xl p-2.5 text-sm"><option value="">Pilih bendahara</option></select></div>
+              <div><label class="block text-xs font-bold mb-1">Cara Pembayaran</label><select id="payment-method" onchange="refreshPaymentNumberPreview()" class="w-full border rounded-xl p-2.5 text-sm"><option value="GU">GU</option><option value="LS">LS</option></select></div>
+              <div><label class="block text-xs font-bold mb-1">Nomor SPM/BKU (Otomatis)</label><input id="payment-number" readonly class="w-full border rounded-xl p-2.5 text-sm bg-slate-100 font-semibold" placeholder="Nomor otomatis"></div>
+              <div><label class="block text-xs font-bold mb-1">Nominal Pembayaran (Rp)</label><input type="number" min="1" step="1" id="payment-amount" class="w-full border rounded-xl p-2.5 text-sm" placeholder="Masukkan nominal pembayaran"></div>
+              <div><label class="block text-xs font-bold mb-1">Status Pembayaran</label><div id="payment-current-status" class="w-full border rounded-xl p-2.5 text-sm font-bold bg-slate-50">Pengajuan</div></div>
+            </div>
+            <div class="rounded-xl border p-3 text-xs">
+              <div class="font-bold text-slate-700 mb-2">Informasi Pembayaran</div>
+              <div id="payment-extra-info" class="space-y-1 text-slate-600">Nomor SPM/BKU dibuat otomatis berdasarkan cara pembayaran dan Tahun Anggaran.</div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+              <button type="button" onclick="closePaymentModal()" class="px-4 py-2 bg-slate-100 text-slate-600 rounded-xl text-xs font-bold">Tutup</button>
+              <button type="button" id="payment-confirm-button" onclick="confirmPaymentFromModal()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold">Konfirmasi Pelunasan</button>
+            </div>
+          </div>
+        </div>
+        <div id="verification-history-view-modal" class="hidden fixed inset-0 z-[130] bg-slate-950/60 backdrop-blur-sm items-center justify-center p-3 sm:p-5">
+          <div class="bg-white w-full max-w-3xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl flex flex-col">
+            <div class="p-4 sm:p-5 border-b flex items-center justify-between"><div><h3 class="font-extrabold text-slate-900">Riwayat Verifikasi Pengajuan</h3><p class="text-xs text-slate-500">Tanggal pemeriksaan, hasil, catatan, dan nama verifikator</p></div><button type="button" onclick="closeVerificationHistoryView()" class="text-slate-400 text-2xl">×</button></div>
+            <div id="verification-history-view-detail" class="p-4 bg-slate-50 border-b text-sm space-y-1"></div>
+            <div class="p-4 overflow-auto"><div class="font-bold text-sm mb-3">Histori Verifikasi</div><div id="verification-history-view-list" class="space-y-3 text-sm"><div class="text-slate-400">Memuat histori...</div></div></div>
+            <div class="p-3 border-t flex justify-end"><button type="button" onclick="closeVerificationHistoryView()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">Tutup</button></div>
+          </div>
+        </div>
+
+        <div id="spj-modal" class="hidden fixed inset-0 z-[130] bg-slate-950/60 backdrop-blur-sm items-center justify-center p-4">
+          <div class="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between border-b pb-3"><div><h3 class="font-extrabold text-slate-900">Pencatatan SPJ</h3><p class="text-xs text-slate-500">Catat penerimaan dokumen pendukung pengajuan</p></div><button type="button" onclick="closeSPJModal()" class="text-slate-400 text-2xl">×</button></div>
+            <input type="hidden" id="spj-record-id">
+            <div id="spj-modal-detail" class="rounded-xl bg-slate-50 border p-3 text-xs space-y-1"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div><label class="block text-xs font-bold mb-1">Tanggal Pengumpulan</label><input type="date" id="spj-date" readonly class="w-full border rounded-xl p-2.5 text-sm bg-slate-100"></div>
+              <div><label class="block text-xs font-bold mb-1">Verifikator</label><input type="text" id="spj-officer" list="spj-officer-options" required maxlength="150" autocomplete="off" placeholder="Ketik untuk mencari nama verifikator" class="w-full border rounded-xl p-2.5 text-sm"><datalist id="spj-officer-options"></datalist><p class="text-[10px] text-slate-500 mt-1">Ketik nama untuk mencari; nama juga dapat ditulis bebas.</p></div>
+            </div>
+            <div><label class="block text-xs font-bold mb-2">Status Pengumpulan Dokumen</label><div class="grid grid-cols-2 gap-2"><label class="border rounded-xl p-3 flex items-center gap-2 cursor-pointer"><input type="radio" name="spj-status" value="Belum Dikumpulkan" checked><span class="text-sm font-semibold">Belum Dikumpulkan</span></label><label class="border rounded-xl p-3 flex items-center gap-2 cursor-pointer"><input type="radio" name="spj-status" value="Lengkap"><span class="text-sm font-semibold">Sudah Dikumpulkan / Lengkap</span></label></div></div>
+            <div><label class="block text-xs font-bold mb-1">Catatan (opsional)</label><textarea id="spj-note" rows="2" class="w-full border rounded-xl p-3 text-sm" placeholder="Catatan penerimaan dokumen..."></textarea></div>
+            <div class="border rounded-xl p-3"><div class="text-xs font-bold mb-2">Riwayat Pengumpulan SPJ</div><div id="spj-history" class="space-y-2 max-h-40 overflow-y-auto text-xs text-slate-600">Belum ada riwayat.</div></div>
+            <div class="flex justify-end gap-2"><button type="button" onclick="closeSPJModal()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">Batal</button><button type="button" onclick="saveSPJRecord()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold">Simpan</button></div>
+          </div>
+        </div>
+
+        <div id="control-detail-modal" class="hidden fixed inset-0 z-[125] bg-slate-950/60 backdrop-blur-sm items-center justify-center p-3 sm:p-5">
+          <div class="bg-white w-full max-w-6xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl flex flex-col">
+            <div class="p-4 sm:p-5 border-b flex items-center justify-between gap-3"><div><h3 id="control-detail-title" class="font-extrabold text-slate-900">Rincian Kartu Kendali</h3><p class="text-xs text-slate-500">Rincian transaksi sesuai filter aktif</p></div><button type="button" onclick="closeControlDetail()" class="text-slate-400 text-2xl">×</button></div>
+            <div class="p-4 overflow-auto"><div class="text-xs text-slate-500 mb-3" id="control-detail-count"></div><table class="w-full min-w-[850px] text-xs border-collapse"><thead class="bg-slate-100"><tr><th class="p-2 border text-left">No.</th><th class="p-2 border text-left">No. Register</th><th class="p-2 border text-left">Uraian / Rekening</th><th class="p-2 border text-left">Penyedia</th><th class="p-2 border text-left">PPTK</th><th class="p-2 border text-right">Nilai</th><th class="p-2 border text-left">Verifikasi</th></tr></thead><tbody id="control-detail-body"></tbody></table></div>
+            <div class="p-3 border-t flex justify-end"><button type="button" onclick="closeControlDetail()" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold">Tutup</button></div>
+          </div>
+        </div>
+
         <!-- FORMULIR INPUT REALISASI -->
         <div id="wrapper-form-realisasi" class="hidden bg-white p-5 sm:p-7 rounded-3xl border border-indigo-200 shadow-md space-y-4 transition duration-300">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 id="form-realisasi-heading" class="text-sm sm:text-base font-bold text-slate-900">Formulir Pengakuan Realisasi Belanja BLUD</h3>
-              <p class="text-xs text-slate-400">Pencatatan Surat Perintah Kerja (SPK), Serah Terima (BAST), dan Pencairan Kas (SPM/BKU)</p>
+              <h3 id="form-realisasi-heading" class="text-sm sm:text-base font-bold text-slate-900">Form Pengajuan Pembayaran</h3>
+              <p class="text-xs text-slate-400">Pencatatan pengajuan pembayaran dan status kelengkapan dokumen</p>
             </div>
             <button type="button" onclick="toggleFormInputRealisasi(false)" class="text-slate-400 hover:text-slate-600 font-bold text-sm cursor-pointer">✕ Tutup</button>
           </div>
 
           <form id="form-transaksi" onsubmit="return false;" class="space-y-4 text-xs">
             <input type="hidden" id="trans-edit-id" value="">
+            <div class="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+              <label class="block text-[10px] font-extrabold uppercase tracking-wider text-indigo-700 mb-1">Kode Unik Realisasi</label>
+              <input type="text" id="trans-kode-unik" readonly class="w-full bg-white border border-indigo-200 rounded-xl p-3 font-mono text-lg font-black tracking-wider text-indigo-900" placeholder="Dibuat otomatis">
+              <p class="text-[10px] text-indigo-600 mt-1">Format: nomor urut + bulan + tahun (contoh: 0001012026)</p>
+            </div>
 
             <div class="p-3 bg-slate-50 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -526,7 +643,7 @@
 
               <div id="trans-pagu-box" class="hidden p-3 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between">
                 <div>
-                  <span class="text-indigo-900 font-bold block">Pagu Efektif:</span>
+                  <span class="text-indigo-900 font-bold block">Sisa Pagu Efektif (Pagu dikurangi Realisasi):</span>
                   <span id="trans-pagu-rek" class="text-[10px] text-indigo-600 font-mono"></span>
                 </div>
                 <span id="trans-pagu-display" class="font-mono font-black text-indigo-700 text-sm">Rp 0</span>
@@ -546,15 +663,7 @@
                 <label class="font-semibold text-slate-700 block mb-1">Pejabat PPTK *</label>
                 <select id="trans-pptk" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium" required></select>
               </div>
-              <div>
-                <label class="font-semibold text-slate-700 block mb-1">Nomor SPM / BKU</label>
-                <input type="text" id="trans-bku" placeholder="Nomor Penerbitan SPM / BKU" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5">
-              </div>
-              <div>
-                <label class="font-semibold text-slate-700 block mb-1">Tanggal SPM / BKU</label>
-                <input type="date" id="trans-tgl-bku" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2">
-              </div>
-              <div class="sm:col-span-2">
+<div class="sm:col-span-2">
                 <label class="font-bold text-slate-900 block mb-1">NILAI REALISASI BELANJA BRUTO (Rp) *</label>
                 <input type="number" id="trans-nilai" placeholder="Contoh: 60051000" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm font-mono font-bold text-slate-900 focus:ring-2 focus:ring-indigo-500/20" required>
               </div>
@@ -646,14 +755,6 @@
               <datalist id="cf-options-penyedia"></datalist>
             </div>
             <div>
-              <label class="font-bold text-slate-700 block mb-1">7. Progres BKU/SPM</label>
-              <select id="cf-progres" onchange="applyCascadingFilter()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500">
-                <option value="ALL">Semua Progres</option>
-                <option value="PROSES">Proses — nomor BKU/SPM belum terisi</option>
-                <option value="FINAL">Final — nomor BKU/SPM sudah terisi</option>
-              </select>
-            </div>
-            <div>
               <label class="font-bold text-slate-700 block mb-1">8. PPTK</label>
               <input type="text" id="cf-search-pptk" list="cf-options-pptk" oninput="searchCascadingOptions('cf-pptk','cf-search-pptk')" placeholder="Ketik nama PPTK..." class="w-full bg-white border border-slate-200 rounded-xl p-2 font-medium hidden" autocomplete="off">
               <select id="cf-pptk" onchange="applyCascadingFilter()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 font-medium focus:ring-2 focus:ring-indigo-500">
@@ -690,16 +791,22 @@
           </div>
 
           <div id="wrapper-register-table" class="hidden transition duration-300">
+            <div id="payment-bulk-toolbar" class="hidden mb-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 flex flex-wrap items-center justify-between gap-3">
+              <div><div class="text-xs text-emerald-800"><b id="payment-selected-count">0 pengajuan dipilih</b></div><div class="text-sm font-extrabold text-emerald-900" id="payment-selected-total">Rp0</div></div>
+              <button type="button" onclick="openBulkPaymentModal()" id="payment-bulk-button" disabled class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold disabled:opacity-40">Proses Pembayaran Terpilih</button>
+            </div>
             <div class="overflow-x-auto custom-scroll border border-slate-100 rounded-2xl">
-              <table class="w-full text-left text-xs min-w-[750px]">
+              <table class="w-full text-left text-xs min-w-[1250px]">
                 <thead class="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 uppercase tracking-wider">
                   <tr>
-                    <th class="py-3 px-3">No</th>
+                    <th class="py-3 px-3">No.</th>
+                    <th class="py-3 px-3">No. Register</th>
                     <th class="py-3 px-3">Uraian Pekerjaan & Rekening</th>
                     <th class="py-3 px-3">Penyedia</th>
                     <th class="py-3 px-3">PPTK</th>
-                    <th class="py-3 px-3">SPM / BKU</th>
                     <th class="py-3 px-3 text-right">Realisasi (Rp)</th>
+                    <th class="py-3 px-3 text-center">Verifikasi</th>
+                    <th class="py-3 px-3 text-center">Pembayaran</th>
                     <th class="py-3 px-3 text-center">Aksi</th>
                   </tr>
                 </thead>
@@ -790,6 +897,37 @@
       </section>
 
       <!-- 6. LAPORAN LRA -->
+      <section id="win-abk" class="hidden space-y-6">
+        <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <div><h3 class="text-sm font-extrabold text-slate-900">Analisis Beban Kerja (ABK)</h3><p class="text-xs text-slate-500">Penghitungan berdasarkan register pengajuan yang diverifikasi dan dibayarkan</p></div>
+            <button type="button" onclick="loadABK()" class="px-3 py-2 rounded-xl bg-indigo-50 text-indigo-700 text-xs font-bold">Muat Ulang</button>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div><label class="block text-xs font-bold text-slate-600 mb-1">Tahun Transaksi</label><select id="abk-year" onchange="initABKMonthFilter();renderABK()" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-2.5 text-sm"></select></div>
+            <div><label class="block text-xs font-bold text-slate-600 mb-1">Periode sampai bulan</label><select id="abk-month" onchange="renderABK()" class="w-full border border-slate-200 bg-slate-50 rounded-xl p-2.5 text-sm"></select></div>
+          </div>
+          <p id="abk-period-note" class="text-[11px] text-slate-500"></p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="rounded-2xl border border-sky-100 bg-sky-50 p-4"><div class="text-[10px] uppercase font-bold text-sky-700">Register Diverifikasi</div><div id="abk-verif-total" class="text-2xl font-black text-sky-900">0</div></div>
+            <div class="rounded-2xl border border-emerald-100 bg-emerald-50 p-4"><div class="text-[10px] uppercase font-bold text-emerald-700">Register Dibayarkan</div><div id="abk-pay-total" class="text-2xl font-black text-emerald-900">0</div></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm"><h4 class="font-extrabold text-sm mb-3">Beban Kerja Verifikator</h4><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="bg-slate-50"><tr><th class="p-2 text-left">Verifikator</th><th class="p-2 text-right">Register</th></tr></thead><tbody id="abk-verif-body"></tbody></table></div></div>
+          <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm"><h4 class="font-extrabold text-sm mb-3">Beban Kerja Bendahara</h4><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="bg-slate-50"><tr><th class="p-2 text-left">Bendahara</th><th class="p-2 text-right">Register</th></tr></thead><tbody id="abk-pay-body"></tbody></table></div></div>
+        </div>
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+          <button type="button" id="abk-detail-toggle" aria-expanded="false" onclick="toggleABKDetails()" class="w-full p-5 flex items-center justify-between gap-3 text-left hover:bg-slate-50 transition">
+            <span><span class="block font-extrabold text-sm text-slate-900">Rincian Aktivitas per Register</span><span class="block text-xs text-slate-500 mt-1">Klik untuk melihat atau menyembunyikan rincian aktivitas</span></span>
+            <span class="flex items-center gap-2 text-xs font-bold text-indigo-700"><span id="abk-detail-toggle-label">Lihat Rincian</span><svg id="abk-detail-chevron" class="w-4 h-4 transition-transform" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.22 7.22a.75.75 0 011.06 0L10 10.94l3.72-3.72a.75.75 0 111.06 1.06l-4.25 4.25a.75.75 0 01-1.06 0L5.22 8.28a.75.75 0 010-1.06z" clip-rule="evenodd"/></svg></span>
+          </button>
+          <div id="abk-detail-content" class="hidden border-t border-slate-100 p-5">
+            <div class="overflow-x-auto"><table class="w-full min-w-[850px] text-xs"><thead class="bg-slate-50"><tr><th class="p-2 text-left">Tanggal</th><th class="p-2 text-left">No. Register</th><th class="p-2 text-left">Aktivitas</th><th class="p-2 text-left">Petugas</th><th class="p-2 text-left">Uraian</th></tr></thead><tbody id="abk-detail-body"></tbody></table></div>
+          </div>
+        </div>
+      </section>
+
       <section id="win-laporan" class="hidden space-y-6">
         <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 no-print">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
@@ -1188,12 +1326,12 @@
         alert('Akses ditolak. Data Pejabat hanya dapat diakses oleh Superadmin.');
         return;
       }
-      ['win-dashboard', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-laporan', 'win-tren-tahunan', 'win-prognosis', 'win-ai-decision', 'win-buku-besar-blud'].forEach(id => {
+      ['win-dashboard', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-abk', 'win-laporan', 'win-tren-tahunan', 'win-prognosis', 'win-ai-decision', 'win-buku-besar-blud'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
 
-      ['nav-dashboard', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-monitoring', 'nav-laporan', 'nav-tren-tahunan', 'nav-prognosis', 'nav-ai-decision', 'nav-buku-besar-blud'].forEach(id => {
+      ['nav-dashboard', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-monitoring', 'nav-abk', 'nav-laporan', 'nav-tren-tahunan', 'nav-prognosis', 'nav-ai-decision', 'nav-buku-besar-blud'].forEach(id => {
         const nav = document.getElementById(id);
         if (nav) nav.classList.remove('nav-active');
       });
@@ -1207,6 +1345,7 @@
         'win-master-user': ['Pejabat Pengelola (KPA, PPK, PPTK)', 'Khusus Superadmin: Pengaturan NIP, Jabatan Kedinasan, dan Hak Akses'],
         'win-input-realisasi': ['Penatausahaan Belanja BLUD', 'Kartu Kendali Plafon, Formulir Realisasi, dan Register Belanja Berfilter'],
         'win-monitoring': ['Monitoring Realisasi', 'Analisis Performa Realisasi Kas Bulanan dan Pengawasan Serapan Kegiatan'],
+        'win-abk': ['Analisis Beban Kerja (ABK)', 'Beban kerja verifikator dan bendahara berdasarkan register pengajuan'],
         'win-laporan': ['Laporan Realisasi Anggaran (LRA)', 'Pertanggungjawaban Keuangan Penatausahaan Kas Akumulasi Tingkat Kegiatan (Format A4)'],
         'win-tren-tahunan': ['Tren Tahunan', 'Perbandingan pagu efektif, realisasi, sisa anggaran, dan serapan lintas tahun'],
         'win-prognosis': ['Prognosis Anggaran', 'Estimasi realisasi akhir tahun berdasarkan data aktual dan filter Program, Kegiatan, serta Subkegiatan'],
@@ -1532,7 +1671,6 @@
       const fKeg = document.getElementById('cf-kegiatan')?.value || 'ALL';
       const fRek = document.getElementById('cf-rekening')?.value || 'ALL';
       const fPen = includeProvider ? (document.getElementById('cf-penyedia')?.value || 'ALL') : 'ALL';
-      const fProgres = document.getElementById('cf-progres')?.value || 'ALL';
       const fPptk = includePptk ? (document.getElementById('cf-pptk')?.value || 'ALL') : 'ALL';
       const masters = masterList.filter(m =>
         (fProg === 'ALL' || (m.nama_program || '').trim() === fProg) &&
@@ -1544,8 +1682,6 @@
         if (!ids.has(Number(r.master_id))) return false;
         if (fPen !== 'ALL' && (r.penyedia || '').trim() !== fPen) return false;
         if (fPptk !== 'ALL' && (r.pptk || '').trim() !== fPptk) return false;
-        const progress = String(r.nomor_spm_bku || '').trim() ? 'FINAL' : 'PROSES';
-        if (fProgres !== 'ALL' && progress !== fProgres) return false;
         return true;
       });
     }
@@ -1587,7 +1723,6 @@
       if (document.getElementById('cf-tahun')) document.getElementById('cf-tahun').value = '2026';
       if (document.getElementById('cf-bulan')) document.getElementById('cf-bulan').value = 'ALL';
       if (document.getElementById('cf-program')) document.getElementById('cf-program').value = 'ALL';
-      if (document.getElementById('cf-progres')) document.getElementById('cf-progres').value = 'ALL';
       if (document.getElementById('cf-pptk')) document.getElementById('cf-pptk').value = 'ALL';
       refreshCascadingOptions(true);
     }
@@ -1599,7 +1734,6 @@
       const fKeg = document.getElementById('cf-kegiatan')?.value || 'ALL';
       const fRek = document.getElementById('cf-rekening')?.value || 'ALL';
       const fPen = document.getElementById('cf-penyedia')?.value || 'ALL';
-      const fProgres = document.getElementById('cf-progres')?.value || 'ALL';
       const fPptk = document.getElementById('cf-pptk')?.value || 'ALL';
       const searchRaw = (document.getElementById('searchRealisasiInput')?.value || '').toLowerCase().trim();
       // Pencarian multi-kata: setiap kata boleh ditemukan pada bagian teks yang
@@ -1656,8 +1790,6 @@
 
         if (fPen !== 'ALL' && (r.penyedia || '').trim() !== fPen) return false;
         if (fPptk !== 'ALL' && (r.pptk || '').trim() !== fPptk) return false;
-        const progress = String(r.nomor_spm_bku || '').trim() ? 'FINAL' : 'PROSES';
-        if (fProgres !== 'ALL' && progress !== fProgres) return false;
 
         if (searchTerms.length) {
           const master = masterList.find(m => Number(m.id) === Number(r.master_id)) || {};
@@ -1678,6 +1810,22 @@
         return true;
       });
 
+      if (activeVerificationSummaryFilter === 'submitted') filteredRealisasi = filteredRealisasi.filter(r => String(r.status_verifikasi || 'Pengajuan').trim() === 'Pengajuan');
+      else if (activeVerificationSummaryFilter === 'process') filteredRealisasi = filteredRealisasi.filter(r => String(r.status_verifikasi || 'Pengajuan').trim().startsWith('Verifikasi '));
+      else if (activeVerificationSummaryFilter === 'complete') filteredRealisasi = filteredRealisasi.filter(r => String(r.status_verifikasi || 'Pengajuan').trim() === 'Lengkap');
+      if(activePenatausahaanView==='pembayaran'){
+        if(activePaymentSummaryFilter==='submitted') filteredRealisasi=filteredRealisasi.filter(r=>String(r.status_pembayaran||'Pengajuan').trim().toLowerCase()!=='lunas');
+        else if(activePaymentSummaryFilter==='paid') filteredRealisasi=filteredRealisasi.filter(r=>(r.status_pembayaran||'Pengajuan')==='Lunas');
+      }
+      currentFilteredRealisasiList = filteredRealisasi.slice();
+      // Hapus pilihan yang sudah lunas atau tidak lagi memenuhi filter aktif.
+      if (activePenatausahaanView === 'pembayaran') {
+        const visibleIds = new Set(filteredRealisasi.map(r => Number(r.id)));
+        (realisasiList || []).forEach(r => {
+          if ((r.status_pembayaran || 'Pengajuan').trim().toLowerCase() === 'lunas' || !visibleIds.has(Number(r.id))) selectedPaymentIds.delete(Number(r.id));
+        });
+        updatePaymentSelectionSummary();
+      }
       updateControlCardFromCascading(matchedMasters, filteredRealisasi, fRek);
       renderPenatausahaanRows(filteredRealisasi);
     }
@@ -1688,7 +1836,7 @@
       const period = [
         `Tahun: ${f('cf-tahun')}`, `Bulan: ${f('cf-bulan')}`, `Program: ${f('cf-program')}`,
         `Kegiatan: ${f('cf-kegiatan')}`, `Objek Rekening: ${f('cf-rekening')}`,
-        `Penyedia: ${f('cf-penyedia')}`, `Progres BKU/SPM: ${f('cf-progres')}`, `PPTK: ${f('cf-pptk')}`
+        `Penyedia: ${f('cf-penyedia')}`, `PPTK: ${f('cf-pptk')}`
       ].join(' | ');
       const tableRows = rows.map((tr, i) => {
         const cells = Array.from(tr.querySelectorAll('td')).slice(0, 6).map(td => td.innerText.trim());
@@ -1706,7 +1854,20 @@
       return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     }
 
+    let currentControlDetailRows = [];
+    function openControlDetail(kind) {
+      const titles={pagu:'Rincian Kartu Kendali · Plafon Pagu',realisasi:'Rincian Kartu Kendali · Realisasi Kas',sisa:'Rincian Kartu Kendali · Sisa Plafon',serapan:'Rincian Kartu Kendali · Daya Serap'};
+      const rows=currentControlDetailRows||[];
+      const masterFor=r=>masterList.find(m=>Number(m.id)===Number(r.master_id))||{};
+      document.getElementById('control-detail-title').textContent=titles[kind]||'Rincian Kartu Kendali';
+      document.getElementById('control-detail-count').textContent=`${rows.length} transaksi pada filter aktif`;
+      document.getElementById('control-detail-body').innerHTML=rows.length?rows.map((r,i)=>{const m=masterFor(r);return `<tr class="hover:bg-slate-50"><td class="p-2 border">${i+1}</td><td class="p-2 border">${safeText(r.kode_unik_realisasi||'-')}</td><td class="p-2 border">${safeText(r.pekerjaan||m.uraian_kegiatan||'-')}<div class="text-slate-500">${safeText(m.kode_rekening||'')}</div></td><td class="p-2 border">${safeText(r.penyedia||'-')}</td><td class="p-2 border">${safeText(r.pptk||'-')}</td><td class="p-2 border text-right">${formatRupiah(Number(r.nilai_kegiatan||0))}</td><td class="p-2 border">${safeText(r.status_verifikasi||'Pengajuan')}</td></tr>`}).join(''):'<tr><td colspan="7" class="p-5 text-center text-slate-500 border">Tidak ada transaksi pada filter aktif.</td></tr>';
+      const modal=document.getElementById('control-detail-modal');modal.classList.remove('hidden');modal.classList.add('flex');
+    }
+    function closeControlDetail(){const modal=document.getElementById('control-detail-modal');modal.classList.add('hidden');modal.classList.remove('flex');}
+
     function updateControlCardFromCascading(masters, realisasis, selectedRekId) {
+      currentControlDetailRows = Array.isArray(realisasis) ? [...realisasis] : [];
       let pagu = masters.reduce((a, c) => a + Number(c.pagu || 0), 0);
       let real = realisasis.reduce((a, c) => a + Number(c.nilai_kegiatan || 0), 0);
       let sisa = pagu - real;
@@ -1743,50 +1904,498 @@
       }
     }
 
-    function renderPenatausahaanRows(list) {
-      const tbody = document.getElementById('penatausahaan-table-body');
-      const emptyState = document.getElementById('penatausahaan-empty');
-      const countLabel = document.getElementById('reg-count-label');
-
-      if (countLabel) countLabel.textContent = `Menampilkan ${list.length} dari ${realisasiList.length} total transaksi`;
-
-      if (!tbody) return;
-
-      if (list.length === 0) {
-        tbody.innerHTML = '';
-        if (emptyState) emptyState.classList.remove('hidden');
+    let activePenatausahaanView = 'pengajuan';
+    let spjLatestById = {};
+    let activeSPJSummaryFilter = 'all';
+    const selectedPaymentIds = new Set();
+    let currentFilteredRealisasiList = [];
+    let activeVerificationSummaryFilter = 'all';
+    // Filter kartu khusus modul Verifikasi.
+    function filterByVerificationSummary(mode) {
+      activeVerificationSummaryFilter = mode || 'all';
+      applyCascadingFilter();
+    }
+    function setPenatausahaanView(view) {
+      activePenatausahaanView = view;
+      activeSPJSummaryFilter = 'all';
+      activeVerificationSummaryFilter = view === 'verifikasi' ? 'process' : 'all';
+      activePaymentSummaryFilter = 'all';
+      const navIds = {pengajuan:'nav-input-realisasi',verifikasi:'nav-pt-verifikasi',pembayaran:'nav-pt-pembayaran',spj:'nav-pt-spj'};
+      Object.values(navIds).forEach(id => document.getElementById(id)?.classList.remove('nav-active'));
+      document.getElementById(navIds[view])?.classList.add('nav-active');
+      const heading = document.getElementById('form-realisasi-heading');
+      if (heading) heading.textContent = 'Form Pengajuan Pembayaran';
+      const formWrap=document.getElementById('wrapper-form-realisasi');
+      if(view!=='pengajuan' && formWrap) formWrap.classList.add('hidden');
+      if(view==='spj') loadSPJHistory();
+      const addBtn=document.querySelector('button[onclick="toggleFormInputRealisasi(true)"]');
+      if(addBtn) addBtn.classList.toggle('hidden',view!=='pengajuan' && !window.canInputManual);
+      const summary=document.getElementById('penatausahaan-summary');
+      if(summary) summary.classList.remove('hidden');
+      updatePenatausahaanSummary();
+      applyCascadingFilter();
+    }
+    function updatePenatausahaanSummary() {
+      const rows = realisasiList || [];
+      const set = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=String(v); };
+      const cards=document.getElementById('penatausahaan-summary');
+      if(!cards) return;
+      if(activePenatausahaanView==='pembayaran'){
+        updatePaymentSummary(rows, cards);
         return;
       }
+      if(activePenatausahaanView==='spj'){ updateSPJSummary(rows, cards); return; }
+      // Pulihkan kartu asli Pengajuan/Verifikasi setelah modul Pembayaran
+      // pernah mengganti isi kontainer ringkasan dengan kartu khusus pembayaran.
+      const originalSummary = `
+        <button type="button" onclick="filterByVerificationSummary('all')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-indigo-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Total Pengajuan</div><div id="pt-total" class="text-xl font-black mt-1">0</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk melihat semua pengajuan</div></button>
+        <button type="button" onclick="filterByVerificationSummary('submitted')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-sky-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Pengajuan</div><div id="pt-verif-submitted" class="text-xl font-black mt-1">0</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk melihat yang belum diproses</div></button>
+        <button type="button" onclick="filterByVerificationSummary('process')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-amber-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Proses Verifikasi</div><div id="pt-verif-process" class="text-xl font-black mt-1">0</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk melihat yang sedang diproses</div></button>
+        <button type="button" onclick="filterByVerificationSummary('complete')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-emerald-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Verifikasi Lengkap</div><div id="pt-verif-complete" class="text-xl font-black mt-1">0</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk melihat yang sudah lengkap</div></button>`;
+      if(!cards.querySelector('#pt-total')) cards.innerHTML=originalSummary;
+      cards.className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3';
+      if(activePenatausahaanView==='verifikasi') updateVerifikasiSummary(rows, set);
+      else updatePengajuanSummary(rows, set);
+    }
 
-      if (emptyState) emptyState.classList.add('hidden');
-      tbody.innerHTML = list.map((item, idx) => {
-        const master = masterList.find(m => Number(m.id) === Number(item.master_id)) || {};
-        const isSPM = item.nomor_spm_bku && String(item.nomor_spm_bku).trim() !== '';
+    function updatePaymentSummary(rows, cards) {
+      if (!cards) return;
+      cards.className = 'grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-3';
+      cards.innerHTML = `
+        <button type="button" onclick="filterByPaymentSummary('all')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-indigo-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Total Pengajuan</div><div id="pay-total" class="text-xl font-black mt-1">${rows.length}</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk seluruh data pembayaran</div></button>
+        <button type="button" onclick="filterByPaymentSummary('submitted')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-sky-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Pengajuan</div><div id="pay-submitted" class="text-xl font-black mt-1">${rows.filter(r => (r.status_pembayaran || 'Pengajuan') !== 'Lunas').length}</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk pengajuan belum lunas</div></button>
+        <button type="button" onclick="filterByPaymentSummary('paid')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-emerald-400 hover:shadow-md transition"><div class="text-[10px] uppercase font-bold text-slate-500">Pelunasan</div><div id="pay-paid" class="text-xl font-black mt-1">${rows.filter(r => (r.status_pembayaran || 'Pengajuan') === 'Lunas').length}</div><div class="text-[10px] text-indigo-600 mt-1">Klik untuk pembayaran lunas</div></button>`;
+    }
+    function updatePengajuanSummary(rows, set) {
+      set('pt-total', rows.length);
+      set('pt-verif-submitted', rows.filter(r => String(r.status_verifikasi || 'Pengajuan').trim() === 'Pengajuan').length);
+      set('pt-verif-complete', rows.filter(r => (r.status_verifikasi || 'Pengajuan') === 'Lengkap').length);
+      set('pt-verif-process', rows.filter(r => String(r.status_verifikasi || 'Pengajuan').startsWith('Verifikasi ')).length);
+    }
+    function updateVerifikasiSummary(rows, set) {
+      set('pt-total', rows.length);
+      set('pt-verif-submitted', rows.filter(r => String(r.status_verifikasi || 'Pengajuan').trim() === 'Pengajuan').length);
+      set('pt-verif-process', rows.filter(r => String(r.status_verifikasi || 'Pengajuan').startsWith('Verifikasi ')).length);
+      set('pt-verif-complete', rows.filter(r => (r.status_verifikasi || 'Pengajuan') === 'Lengkap').length);
+    }
+    let activePaymentSummaryFilter='all';
+    // Filter kartu khusus modul Pembayaran; tidak mengubah status verifikasi.
+    function filterByPaymentSummary(mode){
+      activePaymentSummaryFilter=mode||'all';
+      applyCascadingFilter();
+    }
+    function getVisiblePaymentRows(){
+      return Array.isArray(currentFilteredRealisasiList) ? currentFilteredRealisasiList : (realisasiList||[]);
+    }
+    function syncPaymentSelectAll(visibleRows=getVisiblePaymentRows()){
+      const master=document.getElementById('payment-select-all');
+      if(!master) return;
+      const eligible=(visibleRows||[]).filter(r=>String(r.status_pembayaran||'Pengajuan').trim().toLowerCase()!=='lunas');
+      const selected=eligible.filter(r=>selectedPaymentIds.has(Number(r.id))).length;
+      master.checked=eligible.length>0 && selected===eligible.length;
+      master.indeterminate=selected>0 && selected<eligible.length;
+      master.disabled=eligible.length===0;
+    }
+    function togglePaymentSelection(id, checked){
+      const row=realisasiList.find(r=>Number(r.id)===Number(id));
+      if(!row || String(row.status_pembayaran||'Pengajuan').trim().toLowerCase()==='lunas') return;
+      if(checked) selectedPaymentIds.add(Number(id)); else selectedPaymentIds.delete(Number(id));
+      updatePaymentSelectionSummary();
+      syncPaymentSelectAll();
+    }
+    function toggleAllPaymentRows(checked){
+      const visible=getVisiblePaymentRows();
+      visible.forEach(r=>{
+        if(String(r.status_pembayaran||'Pengajuan').trim().toLowerCase()!=='lunas'){
+          if(checked) selectedPaymentIds.add(Number(r.id));
+          else selectedPaymentIds.delete(Number(r.id));
+        }
+      });
+      renderPembayaranRows(visible);
+      syncPaymentSelectAll(visible);
+    }
+    function updatePaymentSelectionSummary(){
+      const chosen=(realisasiList||[]).filter(r=>selectedPaymentIds.has(Number(r.id)) && String(r.status_pembayaran||'Pengajuan').trim().toLowerCase()!=='lunas');
+      const total=chosen.reduce((sum,r)=>sum+Number(r.nilai_pembayaran??r.nilai_kegiatan??0),0);
+      const count=document.getElementById('payment-selected-count'), amount=document.getElementById('payment-selected-total'), btn=document.getElementById('payment-bulk-button');
+      if(count)count.textContent=`${chosen.length} pengajuan dipilih`;
+      if(amount)amount.textContent=formatRupiah(total);
+      if(btn)btn.disabled=!chosen.length;
+    }
+    function openBulkPaymentModal(){
+      const chosen=(realisasiList||[]).filter(r=>selectedPaymentIds.has(Number(r.id)) && String(r.status_pembayaran||'Pengajuan').trim().toLowerCase()!=='lunas');
+      if(!chosen.length){alert('Pilih minimal satu pengajuan yang belum Lunas.');return;}
+      const total=chosen.reduce((sum,r)=>sum+Number(r.nilai_pembayaran??r.nilai_kegiatan??0),0);
+      const modal=document.getElementById('payment-modal'); modal.dataset.recordIds=JSON.stringify(chosen.map(r=>Number(r.id))); modal.dataset.bulk='1'; delete modal.dataset.recordId;
+      document.getElementById('payment-modal-detail').innerHTML=`<b>Pembayaran kolektif: ${chosen.length} pengajuan</b><div class="max-h-40 overflow-auto mt-2 space-y-1">${chosen.map(r=>`<div>${safeText(r.kode_unik_realisasi||'-')} — ${safeText(r.pekerjaan||'-')} — ${formatRupiah(r.nilai_pembayaran??r.nilai_kegiatan)}</div>`).join('')}</div><div class="border-t mt-2 pt-2 font-extrabold">Total: ${formatRupiah(total)}</div>`;
+      const now=new Date(); document.getElementById('payment-date').value=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
+      const treasurer=document.getElementById('payment-treasurer'); treasurer.innerHTML='<option value="">Pilih bendahara</option>'+(userList||[]).filter(u=>u.nama_lengkap).map(u=>`<option value="${safeText(u.nama_lengkap)}">${safeText(u.nama_lengkap)}</option>`).join(''); treasurer.value='';
+      document.getElementById('payment-method').value='GU'; document.getElementById('payment-amount').value=String(total); document.getElementById('payment-current-status').textContent='Pembayaran Kolektif';
+      const first=chosen[0]; document.getElementById('payment-number').value=nextPaymentNumber(paymentYearForRow(first),'GU');
+      document.getElementById('payment-extra-info').textContent='Satu nomor SPM/BKU digunakan untuk seluruh pengajuan terpilih.';
+      const btn=document.getElementById('payment-confirm-button'); btn.disabled=false;btn.textContent='Konfirmasi Pembayaran Kolektif';
+      modal.classList.remove('hidden');modal.classList.add('flex');
+    }
 
-        return `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="py-3 px-3 font-mono text-slate-400 font-semibold text-center">${idx + 1}</td>
-            <td class="py-3 px-3 max-w-xs">
-              <span class="font-bold text-slate-800 block">${item.pekerjaan}</span>
-              <span class="text-[10px] text-indigo-700 block truncate">${master.uraian_kegiatan || '-'}</span>
-            </td>
-            <td class="py-3 px-3 font-semibold text-slate-700">${item.penyedia}</td>
-            <td class="py-3 px-3 text-slate-600">${item.pptk || '-'}</td>
-            <td class="py-3 px-3">
-              ${isSPM 
-                ? `<span class="font-mono text-emerald-800 font-bold block">${item.nomor_spm_bku}</span><span class="text-[10px] text-emerald-600 block">${item.tanggal_spm_bku || ''}</span>` 
-                : `<span class="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">Proses</span>`}
-            </td>
-            <td class="py-3 px-3 text-right font-mono font-bold text-slate-900">${formatRupiah(item.nilai_kegiatan)}</td>
-            <td class="py-3 px-3 text-center whitespace-nowrap">
-              <div class="inline-flex items-center gap-1.5">
-                <button type="button" onclick="editRealisasiItem(${Number(item.id)})" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold rounded-lg text-[11px] cursor-pointer border border-amber-200">Edit</button>
-                <button type="button" onclick="deleteRealisasiItem(${Number(item.id)})" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-lg text-[11px] cursor-pointer">Hapus</button>
-              </div>
-            </td>
-          </tr>
-        `;
+    function paymentYearForRow(row){ return Number(row?.tahun || new Date().getFullYear()); }
+    function paymentPrefix(method){ return method==='LS' ? 'SPJ/LS' : 'SPJ/BLUD'; }
+    function nextPaymentNumber(year, method, excludeId=null){
+      const re = method==='LS' ? /^(\d+)\/SPJ\/LS\/(\d{4})$/i : /^(\d+)\/SPJ\/BLUD\/(\d{4})$/i;
+      let max=0;
+      (realisasiList||[]).forEach(r=>{
+        if(excludeId!==null && Number(r.id)===Number(excludeId)) return;
+        const m=String(r.nomor_spm_bku||'').trim().match(re);
+        if(m && Number(m[2])===Number(year)) max=Math.max(max,Number(m[1]));
+      });
+      return String(max+1).padStart(4,'0')+'/'+paymentPrefix(method)+'/'+year;
+    }
+    function refreshPaymentNumberPreview(){
+      const modal=document.getElementById('payment-modal');
+      const id=Number(modal?.dataset?.recordId||0);
+      const row=realisasiList.find(r=>Number(r.id)===id);
+      if(modal?.dataset?.bulk==='1'){const ids=JSON.parse(modal.dataset.recordIds||'[]');const first=realisasiList.find(r=>Number(r.id)===Number(ids[0]));if(first){const method=document.getElementById('payment-method')?.value||'GU';const number=document.getElementById('payment-number');if(number)number.value=nextPaymentNumber(paymentYearForRow(first),method); }return;}
+      if(!row)return;
+      const method=document.getElementById('payment-method')?.value||'GU';
+      const number=document.getElementById('payment-number');
+      if(number) number.value=(row.status_pembayaran==='Lunas' && row.nomor_spm_bku) ? row.nomor_spm_bku : nextPaymentNumber(paymentYearForRow(row),method,id);
+    }
+    function openPaymentModal(id){
+      const row=realisasiList.find(r=>Number(r.id)===Number(id));
+      if(!row)return;
+      const master=masterList.find(m=>Number(m.id)===Number(row.master_id))||{};
+      const dateField=document.getElementById('payment-date');
+      if(dateField){const now=new Date();dateField.value=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');}
+      document.getElementById('payment-modal-detail').innerHTML=
+        `<div><b>No. Register:</b> ${safeText(row.kode_unik_realisasi||'-')}</div>
+         <div><b>Uraian:</b> ${safeText(row.pekerjaan||'-')}</div>
+         <div><b>Rekening:</b> ${safeText(master.uraian_kegiatan||'-')}</div>
+         <div><b>Penyedia:</b> ${safeText(row.penyedia||'-')} &nbsp; <b>PPTK:</b> ${safeText(row.pptk||'-')}</div>
+         <div><b>Nilai Pengajuan:</b> ${formatRupiah(Number(row.nilai_kegiatan||0))}</div>`;
+      const modal=document.getElementById('payment-modal'); modal.dataset.recordId=String(row.id);
+      document.getElementById('payment-current-status').textContent=row.status_pembayaran||'Pengajuan';
+      const treasurer=document.getElementById('payment-treasurer');
+      if(treasurer){treasurer.innerHTML='<option value="">Pilih bendahara</option>'+(userList||[]).filter(u=>u.nama_lengkap).map(u=>`<option value="${safeText(u.nama_lengkap)}">${safeText(u.nama_lengkap)}</option>`).join('');treasurer.value=row.nama_bendahara||'';}
+      const method=document.getElementById('payment-method'); if(method) method.value=row.cara_pembayaran||'GU';
+      const amount=document.getElementById('payment-amount'); if(amount) amount.value=String(Number(row.nilai_pembayaran ?? row.nilai_kegiatan ?? 0));
+      refreshPaymentNumberPreview();
+      document.getElementById('payment-extra-info').innerHTML=`<div><b>Nomor tersimpan:</b> ${safeText(row.nomor_spm_bku||'Belum diterbitkan')}</div><div><b>Tahun Anggaran:</b> ${paymentYearForRow(row)}</div>`;
+      const btn=document.getElementById('payment-confirm-button');
+      if(btn){btn.disabled=(row.status_pembayaran||'Pengajuan')==='Lunas';btn.textContent=btn.disabled?'Sudah Lunas':'Konfirmasi Pelunasan';btn.classList.toggle('opacity-40',btn.disabled);}
+      modal.classList.remove('hidden'); modal.classList.add('flex');
+    }
+    function closePaymentModal(){
+      const modal=document.getElementById('payment-modal');
+      modal.classList.add('hidden');modal.classList.remove('flex'); delete modal.dataset.bulk; delete modal.dataset.recordIds;
+    }
+    async function confirmPaymentFromModal(){
+      const modal=document.getElementById('payment-modal');
+      const isBulk=modal?.dataset?.bulk==='1';
+      const id=Number(modal?.dataset?.recordId||0);
+      const row=isBulk ? null : realisasiList.find(r=>Number(r.id)===id);
+      if(!isBulk && !row){alert('Data pembayaran tidak ditemukan.');return;}
+      const tanggal=document.getElementById('payment-date')?.value;
+      const bendahara=document.getElementById('payment-treasurer')?.value?.trim();
+      const cara=document.getElementById('payment-method')?.value||'GU';
+      const nominal=Number(document.getElementById('payment-amount')?.value||0);
+      if(!tanggal || !bendahara || !['GU','LS'].includes(cara) || !Number.isFinite(nominal) || nominal<=0){alert('Lengkapi tanggal, nama bendahara, cara pembayaran, dan nominal pembayaran yang valid.');return;}
+      if(isBulk){
+        const ids=JSON.parse(modal.dataset.recordIds||'[]'); const chosen=ids.map(x=>realisasiList.find(r=>Number(r.id)===Number(x))).filter(r=>r && String(r.status_pembayaran||'Pengajuan').trim().toLowerCase()!=='lunas');
+        if(!chosen.length){alert('Tidak ada pengajuan yang dapat diproses.');return;}
+        const total=chosen.reduce((sum,r)=>sum+Number(r.nilai_pembayaran??r.nilai_kegiatan??0),0);
+        if(Math.round(nominal)!==Math.round(total)){alert('Nominal pembayaran kolektif harus sama dengan total akumulasi pengajuan terpilih.');return;}
+        const tahun=paymentYearForRow(chosen[0]); if(chosen.some(r=>paymentYearForRow(r)!==tahun)){alert('Pengajuan dengan Tahun Anggaran berbeda harus diproses dalam transaksi terpisah.');return;}
+        const nomor=nextPaymentNumber(tahun,cara);
+        if(!confirm(`Simpan pembayaran kolektif ${chosen.length} pengajuan dengan nomor ${nomor} sebesar ${formatRupiah(total)}?`))return;
+        if(!supabaseClient || !supabaseReady){alert('Database belum terhubung.');return;}
+        try{const payload={status_pembayaran:'Lunas',tanggal_spm_bku:tanggal,nomor_spm_bku:nomor,nama_bendahara:bendahara,cara_pembayaran:cara,nilai_pembayaran:total};
+          for(const item of chosen){const {data,error}=await supabaseClient.from('realisasi_kegiatan_blud').update({...payload,nilai_pembayaran:Number(item.nilai_pembayaran??item.nilai_kegiatan??0)}).eq('id',item.id).select('*').single();if(error)throw error;realisasiList=realisasiList.map(r=>Number(r.id)===Number(item.id)?{...r,...data}:r);selectedPaymentIds.delete(Number(item.id));}
+          renderPembayaranRows(getVisiblePaymentRows());updatePaymentSummary();updatePaymentSelectionSummary();closePaymentModal();showDatabaseStatus(`Pembayaran kolektif ${chosen.length} pengajuan berhasil disimpan dengan nomor ${nomor}.`,'ok');
+        }catch(err){alert('Pembayaran kolektif belum seluruhnya berhasil disimpan: '+(err.message||err));}return;
+      }
+      const nomor=(row.status_pembayaran==='Lunas' && row.nomor_spm_bku) ? row.nomor_spm_bku : nextPaymentNumber(paymentYearForRow(row),cara,id);
+      if(!confirm(`Simpan pelunasan dengan nomor ${nomor} sebesar ${formatRupiah(nominal)}?`))return;
+      if(!supabaseClient || !supabaseReady){alert('Database belum terhubung.');return;}
+      try{
+        const payload={status_pembayaran:'Lunas',tanggal_spm_bku:tanggal,nomor_spm_bku:nomor,nama_bendahara:bendahara,cara_pembayaran:cara,nilai_pembayaran:nominal};
+        const {data,error}=await supabaseClient.from('realisasi_kegiatan_blud').update(payload).eq('id',id).select('*').single();
+        if(error)throw error;
+        realisasiList=realisasiList.map(r=>Number(r.id)===id?{...r,...data}:r);
+        renderPenatausahaanRows(realisasiList); updatePaymentSummary(); closePaymentModal();
+        showDatabaseStatus('Data pembayaran berhasil disimpan.','ok');
+      }catch(err){alert('Pembayaran belum berhasil disimpan: '+(err.message||err)+'\nPastikan kolom pembayaran sudah tersedia di database.');}
+    }
+    async function openVerificationModal(id) {
+      const row=realisasiList.find(r=>Number(r.id)===Number(id));
+      if(!row)return;
+      const master=masterList.find(m=>Number(m.id)===Number(row.master_id))||{};
+      document.getElementById('verification-record-id').value=String(row.id);
+      document.getElementById('verification-note').value='';
+      const dateField=document.getElementById('verification-date');
+      if(dateField){const now=new Date();dateField.value=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');}
+      const officer=document.getElementById('verification-officer');
+      if(officer){
+        const people=(userList||[]).filter(u=>u.nama_lengkap);
+        officer.innerHTML='<option value="">-- Pilih Verifikator --</option>'+people.map(u=>`<option value="${safeText(u.nama_lengkap)}">${safeText(u.nama_lengkap)}${u.jabatan?' · '+safeText(u.jabatan):''}</option>`).join('');
+        const current=window.currentAuthUser?.user_metadata?.full_name||window.currentAuthUser?.email||'';
+        const match=people.find(u=>u.email===current||u.nama_lengkap===current);
+        if(match) officer.value=match.nama_lengkap;
+      }
+      document.getElementById('verification-modal-detail').innerHTML=
+        `<div><b>No. Register:</b> ${safeText(row.kode_unik_realisasi||'-')}</div>
+         <div><b>Uraian:</b> ${safeText(row.pekerjaan||'-')}</div>
+         <div><b>Rekening:</b> ${safeText(master.uraian_kegiatan||'-')}</div>
+         <div><b>Penyedia:</b> ${safeText(row.penyedia||'-')} &nbsp; <b>PPTK:</b> ${safeText(row.pptk||'-')}</div>
+         <div><b>Status saat ini:</b> ${safeText(row.status_verifikasi||'Pengajuan')}</div>`;
+      const historyBox=document.getElementById('verification-history');
+      if(historyBox){
+        historyBox.innerHTML='<div class="text-slate-400">Memuat histori verifikasi...</div>';
+        try{
+          const {data,error}=await supabaseClient.from('realisasi_verifikasi_histori').select('*').eq('realisasi_id',Number(row.id)).order('tanggal_verifikasi',{ascending:true}).order('id',{ascending:true});
+          if(error)throw error;
+          historyBox.innerHTML=(data||[]).length?(data||[]).map(h=>`<div class="border-l-2 border-indigo-300 pl-3 py-1"><div class="font-bold">${safeText(h.status_verifikasi||'-')} · ${safeText(h.tanggal_verifikasi||'-')}</div><div>${safeText(h.catatan||'-')}</div><div class="text-slate-500 mt-1">Verifikator: ${safeText(h.nama_verifikator||'-')}</div></div>`).join(''):'<div class="text-slate-400">Belum ada histori verifikasi.</div>';
+        }catch(err){historyBox.innerHTML='<div class="text-rose-600">Histori belum tersedia. Pastikan tabel histori verifikasi sudah dibuat.</div>';}
+      }
+      const modal=document.getElementById('verification-modal');
+      modal.classList.remove('hidden');modal.classList.add('flex');
+    }
+    function closeVerificationModal(){
+      const modal=document.getElementById('verification-modal');
+      modal.classList.add('hidden');modal.classList.remove('flex');
+    }
+    async function openVerificationHistoryView(id) {
+      const row=realisasiList.find(r=>Number(r.id)===Number(id));
+      if(!row)return;
+      const master=masterList.find(m=>Number(m.id)===Number(row.master_id))||{};
+      const detail=document.getElementById('verification-history-view-detail');
+      const list=document.getElementById('verification-history-view-list');
+      detail.innerHTML=`<div><b>No. Register:</b> ${safeText(row.kode_unik_realisasi||'-')}</div><div><b>Uraian:</b> ${safeText(row.pekerjaan||'-')}</div><div><b>Rekening:</b> ${safeText(master.uraian_kegiatan||'-')}</div><div><b>Penyedia:</b> ${safeText(row.penyedia||'-')} &nbsp; <b>PPTK:</b> ${safeText(row.pptk||'-')}</div><div><b>Status verifikasi terkini:</b> ${safeText(row.status_verifikasi||'Pengajuan')}</div>`;
+      list.innerHTML='<div class="text-slate-400">Memuat histori verifikasi...</div>';
+      const modal=document.getElementById('verification-history-view-modal');
+      modal.classList.remove('hidden');modal.classList.add('flex');
+      try {
+        const {data,error}=await supabaseClient.from('realisasi_verifikasi_histori').select('*').eq('realisasi_id',Number(row.id)).order('tanggal_verifikasi',{ascending:true}).order('id',{ascending:true});
+        if(error)throw error;
+        list.innerHTML=(data||[]).length?(data||[]).map((h,i)=>`<div class="border rounded-xl p-3"><div class="flex flex-wrap justify-between gap-2"><b>${i+1}. ${safeText(h.status_verifikasi||'-')}</b><span class="text-indigo-700 font-bold">Tanggal: ${safeText(h.tanggal_verifikasi||'-')}</span></div><div class="mt-2 whitespace-pre-wrap">${safeText(h.catatan||'-')}</div><div class="text-slate-500 mt-2">Verifikator: <b class="text-slate-700">${safeText(h.nama_verifikator||'-')}</b></div></div>`).join(''):'<div class="text-slate-400 border rounded-xl p-4">Belum ada histori verifikasi untuk pengajuan ini.</div>';
+      } catch(err) {
+        list.innerHTML='<div class="text-rose-600 border border-rose-200 rounded-xl p-4">Histori belum dapat ditampilkan. Pastikan tabel realisasi_verifikasi_histori sudah dibuat dan akses Supabase tersedia.</div>';
+      }
+    }
+    function closeVerificationHistoryView(){const modal=document.getElementById('verification-history-view-modal');modal.classList.add('hidden');modal.classList.remove('flex');}
+
+    async function saveVerificationDecision(event){
+      event.preventDefault();
+      const id=Number(document.getElementById('verification-record-id').value);
+      const row=realisasiList.find(r=>Number(r.id)===id);
+      if(!row)return;
+      const note=document.getElementById('verification-note').value.trim();
+      const date=document.getElementById('verification-date').value;
+      const officer=document.getElementById('verification-officer').value;
+      const decision=document.querySelector('input[name="verification-decision"]:checked')?.value||'Perbaikan';
+      if(!date){alert('Tanggal verifikasi wajib diisi.');return;}
+      if(!officer){alert('Pilih verifikator terlebih dahulu.');return;}
+      if(!note){alert('Catatan pemeriksaan wajib diisi.');return;}
+      const next=decision==='Lengkap'?'Lengkap':`Verifikasi ${Number(row.jumlah_verifikasi||0)+1}`;
+      const payload={status_verifikasi:next,catatan_verifikasi:note,jumlah_verifikasi:decision==='Lengkap'?Number(row.jumlah_verifikasi||0):Number(row.jumlah_verifikasi||0)+1};
+      try{
+        const {error:historyError}=await supabaseClient.from('realisasi_verifikasi_histori').insert({
+          realisasi_id:id,tanggal_verifikasi:date,nama_verifikator:officer,catatan:note,status_verifikasi:next
+        });
+        if(historyError)throw historyError;
+        const {data,error}=await supabaseClient.from('realisasi_kegiatan_blud').update(payload).eq('id',id).select('*').single();
+        if(error)throw error;
+        const index=realisasiList.findIndex(r=>Number(r.id)===id);
+        if(index>=0)realisasiList[index]={...realisasiList[index],...data};
+        closeVerificationModal();updatePenatausahaanSummary();applyCascadingFilter();
+      }catch(err){alert('Hasil verifikasi belum berhasil disimpan: '+(err.message||err));}
+    }
+
+    async function updatePaymentStatus(id, nextStatus) {
+      if (!supabaseClient || !supabaseReady) { alert('Koneksi database belum tersedia.'); return; }
+      const row = realisasiList.find(r => Number(r.id) === Number(id));
+      if (!row) { alert('Data pembayaran tidak ditemukan.'); return; }
+      if (nextStatus === 'Lunas' && !confirm('Konfirmasi bahwa pembayaran telah benar-benar dilunasi?')) return;
+      try {
+        const { data, error } = await supabaseClient.from('realisasi_kegiatan_blud')
+          .update({ status_pembayaran: nextStatus }).eq('id', id).select('*').single();
+        if (error) throw error;
+        const i = realisasiList.findIndex(r => Number(r.id) === Number(id));
+        if (i >= 0) realisasiList[i] = { ...realisasiList[i], ...data };
+        updatePaymentSummary();
+        applyCascadingFilter();
+      } catch (err) { alert('Status pembayaran belum berhasil disimpan: ' + (err.message || err)); }
+    }
+    async function updatePenatausahaanStatus(id, field, value) {
+      if (!supabaseClient || !supabaseReady) { alert('Koneksi database belum tersedia.'); return; }
+      const row = realisasiList.find(r=>Number(r.id)===Number(id));
+      if (!row) return;
+      let payload = {};
+      if (field==='verifikasi') {
+        const note = prompt('Catatan verifikasi / perbaikan (kosongkan jika dinyatakan lengkap):', row.catatan_verifikasi || '');
+        if (note===null) return;
+        const next = value==='Lengkap' ? 'Lengkap' : (Number(row.jumlah_verifikasi||0)+1===1?'Verifikasi 1':`Verifikasi ${Number(row.jumlah_verifikasi||0)+1}`);
+        payload = {status_verifikasi:next,catatan_verifikasi:note,jumlah_verifikasi:next==='Lengkap'?Number(row.jumlah_verifikasi||0):Number(row.jumlah_verifikasi||0)+1};
+      } else {
+        if (value==='Lunas' && !confirm('Konfirmasi bahwa pembayaran telah benar-benar dilunasi?')) return;
+        payload = {status_pembayaran:value};
+      }
+      try {
+        const {data,error}=await supabaseClient.from('realisasi_kegiatan_blud').update(payload).eq('id',id).select('*').single();
+        if(error) throw error;
+        const i=realisasiList.findIndex(r=>Number(r.id)===Number(id));
+        if(i>=0) realisasiList[i]={...realisasiList[i],...data};
+        updatePenatausahaanSummary(); applyCascadingFilter();
+      } catch(err) { alert('Status belum berhasil disimpan: '+(err.message||err)); }
+    }
+
+    async function loadSPJHistory(){
+      if(!supabaseClient || !supabaseReady) return;
+      try{
+        const {data,error}=await supabaseClient.from('realisasi_spj_histori').select('*').order('id',{ascending:false});
+        if(error) throw error;
+        spjLatestById={};
+        (data||[]).forEach(h=>{const id=Number(h.realisasi_id);if(!spjLatestById[id])spjLatestById[id]=h;});
+        if(activePenatausahaanView==='spj'){updatePenatausahaanSummary();applyCascadingFilter();}
+      }catch(err){console.warn('Histori SPJ belum dapat dimuat:',err.message||err);}
+    }
+    function spjEligibleRows(rows){return (rows||[]).filter(r=>String(r.status_pembayaran||'').trim().toLowerCase()==='lunas' && String(r.status_verifikasi||'').trim().toLowerCase()==='lengkap');}
+    function filterBySPJSummary(mode){
+      activeSPJSummaryFilter=mode||'all';
+      applyCascadingFilter();
+    }
+    function updateSPJSummary(rows,cards){
+      const eligible=spjEligibleRows(rows);const complete=eligible.filter(r=>spjLatestById[Number(r.id)]?.status_spj==='Lengkap').length;
+      const card=(mode,label,value,color,help)=>`<button type="button" onclick="filterBySPJSummary('${mode}')" class="text-left bg-white border rounded-2xl p-4 cursor-pointer hover:border-indigo-400 hover:shadow-md transition focus:outline-none focus:ring-2 focus:ring-indigo-400"><div class="text-[10px] uppercase font-bold ${color}">${label}</div><div class="text-xl font-black mt-1">${value}</div><div class="text-[10px] text-slate-500 mt-1">${help}</div></button>`;
+      cards.className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3';
+      cards.innerHTML=card('all','Total Pengajuan',rows.length,'text-slate-500','Klik untuk melihat daftar SPJ yang memenuhi syarat')+
+        card('all','Dokumen Memenuhi Syarat',eligible.length,'text-slate-500','Lunas dan verifikasi lengkap · Klik untuk melihat')+
+        card('complete','SPJ Lengkap',complete,'text-emerald-700','Klik untuk melihat dokumen yang sudah dikumpulkan')+
+        card('incomplete','SPJ Tidak Lengkap',eligible.length-complete,'text-amber-700','Klik untuk melihat dokumen yang belum dikumpulkan');
+    }
+    function renderSPJRows(list){
+      let eligible=spjEligibleRows(list);
+      if(activeSPJSummaryFilter==='complete') eligible=eligible.filter(r=>spjLatestById[Number(r.id)]?.status_spj==='Lengkap');
+      if(activeSPJSummaryFilter==='incomplete') eligible=eligible.filter(r=>spjLatestById[Number(r.id)]?.status_spj!=='Lengkap');const tbody=document.getElementById('penatausahaan-table-body');const empty=document.getElementById('penatausahaan-empty');
+      const head=document.querySelector('#wrapper-register-table thead tr');
+      if(head)head.innerHTML='<th class="py-3 px-3">No.</th><th class="py-3 px-3">No. Register</th><th class="py-3 px-3">Uraian Pekerjaan</th><th class="py-3 px-3">Penyedia</th><th class="py-3 px-3">PPTK</th><th class="py-3 px-3 text-right">Nilai (Rp)</th><th class="py-3 px-3">No. SPM/BKU</th><th class="py-3 px-3 text-center">Status SPJ</th>';
+      const count=document.getElementById('reg-count-label');if(count)count.textContent=`Menampilkan ${eligible.length} pengajuan yang memenuhi syarat SPJ`;
+      if(!tbody)return;
+      if(!eligible.length){tbody.innerHTML='';empty?.classList.remove('hidden');return;}empty?.classList.add('hidden');
+      tbody.innerHTML=eligible.map((r,i)=>{const h=spjLatestById[Number(r.id)];const status=h?.status_spj||'Belum Dikumpulkan';const master=masterList.find(m=>Number(m.id)===Number(r.master_id))||{};return `<tr class="hover:bg-indigo-50/60 cursor-pointer" onclick="openSPJModal(${Number(r.id)})"><td class="py-3 px-3">${i+1}</td><td class="py-3 px-3 font-mono font-bold">${safeText(r.kode_unik_realisasi||'-')}</td><td class="py-3 px-3">${safeText(r.pekerjaan||master.uraian_kegiatan||'-')}</td><td class="py-3 px-3">${safeText(r.penyedia||'-')}</td><td class="py-3 px-3">${safeText(r.pptk||'-')}</td><td class="py-3 px-3 text-right">${formatRupiah(r.nilai_pembayaran??r.nilai_kegiatan??0)}</td><td class="py-3 px-3">${safeText(r.nomor_spm_bku||'-')}</td><td class="py-3 px-3 text-center"><span class="px-2 py-1 rounded-lg text-[10px] font-bold ${status==='Lengkap'?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">${status==='Lengkap'?'SPJ Lengkap':'Belum Dikumpulkan'}</span></td></tr>`;}).join('');
+    }
+    async function openSPJModal(id){
+      const row=realisasiList.find(r=>Number(r.id)===Number(id));if(!row)return;const master=masterList.find(m=>Number(m.id)===Number(row.master_id))||{};const latest=spjLatestById[Number(id)];
+      document.getElementById('spj-record-id').value=String(id);document.getElementById('spj-officer').value=latest?.nama_penerima||'';document.getElementById('spj-note').value='';
+      const officerOptions=document.getElementById('spj-officer-options');if(officerOptions){const people=(userList||[]).filter(u=>u.nama_lengkap);officerOptions.innerHTML=people.map(u=>`<option value="${safeText(u.nama_lengkap)}">${safeText(u.jabatan||'')}</option>`).join('');}
+      const now=new Date();document.getElementById('spj-date').value=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
+      document.querySelectorAll('input[name="spj-status"]').forEach(x=>x.checked=x.value===(latest?.status_spj||'Belum Dikumpulkan'));
+      document.getElementById('spj-modal-detail').innerHTML=`<div><b>No. Register:</b> ${safeText(row.kode_unik_realisasi||'-')}</div><div><b>Uraian:</b> ${safeText(row.pekerjaan||master.uraian_kegiatan||'-')}</div><div><b>Penyedia:</b> ${safeText(row.penyedia||'-')} &nbsp; <b>PPTK:</b> ${safeText(row.pptk||'-')}</div><div><b>Nilai:</b> ${formatRupiah(row.nilai_pembayaran??row.nilai_kegiatan??0)} &nbsp; <b>SPM/BKU:</b> ${safeText(row.nomor_spm_bku||'-')}</div>`;
+      const hist=document.getElementById('spj-history');hist.innerHTML='Memuat riwayat...';
+      try{const {data,error}=await supabaseClient.from('realisasi_spj_histori').select('*').eq('realisasi_id',Number(id)).order('id',{ascending:false});if(error)throw error;hist.innerHTML=(data||[]).length?data.map(h=>`<div class="border-l-2 border-indigo-300 pl-3 py-1"><b>${safeText(h.status_spj)} · ${safeText(h.tanggal_pengumpulan)}</b><div>Penerima: ${safeText(h.nama_penerima)}</div><div>${safeText(h.catatan||'-')}</div></div>`).join(''):'Belum ada riwayat pengumpulan SPJ.';}catch(e){hist.textContent='Riwayat belum tersedia. Pastikan tabel realisasi_spj_histori sudah dibuat.';}
+      const modal=document.getElementById('spj-modal');modal.classList.remove('hidden');modal.classList.add('flex');
+    }
+    function closeSPJModal(){const modal=document.getElementById('spj-modal');modal.classList.add('hidden');modal.classList.remove('flex');}
+    async function saveSPJRecord(){
+      const id=Number(document.getElementById('spj-record-id').value);const date=document.getElementById('spj-date').value;const officer=document.getElementById('spj-officer').value.trim();const status=document.querySelector('input[name="spj-status"]:checked')?.value||'Belum Dikumpulkan';const note=document.getElementById('spj-note').value.trim();
+      if(!officer){alert('Nama penerima/verifikator wajib diisi.');document.getElementById('spj-officer').focus();return;}if(!date){alert('Tanggal pengumpulan belum tersedia.');return;}if(!supabaseClient||!supabaseReady){alert('Koneksi database belum tersedia.');return;}
+      try{const payload={realisasi_id:id,tanggal_pengumpulan:date,nama_penerima:officer,status_spj:status,catatan:note};const {data,error}=await supabaseClient.from('realisasi_spj_histori').insert(payload).select('*').single();if(error)throw error;spjLatestById[id]=data;closeSPJModal();updatePenatausahaanSummary();applyCascadingFilter();showDatabaseStatus('Pencatatan SPJ berhasil disimpan.','ok');}catch(err){alert('Pencatatan SPJ belum berhasil disimpan: '+(err.message||err)+'\nPastikan tabel realisasi_spj_histori sudah dibuat.');}
+    }
+
+    function renderPenatausahaanRowsInternal(list, view) {
+      const tbody=document.getElementById('penatausahaan-table-body');
+      const emptyState=document.getElementById('penatausahaan-empty');
+      const countLabel=document.getElementById('reg-count-label');
+      updatePenatausahaanSummary();
+      if(countLabel) countLabel.textContent=`Menampilkan ${list.length} dari ${realisasiList.length} total pengajuan`;
+      if(!tbody) return;
+      const tableHead=document.querySelector('#wrapper-register-table thead tr');
+      if(tableHead){
+        if(view==='verifikasi'){
+          tableHead.innerHTML='<th class="py-3 px-3">No.</th><th class="py-3 px-3">No. Register</th><th class="py-3 px-3">Uraian Pekerjaan & Rekening</th><th class="py-3 px-3">Penyedia</th><th class="py-3 px-3">PPTK</th><th class="py-3 px-3 text-center">Status Verifikasi</th><th class="py-3 px-3">Catatan Terakhir</th>';
+        }else if(view==='pembayaran'){
+          tableHead.innerHTML='<th class="py-3 px-3 text-center"><input type="checkbox" id="payment-select-all" aria-label="Pilih semua pengajuan yang tampil" onchange="toggleAllPaymentRows(this.checked)"></th><th class="py-3 px-3">No.</th><th class="py-3 px-3">No. Register</th><th class="py-3 px-3">Uraian Pekerjaan & Rekening</th><th class="py-3 px-3">Penyedia</th><th class="py-3 px-3">PPTK</th><th class="py-3 px-3 text-right">Nilai Pengajuan (Rp)</th><th class="py-3 px-3 text-center">Status Pembayaran</th>';
+        }else{
+          tableHead.innerHTML='<th class="py-3 px-3">No.</th><th class="py-3 px-3">No. Register</th><th class="py-3 px-3">Uraian Pekerjaan & Rekening</th><th class="py-3 px-3">Penyedia</th><th class="py-3 px-3">PPTK</th><th class="py-3 px-3 text-right">Realisasi (Rp)</th><th class="py-3 px-3 text-center">Verifikasi</th><th class="py-3 px-3 text-center">Pembayaran</th><th class="py-3 px-3 text-center">Aksi</th>';
+        }
+      }
+      if(!list.length){tbody.innerHTML='';if(emptyState)emptyState.classList.remove('hidden');if(view==='pembayaran')syncPaymentSelectAll(list);return;}
+      if(emptyState)emptyState.classList.add('hidden');
+      tbody.innerHTML=list.map((item,idx)=>{
+        const master=masterList.find(m=>Number(m.id)===Number(item.master_id))||{};
+        const ver=item.status_verifikasi||'Pengajuan';
+        const pay=item.status_pembayaran||'Pengajuan';
+        const reg=item.kode_unik_realisasi||'Belum ada register';
+        const verColor=ver==='Lengkap'?'bg-emerald-100 text-emerald-800':'bg-amber-100 text-amber-800';
+        const payColor=pay==='Lunas'?'bg-emerald-100 text-emerald-800':'bg-blue-100 text-blue-800';
+        let action='';
+        if(view==='pengajuan'){
+          const progressed = ver !== 'Pengajuan' || pay !== 'Pengajuan';
+          const role = window.currentAppRole || '';
+          const isSuperadmin = role === 'superadmin';
+          const canEdit = isSuperadmin || (role === 'admin' && !progressed);
+          const canDelete = isSuperadmin || (role === 'admin' && !progressed);
+          action=`<button type="button" onclick="editRealisasiItem(${Number(item.id)})" ${canEdit?'':'disabled title="Admin hanya dapat mengedit selama Verifikasi dan Pembayaran masih Pengajuan"'} class="px-2 py-1 rounded-lg text-[11px] font-bold ${canEdit?'bg-amber-50 text-amber-700':'bg-slate-100 text-slate-400 cursor-not-allowed'}">Edit</button> ${canDelete?`<button type="button" onclick="deleteRealisasiItem(${Number(item.id)})" class="px-2 py-1 bg-rose-50 text-rose-700 rounded-lg text-[11px] font-bold">Hapus</button>`:`<button type="button" disabled title="Admin hanya dapat menghapus selama Verifikasi dan Pembayaran masih Pengajuan" class="px-2 py-1 bg-slate-100 text-slate-400 rounded-lg text-[11px] font-bold cursor-not-allowed">Hapus</button>`}`;
+        } else if(view==='verifikasi'){
+          action=`<button type="button" onclick="updatePenatausahaanStatus(${Number(item.id)},'verifikasi','Perbaikan')" class="px-2 py-1 bg-amber-50 text-amber-700 rounded-lg text-[11px] font-bold">Catat Verifikasi</button> <button type="button" onclick="updatePenatausahaanStatus(${Number(item.id)},'verifikasi','Lengkap')" class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[11px] font-bold">Lengkap</button>`;
+        } else {
+          action=`<button type="button" onclick="updatePenatausahaanStatus(${Number(item.id)},'pembayaran','Lunas')" ${pay==='Lunas'?'disabled':''} class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-[11px] font-bold disabled:opacity-40">Konfirmasi Lunas</button>`;
+        }
+        if(view==='pembayaran'){
+          return `<tr class="hover:bg-emerald-50 cursor-pointer" onclick="openPaymentModal(${Number(item.id)})" title="Klik untuk membuka rincian pembayaran">
+            <td class="py-3 px-3 text-center" onclick="event.stopPropagation()"><input type="checkbox" ${pay==='Lunas'?'disabled':''} ${selectedPaymentIds.has(Number(item.id))?'checked':''} onchange="togglePaymentSelection(${Number(item.id)},this.checked)" aria-label="Pilih pengajuan ${safeText(reg)}"></td>
+            <td class="py-3 px-3 text-center">${idx+1}</td>
+            <td class="py-3 px-3 font-mono font-bold text-indigo-700">${safeText(reg)}</td>
+            <td class="py-3 px-3"><b>${safeText(item.pekerjaan||'-')}</b><span class="block text-[10px] text-indigo-700">${safeText(master.uraian_kegiatan||'-')}</span></td>
+            <td class="py-3 px-3">${safeText(item.penyedia||'-')}</td>
+            <td class="py-3 px-3">${safeText(item.pptk||'-')}</td>
+            <td class="py-3 px-3 text-right font-mono font-bold">${formatRupiah(item.nilai_kegiatan)}</td>
+            <td class="py-3 px-3 text-center"><span class="px-2 py-1 rounded-lg text-[10px] font-bold ${payColor}">${safeText(pay)}</span><div class="text-[9px] text-emerald-700 mt-1">Klik untuk proses pembayaran</div></td>
+          </tr>`;
+        }
+        if(view==='verifikasi'){
+          return `<tr class="hover:bg-indigo-50 cursor-pointer" onclick="openVerificationModal(${Number(item.id)})" title="Klik untuk memeriksa pengajuan">
+            <td class="py-3 px-3 text-center">${idx+1}</td>
+            <td class="py-3 px-3 font-mono font-bold text-indigo-700">${safeText(reg)}</td>
+            <td class="py-3 px-3"><b>${safeText(item.pekerjaan||'-')}</b><span class="block text-[10px] text-indigo-700">${safeText(master.uraian_kegiatan||'-')}</span></td>
+            <td class="py-3 px-3">${safeText(item.penyedia||'-')}</td>
+            <td class="py-3 px-3">${safeText(item.pptk||'-')}</td>
+            <td class="py-3 px-3 text-center"><span class="px-2 py-1 rounded-lg text-[10px] font-bold ${verColor}">${safeText(ver)}</span></td>
+            <td class="py-3 px-3 text-xs text-slate-600">${safeText(item.catatan_verifikasi||'Klik untuk melakukan verifikasi')}</td>
+          </tr>`;
+        }
+        return `<tr class="hover:bg-slate-50">
+          <td class="py-3 px-3 text-center">${idx+1}</td>
+          <td class="py-3 px-3 font-mono font-bold text-indigo-700">${safeText(reg)}</td>
+          <td class="py-3 px-3"><b>${safeText(item.pekerjaan||'-')}</b><span class="block text-[10px] text-indigo-700">${safeText(master.uraian_kegiatan||'-')}</span></td>
+          <td class="py-3 px-3">${safeText(item.penyedia||'-')}</td>
+          <td class="py-3 px-3">${safeText(item.pptk||'-')}</td>
+          <td class="py-3 px-3 text-right font-mono font-bold">${formatRupiah(item.nilai_kegiatan)}</td>
+          <td class="py-3 px-3 text-center cursor-pointer hover:bg-indigo-50" onclick="event.stopPropagation();openVerificationHistoryView(${Number(item.id)})" title="Klik untuk melihat tanggal, histori, dan verifikator"><span class="px-2 py-1 rounded-lg text-[10px] font-bold ${verColor}">${safeText(ver)}</span>${item.catatan_verifikasi?`<div class="mt-1 text-[10px] text-slate-500 max-w-[180px]">${safeText(item.catatan_verifikasi)}</div>`:''}<div class="text-[9px] text-indigo-600 mt-1">Lihat histori</div></td>
+          <td class="py-3 px-3 text-center"><span class="px-2 py-1 rounded-lg text-[10px] font-bold ${payColor}">${safeText(pay)}</span></td>
+          <td class="py-3 px-3 text-center whitespace-nowrap">${action}</td>
+        </tr>`;
       }).join('');
+      const bulkBar=document.getElementById('payment-bulk-toolbar');
+      // Gunakan display eksplisit karena kelas flex pada toolbar dapat
+      // mengalahkan utilitas hidden; toolbar hanya boleh tampil di Pembayaran.
+      if(bulkBar) bulkBar.style.display = view==='pembayaran' ? 'flex' : 'none';
+      if(view==='pembayaran'){ updatePaymentSelectionSummary(); syncPaymentSelectAll(list); }
+    }
+
+    // Renderer tiap modul dipisah agar perubahan tampilan satu modul tidak mengubah modul lain.
+    function renderPengajuanPembayaranRows(list) {
+      renderPenatausahaanRowsInternal(list, 'pengajuan');
+    }
+    function renderVerifikasiRows(list) {
+      renderPenatausahaanRowsInternal(list, 'verifikasi');
+    }
+    function renderPembayaranRows(list) {
+      renderPenatausahaanRowsInternal(list, 'pembayaran');
+    }
+    function renderPenatausahaanRows(list) {
+      if (activePenatausahaanView === 'spj') return renderSPJRows(list);
+      if (activePenatausahaanView === 'verifikasi') return renderVerifikasiRows(list);
+      if (activePenatausahaanView === 'pembayaran') return renderPembayaranRows(list);
+      return renderPengajuanPembayaranRows(list);
     }
 
     function toggleFormInputRealisasi(show = true) {
@@ -1800,9 +2409,9 @@
           const editField = document.getElementById('trans-edit-id');
           if (editField) editField.value = '';
           const heading = document.getElementById('form-realisasi-heading');
-          if (heading) heading.textContent = 'Formulir Pengakuan Realisasi Belanja BLUD';
+          if (heading) heading.textContent = 'Form Pengajuan Pembayaran';
           const submit = document.querySelector('#form-transaksi button[type="submit"]');
-          if (submit) submit.textContent = 'Simpan Transaksi Belanja';
+          if (submit) submit.textContent = 'Simpan Pengajuan Pembayaran';
         }
       }
     }
@@ -1875,27 +2484,53 @@
       selUraian.className = "w-full bg-white border border-slate-300 rounded-xl p-2.5 font-medium";
     }
 
+    function calculateRemainingEffectivePagu(masterId, year, month, excludeId='') {
+      const selected = masterList.find(m => String(m.id) === String(masterId));
+      if (!selected) return { pagu: 0, realisasi: 0, sisa: 0, key: '' };
+      const yr = Number(year || selected.tahun || 2026);
+      const mo = Number(month || 12);
+      const yearRows = masterList.filter(m => Number(m.tahun || 2026) === yr);
+      const effectiveRows = effectiveMasterPagu(yearRows, mo);
+      const key = masterAccountKey(selected);
+      const effective = effectiveRows.find(m => masterAccountKey(m) === key) || selected;
+      const ids = historicalMasterIds([effective], yearRows);
+      const realisasi = (realisasiList || []).filter(r =>
+        Number(r.tahun || 2026) === yr &&
+        Number(r.bulan || 1) <= mo &&
+        ids.has(Number(r.master_id)) &&
+        String(r.id) !== String(excludeId)
+      ).reduce((sum,r)=>sum+Number(r.nilai_kegiatan||0),0);
+      const pagu = Number(effective.pagu || 0);
+      return { pagu, realisasi, sisa: pagu - realisasi, key };
+    }
+
     function showPlafonInfo(masterId) {
       const box = document.getElementById('trans-pagu-box');
       const disp = document.getElementById('trans-pagu-display');
       const rek = document.getElementById('trans-pagu-rek');
-
-      if (!masterId) {
-        if (box) box.classList.add('hidden');
-        return;
-      }
-
+      if (!masterId) { if (box) box.classList.add('hidden'); return; }
       const selected = masterList.find(m => String(m.id) === String(masterId));
-      if (selected && box && disp) {
-        disp.textContent = formatRupiah(selected.pagu);
-        if (rek) rek.textContent = `Kode: ${selected.kode_sub_kegiatan || '-'}`;
-        box.classList.remove('hidden');
-      }
+      if (!selected || !box || !disp) { if (box) box.classList.add('hidden'); return; }
+      const year = document.getElementById('trans-tahun')?.value || selected.tahun || 2026;
+      const month = document.getElementById('trans-bulan')?.value || 12;
+      const editId = document.getElementById('trans-edit-id')?.value || '';
+      const remaining = calculateRemainingEffectivePagu(masterId, year, month, editId);
+      disp.textContent = formatRupiah(remaining.sisa);
+      disp.classList.toggle('text-rose-700', remaining.sisa < 0);
+      disp.classList.toggle('text-indigo-700', remaining.sisa >= 0);
+      if (rek) rek.textContent = `Kode: ${selected.kode_sub_kegiatan || '-'} · Pagu ${formatRupiah(remaining.pagu)} − Realisasi ${formatRupiah(remaining.realisasi)}`;
+      box.classList.remove('hidden');
     }
 
     function editRealisasiItem(id) {
       const item = realisasiList.find(r => Number(r.id) === Number(id));
       if (!item) { alert('Data realisasi tidak ditemukan.'); return; }
+      const progressed = (item.status_verifikasi || 'Pengajuan') !== 'Pengajuan' || (item.status_pembayaran || 'Pengajuan') !== 'Pengajuan';
+      const role = window.currentAppRole || '';
+      if (role !== 'superadmin' && !(role === 'admin' && !progressed)) {
+        alert('Akses ditolak. Admin hanya dapat mengedit selama status Verifikasi dan Pembayaran masih Pengajuan. Superadmin dapat mengedit seluruh pengajuan.');
+        return;
+      }
       const master = masterList.find(m => Number(m.id) === Number(item.master_id));
       if (!master) { alert('Rekening master untuk transaksi ini tidak ditemukan. Data tidak diubah.'); return; }
 
@@ -1916,14 +2551,30 @@
         pptkSelect.add(new Option(item.pptk, item.pptk));
       }
       if (pptkSelect) pptkSelect.value = item.pptk || '';
-      document.getElementById('trans-bku').value = item.nomor_spm_bku || '';
-      document.getElementById('trans-tgl-bku').value = item.tanggal_spm_bku || '';
+      document.getElementById('trans-kode-unik').value = item.kode_unik_realisasi || '';
       document.getElementById('trans-nilai').value = Number(item.nilai_kegiatan || 0);
       const heading = document.getElementById('form-realisasi-heading');
       if (heading) heading.textContent = 'Edit Realisasi Belanja BLUD';
       const submit = document.querySelector('#form-transaksi button[type="submit"]');
       if (submit) submit.textContent = 'Simpan Perubahan';
       toggleFormInputRealisasi(true);
+    }
+
+    function generateKodeUnikRealisasi(tahun, bulan, currentId='') {
+      const mm = String(Number(bulan) || 1).padStart(2, '0');
+      const yyyy = String(Number(tahun) || 2026);
+      const numbers = (realisasiList || [])
+        .filter(r => String(r.tahun) === yyyy && String(Number(r.bulan)).padStart(2,'0') === mm && String(r.id) !== String(currentId))
+        .map(r => String(r.kode_unik_realisasi || '').slice(0,4))
+        .filter(v => /^\d{4}$/.test(v)).map(Number);
+      return String(Math.max(0, ...numbers) + 1).padStart(4,'0') + mm + yyyy;
+    }
+    function refreshKodeUnikRealisasi() {
+      const y = document.getElementById('trans-tahun')?.value || 2026;
+      const m = document.getElementById('trans-bulan')?.value || 1;
+      const editId = document.getElementById('trans-edit-id')?.value || '';
+      const field = document.getElementById('trans-kode-unik');
+      if (field && !editId) field.value = generateKodeUnikRealisasi(y,m);
     }
 
     function handleSaveRealisasi(e) {
@@ -1937,8 +2588,9 @@
         pekerjaan: document.getElementById('trans-pekerjaan').value,
         penyedia: document.getElementById('trans-penyedia').value,
         pptk: document.getElementById('trans-pptk').value,
-        nomor_spm_bku: document.getElementById('trans-bku').value || null,
-        tanggal_spm_bku: document.getElementById('trans-tgl-bku').value || null,
+        kode_unik_realisasi: document.getElementById('trans-kode-unik').value,
+        tahapan_pembayaran: document.getElementById('trans-tahapan-pembayaran').value,
+        kelengkapan_dokumen: document.getElementById('trans-kelengkapan-dokumen').value,
         nilai_kegiatan: Number(document.getElementById('trans-nilai').value || 0)
       };
 
@@ -1953,20 +2605,50 @@
       }
       document.getElementById('trans-edit-id').value = '';
       const heading = document.getElementById('form-realisasi-heading');
-      if (heading) heading.textContent = 'Formulir Pengakuan Realisasi Belanja BLUD';
+      if (heading) heading.textContent = 'Form Pengajuan Pembayaran';
       const submit = document.querySelector('#form-transaksi button[type="submit"]');
-      if (submit) submit.textContent = 'Simpan Transaksi Belanja';
+      if (submit) submit.textContent = 'Simpan Pengajuan Pembayaran';
       toggleFormInputRealisasi(false);
       document.getElementById('form-transaksi').reset();
       updateDashboardMetrics();
       applyCascadingFilter();
     }
 
-    function deleteRealisasiItem(id) {
-      if (!confirm("Hapus data realisasi belanja ini?")) return;
-      realisasiList = realisasiList.filter(r => Number(r.id) !== Number(id));
-      updateDashboardMetrics();
-      applyCascadingFilter();
+    async function deleteRealisasiItem(id) {
+      const item = realisasiList.find(r => Number(r.id) === Number(id));
+      if (!item) { alert('Data pengajuan tidak ditemukan.'); return; }
+      const progressed = (item.status_verifikasi || 'Pengajuan') !== 'Pengajuan' || (item.status_pembayaran || 'Pengajuan') !== 'Pengajuan';
+      const role = window.currentAppRole || '';
+      const allowed = role === 'superadmin' || (role === 'admin' && !progressed);
+      if (!allowed) {
+        alert(progressed
+          ? 'Akses ditolak. Pengajuan yang sudah diproses pada Verifikasi atau Pembayaran hanya dapat dihapus oleh Superadmin.'
+          : 'Akses ditolak. Penghapusan hanya dapat dilakukan Admin atau Superadmin.');
+        return;
+      }
+      if (!supabaseClient || !supabaseReady) {
+        alert('Database belum terhubung. Data tidak dihapus.');
+        return;
+      }
+      if (!confirm('Hapus pengajuan ini secara permanen? Tindakan ini tidak dapat dibatalkan.')) return;
+      try {
+        const { data, error } = await supabaseClient
+          .from('realisasi_kegiatan_blud')
+          .delete()
+          .eq('id', Number(id))
+          .select('id')
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) throw new Error('Database tidak mengembalikan konfirmasi penghapusan. Periksa izin DELETE RLS.');
+        realisasiList = realisasiList.filter(r => Number(r.id) !== Number(id));
+        updateDashboardMetrics();
+        applyCascadingFilter();
+        showDatabaseStatus('Pengajuan berhasil dihapus oleh Superadmin.', 'ok');
+      } catch (error) {
+        const message = error?.message || String(error);
+        alert('Pengajuan belum berhasil dihapus: ' + message);
+        showDatabaseStatus('Penghapusan pengajuan gagal: ' + message, 'error');
+      }
     }
 
     function downloadExcelTemplateRealisasi() {
@@ -3165,6 +3847,75 @@
       }
     }
 
+    let abkVerificationHistory = [];
+    function toggleABKDetails(){
+      const content=document.getElementById('abk-detail-content');
+      const button=document.getElementById('abk-detail-toggle');
+      const label=document.getElementById('abk-detail-toggle-label');
+      const chevron=document.getElementById('abk-detail-chevron');
+      if(!content||!button)return;
+      const willOpen=content.classList.contains('hidden');
+      content.classList.toggle('hidden',!willOpen);
+      button.setAttribute('aria-expanded',String(willOpen));
+      if(label)label.textContent=willOpen?'Sembunyikan Rincian':'Lihat Rincian';
+      if(chevron)chevron.classList.toggle('rotate-180',willOpen);
+    }
+    function abkDateParts(value){ if(!value)return null; const d=new Date(String(value).length===10?String(value)+'T00:00:00':value); return Number.isNaN(d.getTime())?null:{year:d.getFullYear(),month:d.getMonth()+1,date:d.toISOString().slice(0,10)}; }
+    function initABKFilters(){
+      const y=document.getElementById('abk-year'),m=document.getElementById('abk-month'); if(!y||!m)return;
+      const now=new Date(), currentYear=now.getFullYear(), currentMonth=now.getMonth()+1;
+      const years=[...new Set([currentYear,...(realisasiList||[]).map(r=>Number(r.tahun)).filter(Number.isFinite)])].sort((a,b)=>b-a);
+      y.innerHTML=years.map(v=>`<option value="${v}">${v}</option>`).join(''); y.value=String(currentYear);
+      initABKMonthFilter();
+    }
+    function initABKMonthFilter(){
+      const y=document.getElementById('abk-year'),m=document.getElementById('abk-month');if(!y||!m)return;
+      const selectedYear=Number(y.value||new Date().getFullYear()),now=new Date();
+      const maxMonth=selectedYear===now.getFullYear()?now.getMonth()+1:12;
+      const names=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+      const previous=Number(m.value||maxMonth);m.innerHTML=names.slice(0,maxMonth).map((v,i)=>`<option value="${i+1}">${v}</option>`).join('');m.value=String(Math.min(previous,maxMonth));
+    }
+    async function loadABK(){
+      if(!supabaseClient||!supabaseReady){renderABK();return;}
+      try{const {data,error}=await supabaseClient.from('realisasi_verifikasi_histori').select('id,realisasi_id,tanggal_verifikasi,nama_verifikator,status_verifikasi').order('tanggal_verifikasi',{ascending:false});if(error)throw error;abkVerificationHistory=data||[];}
+      catch(err){console.warn('Riwayat verifikasi ABK tidak dapat dimuat:',err.message||err);abkVerificationHistory=[];}
+      initABKFilters();renderABK();
+    }
+    function renderABK(){
+      const year=Number(document.getElementById('abk-year')?.value||new Date().getFullYear());
+      const month=Number(document.getElementById('abk-month')?.value||new Date().getMonth()+1);
+      const monthNames=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+      const verifMap=new Map(),payMap=new Map(),details=[];
+      const registerById=new Map((realisasiList||[]).map(r=>[Number(r.id),r]));
+      (abkVerificationHistory||[]).forEach(h=>{const dt=abkDateParts(h.tanggal_verifikasi);if(!dt||dt.year!==year||dt.month>month||!h.nama_verifikator)return;const r=registerById.get(Number(h.realisasi_id));if(!r)return;const key=String(h.nama_verifikator).trim();if(!key)return;if(!verifMap.has(key))verifMap.set(key,new Map());verifMap.get(key).set(Number(r.id),r);details.push({date:dt.date,register:r.kode_unik_realisasi||'-',activity:'Verifikasi',officer:key,description:r.pekerjaan||'-'});});
+      (realisasiList||[]).forEach(r=>{if(String(r.status_pembayaran||'').toLowerCase()!=='lunas'||!r.nama_bendahara)return;const dt=abkDateParts(r.tanggal_spm_bku);if(!dt||dt.year!==year||dt.month>month)return;const key=String(r.nama_bendahara).trim();if(!key)return;if(!payMap.has(key))payMap.set(key,new Map());payMap.get(key).set(Number(r.id),r);details.push({date:dt.date,register:r.kode_unik_realisasi||'-',activity:'Pembayaran',officer:key,description:r.pekerjaan||'-'});});
+      const count=map=>[...map.values()].reduce((n,regs)=>n+regs.size,0);
+      document.getElementById('abk-verif-total').textContent=count(verifMap);document.getElementById('abk-pay-total').textContent=count(payMap);
+      document.getElementById('abk-period-note').textContent=`Periode kumulatif: 1 Januari s.d. ${monthNames[month-1]} ${year}. Setiap register dihitung satu aktivitas per petugas dalam periode ini.`;
+      const rows=(map)=>[...map.entries()].sort((a,b)=>b[1].size-a[1].size).map(([name,regs])=>`<tr class="border-b"><td class="p-2">${safeText(name)}</td><td class="p-2 text-right font-bold">${regs.size}</td></tr>`).join('')||'<tr><td colspan="2" class="p-3 text-center text-slate-400">Belum ada aktivitas pada periode ini.</td></tr>';
+      document.getElementById('abk-verif-body').innerHTML=rows(verifMap);document.getElementById('abk-pay-body').innerHTML=rows(payMap);
+      details.sort((a,b)=>b.date.localeCompare(a.date)||a.register.localeCompare(b.register));
+      document.getElementById('abk-detail-body').innerHTML=details.map(d=>`<tr class="border-b"><td class="p-2">${safeText(d.date)}</td><td class="p-2 font-mono">${safeText(d.register)}</td><td class="p-2">${safeText(d.activity)}</td><td class="p-2">${safeText(d.officer)}</td><td class="p-2">${safeText(d.description)}</td></tr>`).join('')||'<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada aktivitas pada periode ini.</td></tr>';
+    }
+
+    function makeRegisterCode(year,month,editingId='') {
+      const mm=String(Number(month)||1).padStart(2,'0'), yy=String(year||2026);
+      const seq=(realisasiList||[]).filter(r=>String(r.tahun||2026)===yy && String(Number(r.bulan)||1).padStart(2,'0')===mm && String(r.id)!==String(editingId))
+        .map(r=>Number(String(r.kode_unik_realisasi||'').slice(0,4))).filter(Number.isFinite);
+      return String(Math.max(0,...seq)+1).padStart(4,'0')+mm+yy;
+    }
+    function refreshRegisterCode(){
+      const field=document.getElementById('trans-kode-unik');
+      if(field && !document.getElementById('trans-edit-id')?.value)
+        field.value='Nomor dibuat otomatis saat disimpan';
+    }
+    document.getElementById('trans-tahun')?.addEventListener('change',refreshRegisterCode);
+    document.getElementById('trans-bulan')?.addEventListener('change',refreshRegisterCode);
+    document.getElementById('trans-tahun')?.addEventListener('change',()=>showPlafonInfo(document.getElementById('trans-uraian')?.value));
+    document.getElementById('trans-bulan')?.addEventListener('change',()=>showPlafonInfo(document.getElementById('trans-uraian')?.value));
+    const _toggleRegisterOriginal=window.toggleFormInputRealisasi;
+    window.toggleFormInputRealisasi=function(show=true){ if(typeof _toggleRegisterOriginal==='function')_toggleRegisterOriginal(show); if(show)refreshRegisterCode(); };
+
     // Menyimpan transaksi baru (INSERT) atau memperbarui transaksi terpilih (UPDATE).
     // Mode edit ditentukan dari hidden field trans-edit-id dan tidak dihapus sebelum database berhasil.
     window.handleSaveRealisasi = async function (e) {
@@ -3197,8 +3948,11 @@
         pekerjaan: document.getElementById('trans-pekerjaan').value.trim(),
         penyedia: document.getElementById('trans-penyedia').value.trim(),
         pptk: document.getElementById('trans-pptk').value || null,
-        nomor_spm_bku: document.getElementById('trans-bku').value.trim() || null,
-        tanggal_spm_bku: document.getElementById('trans-tgl-bku').value || null,
+        kode_unik_realisasi: document.getElementById('trans-kode-unik').value || '',
+        status_verifikasi: editId !== null ? (realisasiList.find(r=>Number(r.id)===editId)?.status_verifikasi || 'Pengajuan') : 'Pengajuan',
+        status_pembayaran: editId !== null ? (realisasiList.find(r=>Number(r.id)===editId)?.status_pembayaran || 'Pengajuan') : 'Pengajuan',
+        jumlah_verifikasi: editId !== null ? Number(realisasiList.find(r=>Number(r.id)===editId)?.jumlah_verifikasi || 0) : 0,
+        catatan_verifikasi: editId !== null ? (realisasiList.find(r=>Number(r.id)===editId)?.catatan_verifikasi || '') : '',
         nilai_kegiatan: Number(document.getElementById('trans-nilai').value || 0)
       };
       if (!payload.pekerjaan || !payload.penyedia) {
@@ -3207,6 +3961,13 @@
       }
       if (!Number.isFinite(payload.nilai_kegiatan) || payload.nilai_kegiatan < 0) {
         alert('Nilai realisasi harus berupa angka nol atau lebih.');
+        return;
+      }
+      const budget = calculateRemainingEffectivePagu(
+        payload.master_id, payload.tahun, payload.bulan, editIdRaw
+      );
+      if (payload.nilai_kegiatan > budget.sisa) {
+        alert(`Pengajuan ditolak. Nilai pengajuan ${formatRupiah(payload.nilai_kegiatan)} melebihi sisa pagu efektif ${formatRupiah(budget.sisa)}. Pagu ${formatRupiah(budget.pagu)} dikurangi realisasi ${formatRupiah(budget.realisasi)}.`);
         return;
       }
 
@@ -3238,6 +3999,10 @@
           alert('Perubahan realisasi berhasil diperbarui.');
           showDatabaseStatus('Perubahan realisasi berhasil diperbarui di Supabase.', 'ok');
         } else {
+          // Nomor register dibuat di database berdasarkan tanggal penyimpanan aktual.
+          const { data: generatedRegister, error: registerError } = await supabaseClient.rpc('generate_register_number');
+          if (registerError) throw new Error('Nomor register otomatis belum tersedia. Jalankan SQL fungsi generate_register_number terlebih dahulu. Detail: ' + registerError.message);
+          payload.kode_unik_realisasi = generatedRegister;
           const result = await supabaseClient
             .from('realisasi_kegiatan_blud')
             .insert(payload)
@@ -3258,7 +4023,7 @@
         // Bersihkan mode edit hanya setelah operasi database berhasil.
         if (editField) editField.value = '';
         const heading = document.getElementById('form-realisasi-heading');
-        if (heading) heading.textContent = 'Formulir Pengakuan Realisasi Belanja BLUD';
+        if (heading) heading.textContent = 'Form Pengajuan Pembayaran';
         if (submitButton) submitButton.textContent = 'Simpan Transaksi Belanja';
         toggleFormInputRealisasi(false);
         document.getElementById('form-transaksi').reset();
@@ -3818,9 +4583,65 @@ async function downloadAIPresentation(){
   await pptx.writeFile({fileName:filename});
  }catch(e){console.error('PPT AI Decision:',e);alert('PPT gagal dibuat: '+(e?.message||'kesalahan tidak diketahui')+'. Data aplikasi tidak diubah.');}
 }
-window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();refreshMasterSearchFilters();renderMasterTable();renderUserTable();populateMonitoringFilterDropdowns();applyMonitoringFilters();applyLRAFilters();runAIDiagnosis();});
+
+// Searchable dropdown khusus filter Penatausahaan Belanja > Realisasi Belanja.
+// Select asli tetap dipertahankan sebagai sumber nilai agar seluruh logika filter lama berjalan.
+function initRealisasiSearchableFilters(){
+  const ids=['cf-tahun','cf-bulan','cf-program','cf-kegiatan','cf-rekening','cf-penyedia','cf-pptk'];
+  ids.forEach(id=>{
+    const sel=document.getElementById(id);
+    if(!sel || sel.dataset.searchUi==='1') return;
+    const wrap=document.createElement('div');
+    wrap.id=id+'-searchbox';
+    wrap.className='relative';
+    wrap.innerHTML='<input type="text" autocomplete="off" aria-label="Cari pilihan '+id.replace('cf-','')+'" placeholder="Cari / pilih..." class="w-full bg-white border border-slate-300 rounded-xl p-2 text-xs font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400"><div class="hidden absolute z-[80] top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-xl"></div>';
+    sel.parentNode.insertBefore(wrap,sel);
+    sel.classList.add('hidden');
+    sel.dataset.searchUi='1';
+    const input=wrap.querySelector('input');
+    const menu=wrap.querySelector('div');
+    const draw=()=>{
+      const q=input.value.toLocaleLowerCase('id-ID').trim().split(/\s+/).filter(Boolean);
+      const opts=Array.from(sel.options);
+      const filtered=opts.filter(o=>q.every(t=>o.textContent.toLocaleLowerCase('id-ID').includes(t)));
+      menu.innerHTML=filtered.map(o=>`<button type="button" data-value="${String(o.value).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}" class="block w-full text-left px-3 py-2.5 text-xs hover:bg-indigo-50 ${o.value===sel.value?'bg-indigo-50 font-bold text-indigo-800':''}">${o.textContent.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</button>`).join('') || '<div class="px-3 py-3 text-xs text-slate-400">Tidak ada pilihan yang cocok</div>';
+      menu.classList.remove('hidden');
+    };
+    const sync=()=>{
+      if(document.activeElement!==input || menu.classList.contains('hidden')){
+        const selected=sel.selectedOptions && sel.selectedOptions[0];
+        input.value=selected ? selected.textContent : '';
+      }
+    };
+    input.addEventListener('focus',()=>{input.select();draw();});
+    input.addEventListener('input',draw);
+    menu.addEventListener('click',e=>{
+      const btn=e.target.closest('button[data-value]');
+      if(!btn)return;
+      sel.value=btn.dataset.value;
+      input.value=sel.selectedOptions?.[0]?.textContent || '';
+      menu.classList.add('hidden');
+      sel.dispatchEvent(new Event('change',{bubbles:true}));
+    });
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){menu.classList.add('hidden');sync();}
+      if(e.key==='Enter'){e.preventDefault();menu.querySelector('button[data-value]')?.click();}
+      if(e.key==='ArrowDown'){e.preventDefault();menu.querySelector('button[data-value]')?.focus();}
+    });
+    menu.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){menu.classList.add('hidden');input.focus();}
+    });
+    document.addEventListener('click',e=>{
+      if(!wrap.contains(e.target)){menu.classList.add('hidden');sync();}
+    });
+    new MutationObserver(()=>{sync();}).observe(sel,{childList:true});
+    sel.addEventListener('change',sync);
+    sync();
+  });
+}
+
+window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();initRealisasiSearchableFilters();document.getElementById('trans-tahun')?.addEventListener('change',refreshKodeUnikRealisasi);document.getElementById('trans-bulan')?.addEventListener('change',refreshKodeUnikRealisasi);refreshMasterSearchFilters();renderMasterTable();renderUserTable();populateMonitoringFilterDropdowns();applyMonitoringFilters();applyLRAFilters();runAIDiagnosis();});
 </script>
 
 </body>
 </html>
-
