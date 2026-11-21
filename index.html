@@ -392,7 +392,7 @@
           </div>
           <div class="overflow-hidden">
             <span class="text-xs font-black tracking-tight text-slate-900 block leading-tight font-display uppercase">PENGADAAN BLUD</span>
-            <span class="text-[11px] font-bold text-indigo-700 block truncate">RSUD AM Parikesit</span>
+            <span id="sidebar-nama-rs" class="text-[11px] font-bold text-indigo-700 block truncate">Memuat profil RS…</span>
             <span class="text-[9px] text-slate-400 font-mono block">DPA-BLUD T.A. 2026</span>
           </div>
         </div>
@@ -413,13 +413,16 @@
             <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-bold">Superadmin</span>
           </div>
           <div class="space-y-1">
+            <button type="button" onclick="switchWindow('win-profil');loadProfilRS()" id="nav-profil" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
+              <span class="text-sm">🏥</span><span>Profil</span>
+            </button>
             <button type="button" onclick="switchWindow('win-master-data')" id="nav-master-data" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
               <span class="text-sm">📑</span>
               <span>Rekening Belanja & Pagu Anggaran</span>
             </button>
             <button type="button" onclick="switchWindow('win-master-user')" id="nav-master-user" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition text-slate-600 hover:bg-slate-50 cursor-pointer">
               <span class="text-sm">👥</span>
-              <span>Pejabat (KPA / PPK / PPTK)</span>
+              <span>Pengguna & Role</span>
             </button>
           </div>
         </div>
@@ -599,6 +602,42 @@
             </button>
           </div>
           <div id="dash-ai-points-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs"></div>
+        </div>
+      </section>
+
+      <!-- 1A. PROFIL RUMAH SAKIT -->
+      <section id="win-profil" class="hidden space-y-6">
+        <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-5">
+          <div class="flex items-center gap-3"><div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-2xl">🏥</div><div><h3 class="font-black text-base">Profil Rumah Sakit</h3><p class="text-xs text-slate-300 mt-1">Identitas institusi yang digunakan pada kop laporan dan dokumen aplikasi.</p></div></div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-5">
+          <div class="flex items-center justify-between gap-3"><div><h4 class="font-bold text-sm text-slate-900">Identitas Institusi</h4><p class="text-xs text-slate-500">Satu profil untuk satu database rumah sakit.</p></div><span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700">Superadmin</span></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="text-xs font-semibold text-slate-600">Nama resmi rumah sakit<input id="profil-nama-rs" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="RSUD Aji Muhammad Parikesit"></label>
+            <label class="text-xs font-semibold text-slate-600">Kode rumah sakit<input id="profil-kode-rs" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="Kode RS"></label>
+            <label class="text-xs font-semibold text-slate-600">Jenis rumah sakit<input id="profil-jenis-rs" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="Rumah Sakit Umum Daerah"></label>
+            <label class="text-xs font-semibold text-slate-600">Pemerintah daerah / instansi induk<input id="profil-pemda" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="Pemerintah Kabupaten Kutai Kartanegara"></label>
+            <label class="text-xs font-semibold text-slate-600 md:col-span-2">Alamat lengkap<textarea id="profil-alamat" rows="2" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="Alamat rumah sakit"></textarea></label>
+            <label class="text-xs font-semibold text-slate-600">Nomor telepon<input id="profil-telepon" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="Nomor telepon resmi"></label>
+            <label class="text-xs font-semibold text-slate-600">Email resmi<input id="profil-email" type="email" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="email@rumahsakit.go.id"></label>
+            <label class="text-xs font-semibold text-slate-600">Website<input id="profil-website" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="https://..."></label>
+            <div class="text-xs font-semibold text-slate-600">Logo rumah sakit (PNG)
+              <div class="mt-1 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <input id="profil-logo-file" type="file" accept="image/png,.png" class="w-full border rounded-xl p-3 text-sm font-normal" onchange="previewProfilLogo(this)">
+                <img id="profil-logo-preview" class="hidden h-16 w-16 object-contain border rounded-lg bg-white p-1" alt="Preview logo rumah sakit">
+              </div><p class="mt-1 text-[10px] text-slate-400">Format PNG, maksimal 2 MB. Upload logo baru untuk mengganti logo lama.</p>
+            </div>
+            <label class="text-xs font-semibold text-slate-600">Nomor DPA<input id="profil-dpa-nomor" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="Nomor DPA"></label>
+            <label class="text-xs font-semibold text-slate-600">Tanggal DPA<input id="profil-dpa-tanggal" type="date" class="mt-1 w-full border rounded-xl p-3 text-sm"></label>
+          </div>
+          <div class="border-t pt-4"><h4 class="font-bold text-sm text-slate-900 mb-3">Pejabat Penandatangan Dokumen</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="text-xs font-semibold text-slate-600">Nama pejabat / direktur<input id="profil-nama-pejabat" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="Nama lengkap dan gelar"></label>
+            <label class="text-xs font-semibold text-slate-600">NIP pejabat<input id="profil-nip-pejabat" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="NIP"></label>
+            <label class="text-xs font-semibold text-slate-600">Jabatan penandatangan<input id="profil-jabatan-pejabat" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="Direktur"></label>
+            <label class="text-xs font-semibold text-slate-600">Nama bendahara pengeluaran BLUD<input id="profil-nama-bendahara" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="Nama lengkap"></label>
+            <label class="text-xs font-semibold text-slate-600">NIP bendahara<input id="profil-nip-bendahara" class="mt-1 w-full border rounded-xl p-3 text-sm" placeholder="NIP bendahara"></label>
+          </div></div>
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t pt-4"><p id="profil-status" class="text-xs text-slate-500">Profil belum dimuat.</p><button id="profil-save-btn" type="button" onclick="saveProfilRS()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">Simpan Profil</button></div>
         </div>
       </section>
 
@@ -1482,7 +1521,7 @@
     </div>
   </div>
 
-  <div id="modal-master-user" style="display:none" class="fixed inset-0 z-50 items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"><div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4"><div class="flex justify-between border-b pb-3"><h3 id="user-modal-title" class="font-bold">Tambah Pejabat</h3><button type="button" onclick="closeUserModal()">✕</button></div><form id="form-user-crud" onsubmit="saveUserData(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs"><input type="hidden" id="u-id"><label class="font-bold">Nama lengkap<input id="u-nama" required class="block w-full border rounded-xl p-2 mt-1"></label><label class="font-bold">NIP<input id="u-nip" class="block w-full border rounded-xl p-2 mt-1"></label><label class="font-bold">Jabatan<input id="u-jabatan" required placeholder="KPA / PPK / PPTK" class="block w-full border rounded-xl p-2 mt-1"></label><label class="font-bold">Email<input id="u-email" type="email" class="block w-full border rounded-xl p-2 mt-1"></label><label class="font-bold">Peran sistem<select id="u-role" class="block w-full border rounded-xl p-2 mt-1"><option>Admin</option><option>Superadmin</option><option>KPA</option><option>PPK</option><option>PPTK</option><option>Viewer</option></select></label><div class="sm:col-span-2 flex justify-end gap-2 pt-2"><button type="button" onclick="closeUserModal()" class="px-4 py-2 bg-slate-100 rounded-xl font-bold">Batal</button><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold">Simpan Pejabat</button></div></form></div></div>
+  <div id="modal-master-user" style="display:none" class="fixed inset-0 z-50 items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"><div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4"><div class="flex justify-between border-b pb-3"><h3 id="user-modal-title" class="font-bold">Tambah Pejabat</h3><button type="button" onclick="closeUserModal()">✕</button></div><form id="form-user-crud" onsubmit="saveUserData(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs"><input type="hidden" id="u-id"><label class="font-bold">Nama lengkap<input id="u-nama" required class="block w-full border rounded-xl p-2 mt-1"></label><label class="font-bold">NIP<input id="u-nip" class="block w-full border rounded-xl p-2 mt-1"></label><label class="font-bold">Jabatan<input id="u-jabatan" required placeholder="KPA / PPK / PPTK" class="block w-full border rounded-xl p-2 mt-1"></label><label class="font-bold">Email<input id="u-email" type="email" class="block w-full border rounded-xl p-2 mt-1"></label><label class="font-bold">Peran sistem<select id="u-role" class="block w-full border rounded-xl p-2 mt-1"><option>SUPERADMIN</option><option>ADMIN</option><option>VERIFIKATOR</option><option>PPTK</option><option>BENDAHARA</option><option>PPK-BLUD</option></select></label><div class="sm:col-span-2 rounded-xl border border-indigo-100 bg-indigo-50 p-3"><div class="font-bold text-slate-800">Akun Login Supabase</div><p class="text-slate-600 mt-1">Password dibuat sendiri oleh pejabat melalui tautan aktivasi yang dikirim ke email. Password tidak disimpan di aplikasi.</p><button id="u-invite-account" type="button" onclick="invitePejabatAccount()" class="hidden mt-2 px-3 py-2 bg-indigo-600 text-white rounded-lg font-bold">Kirim Undangan Aktivasi / Sinkronkan Role</button><div id="u-account-help" class="text-slate-500 mt-1">Simpan data pejabat terlebih dahulu untuk mengaktifkan akun.</div></div><div class="sm:col-span-2 flex justify-end gap-2 pt-2"><button type="button" onclick="closeUserModal()" class="px-4 py-2 bg-slate-100 rounded-xl font-bold">Batal</button><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold">Simpan Pejabat</button></div></form></div></div>
 
   <!-- JAVASCRIPT ENGINE LENGKAP -->
   <script>
@@ -1610,16 +1649,20 @@
 
     // FUNGSI NAVIGASI JENDELA UTAMA
     function switchWindow(windowId) {
+      if (windowId === 'win-profil' && !['superadmin','admin'].includes(window.currentAppRole)) {
+        alert('Akses ditolak. Profil Rumah Sakit hanya dapat diubah oleh Superadmin.');
+        return;
+      }
       if (windowId === 'win-master-user' && !window.canManagePejabat) {
         alert('Akses ditolak. Data Pejabat hanya dapat diakses oleh Superadmin.');
         return;
       }
-      ['win-dashboard', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-abk', 'win-laporan', 'win-tren-tahunan', 'win-prognosis', 'win-ai-decision', 'win-buku-besar-blud', 'win-spp-ls'].forEach(id => {
+      ['win-dashboard', 'win-profil', 'win-master-data', 'win-master-user', 'win-input-realisasi', 'win-monitoring', 'win-abk', 'win-laporan', 'win-tren-tahunan', 'win-prognosis', 'win-ai-decision', 'win-buku-besar-blud', 'win-spp-ls'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
 
-      ['nav-dashboard', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-pt-verifikasi', 'nav-pt-pembayaran', 'nav-pt-spj', 'nav-monitoring', 'nav-abk', 'nav-laporan', 'nav-tren-tahunan', 'nav-prognosis', 'nav-ai-decision', 'nav-buku-besar-blud', 'nav-spp-ls'].forEach(id => {
+      ['nav-dashboard', 'nav-profil', 'nav-master-data', 'nav-master-user', 'nav-input-realisasi', 'nav-pt-verifikasi', 'nav-pt-pembayaran', 'nav-pt-spj', 'nav-monitoring', 'nav-abk', 'nav-laporan', 'nav-tren-tahunan', 'nav-prognosis', 'nav-ai-decision', 'nav-buku-besar-blud', 'nav-spp-ls'].forEach(id => {
         const nav = document.getElementById(id);
         if (nav) nav.classList.remove('nav-active');
       });
@@ -1628,6 +1671,7 @@
       if (targetWin) targetWin.classList.remove('hidden');
 
       const titles = {
+        'win-profil': ['Profil Rumah Sakit', 'Identitas institusi dan pejabat penandatangan dokumen'],
         'win-dashboard': ['Dashboard Eksekutif', 'Monitoring Pagu, Pengawasan Kas, dan Realisasi Anggaran BLUD'],
         'win-master-data': ['Daftar Rekening & Pagu DPA', 'Khusus Superadmin: Manajemen Struktur Rekening dan Pagu Belanja'],
         'win-master-user': ['Pejabat Pengelola (KPA, PPK, PPTK)', 'Khusus Superadmin: Pengaturan NIP, Jabatan Kedinasan, dan Hak Akses'],
@@ -2332,6 +2376,9 @@
     }
 
     function setPenatausahaanView(view) {
+      const role=window.currentAppRole||'';
+      const allowed={pengajuan:['superadmin','admin','pptk'],verifikasi:['superadmin','admin','verifikator','ppk-blud'],pembayaran:['superadmin','admin','bendahara'],spj:['superadmin','admin','bendahara','ppk-blud']};
+      if(!(allowed[view]||[]).includes(role)){alert('Akses ditolak untuk menu ini.');return;}
       activePenatausahaanView = view;
       updatePenatausahaanModuleHeader(view);
       activeSPJSummaryFilter = 'all';
@@ -2760,10 +2807,60 @@
       const modal=document.getElementById('spj-modal');modal.classList.remove('hidden');modal.classList.add('flex');
     }
     function closeSPJModal(){const modal=document.getElementById('spj-modal');modal.classList.add('hidden');modal.classList.remove('flex');}
+    let spjSaveInProgress = false;
+    function normalizeSPJDuplicateValue(value){
+      return String(value ?? '').trim().replace(/\s+/g,' ').toLocaleLowerCase('id');
+    }
     async function saveSPJRecord(){
-      const id=Number(document.getElementById('spj-record-id').value);const date=document.getElementById('spj-date').value;const officer=document.getElementById('spj-officer').value.trim();const status=document.querySelector('input[name="spj-status"]:checked')?.value||'Belum Dikumpulkan';const note=document.getElementById('spj-note').value.trim();
-      if(!officer){alert('Nama penerima/verifikator wajib diisi.');document.getElementById('spj-officer').focus();return;}if(!date){alert('Tanggal pengumpulan belum tersedia.');return;}if(!supabaseClient||!supabaseReady){alert('Koneksi database belum tersedia.');return;}
-      try{const payload={realisasi_id:id,tanggal_pengumpulan:date,nama_penerima:officer,status_spj:status,catatan:note};const {data,error}=await supabaseClient.from('realisasi_spj_histori').insert(payload).select('*').single();if(error)throw error;spjLatestById[id]=data;closeSPJModal();updatePenatausahaanSummary();applyCascadingFilter();showDatabaseStatus('Pencatatan SPJ berhasil disimpan.','ok');}catch(err){alert('Pencatatan SPJ belum berhasil disimpan: '+(err.message||err)+'\nPastikan tabel realisasi_spj_histori sudah dibuat.');}
+      if(spjSaveInProgress) return;
+      const button=document.querySelector('#spj-modal button[onclick="saveSPJRecord()"]');
+      const originalButtonText=button?.textContent||'Simpan Riwayat SPJ';
+      const id=Number(document.getElementById('spj-record-id').value);
+      const date=document.getElementById('spj-date').value;
+      const officer=document.getElementById('spj-officer').value.trim();
+      const status=document.querySelector('input[name="spj-status"]:checked')?.value||'Belum Dikumpulkan';
+      const note=document.getElementById('spj-note').value.trim();
+      if(!officer){alert('Nama penerima/verifikator wajib diisi.');document.getElementById('spj-officer').focus();return;}
+      if(!date){alert('Tanggal pengumpulan belum tersedia.');return;}
+      if(!supabaseClient||!supabaseReady){alert('Koneksi database belum tersedia.');return;}
+      if(!Number.isFinite(id)||id<=0){alert('Data pengajuan tidak valid. Muat ulang formulir SPJ.');return;}
+
+      spjSaveInProgress=true;
+      if(button){button.disabled=true;button.textContent='Memeriksa…';button.classList.add('opacity-60','cursor-not-allowed');}
+      try{
+        // Cari catatan pada pengajuan dan tanggal yang sama terlebih dahulu.
+        const {data:existingRows,error:checkError}=await supabaseClient
+          .from('realisasi_spj_histori')
+          .select('id,realisasi_id,tanggal_pengumpulan,nama_penerima,status_spj,catatan')
+          .eq('realisasi_id',id)
+          .eq('tanggal_pengumpulan',date);
+        if(checkError) throw checkError;
+
+        const duplicate=(existingRows||[]).find(row=>
+          normalizeSPJDuplicateValue(row.nama_penerima)===normalizeSPJDuplicateValue(officer) &&
+          normalizeSPJDuplicateValue(row.status_spj)===normalizeSPJDuplicateValue(status) &&
+          normalizeSPJDuplicateValue(row.catatan)===normalizeSPJDuplicateValue(note)
+        );
+        if(duplicate){
+          alert('Catatan SPJ dengan tanggal, penerima, status, dan catatan yang sama sudah tersimpan. Tidak dibuat duplikasi.');
+          return;
+        }
+
+        if(button) button.textContent='Menyimpan…';
+        const payload={realisasi_id:id,tanggal_pengumpulan:date,nama_penerima:officer,status_spj:status,catatan:note};
+        const {data,error}=await supabaseClient.from('realisasi_spj_histori').insert(payload).select('*').single();
+        if(error) throw error;
+        spjLatestById[id]=data;
+        closeSPJModal();
+        updatePenatausahaanSummary();
+        applyCascadingFilter();
+        showDatabaseStatus('Pencatatan SPJ berhasil disimpan.','ok');
+      }catch(err){
+        alert('Pencatatan SPJ belum berhasil disimpan: '+(err.message||err)+'\nPastikan tabel realisasi_spj_histori tersedia dan hak aksesnya benar.');
+      }finally{
+        spjSaveInProgress=false;
+        if(button){button.disabled=false;button.textContent=originalButtonText;button.classList.remove('opacity-60','cursor-not-allowed');}
+      }
     }
 
     function renderPenatausahaanRowsInternal(list, view) {
@@ -4137,14 +4234,20 @@
       const program = document.getElementById('prognosis-filter-program')?.value || 'ALL';
       const kegiatan = document.getElementById('prognosis-filter-kegiatan')?.value || 'ALL';
       const sub = document.getElementById('prognosis-filter-subkegiatan')?.value || 'ALL';
-      const yearMasters = masterList.filter(m=>Number(m.tahun||2026)===year && (program==='ALL'||m.nama_program===program) && (kegiatan==='ALL'||m.nama_kegiatan===kegiatan) && (sub==='ALL'||m.nama_sub_kegiatan===sub));
+      // Gunakan basis yang sama dengan Monitoring Realisasi Belanja:
+      // 1) pagu efektif sampai bulan yang dipilih,
+      // 2) pemetaan seluruh ID master historis dari rekening efektif,
+      // 3) hanya transaksi Lunas,
+      // 4) tahun/bulan transaksi mengikuti tanggal SPM/BKU.
       const yearAllOriginal = masterList.filter(m=>Number(m.tahun||2026)===year);
-      const effective = effectiveMasterPagu(yearMasters);
+      const effective = effectiveMasterPagu(yearAllOriginal, String(month)).filter(m=>
+        (program==='ALL'||m.nama_program===program) &&
+        (kegiatan==='ALL'||m.nama_kegiatan===kegiatan) &&
+        (sub==='ALL'||m.nama_sub_kegiatan===sub)
+      );
       const ids = historicalMasterIds(effective, yearAllOriginal);
-      const eligibleIds = new Set(yearMasters.map(m=>Number(m.id)));
       const yearTx = realisasiList.filter(r=>{
         if(!ids.has(Number(r.master_id)) || !isPaidReportTransaction(r)) return false;
-        if(String(r.tahun||2026)!==String(year)) return false;
         const dt=reportPaymentDateParts(r);
         return dt.year===year && dt.month<=month;
       });
@@ -4208,6 +4311,64 @@
       // nama tabel, endpoint, atau pesan backend kepada pengguna aplikasi.
       return operation + ' tidak berhasil. Periksa hak akses atau hubungi administrator aplikasi.';
     }
+
+    const profilFields = {
+      nama_rs:'profil-nama-rs', kode_rs:'profil-kode-rs', jenis_rs:'profil-jenis-rs', nama_pemda:'profil-pemda',
+      alamat:'profil-alamat', telepon:'profil-telepon', email:'profil-email', website:'profil-website', dpa_nomor:'profil-dpa-nomor', dpa_tanggal:'profil-dpa-tanggal',
+      nama_pejabat:'profil-nama-pejabat', nip_pejabat:'profil-nip-pejabat', jabatan_pejabat:'profil-jabatan-pejabat',
+      nama_bendahara:'profil-nama-bendahara', nip_bendahara:'profil-nip-bendahara'
+    };
+    window.previewProfilLogo = function(input) {
+      const file=input?.files?.[0], preview=document.getElementById('profil-logo-preview');
+      if(!preview)return;
+      if(!file){preview.classList.add('hidden');preview.removeAttribute('src');return;}
+      if(file.type!=='image/png' || !/\.png$/i.test(file.name)){alert('Logo harus berupa file PNG.');input.value='';preview.classList.add('hidden');return;}
+      if(file.size>2*1024*1024){alert('Ukuran logo maksimal 2 MB.');input.value='';preview.classList.add('hidden');return;}
+      preview.src=URL.createObjectURL(file);preview.classList.remove('hidden');
+    };
+    window.applyProfilBranding = function(data) {
+      const namaNode=document.getElementById('sidebar-nama-rs');
+      if(namaNode) namaNode.textContent=(data?.nama_rs||'Nama Rumah Sakit Belum Diatur').trim();
+    };
+    window.loadProfilRS = async function() {
+      const status=document.getElementById('profil-status');
+      if(!supabaseClient){if(status)status.textContent='Koneksi data belum tersedia.';return;}
+      if(status)status.textContent='Memuat profil…';
+      const {data,error}=await supabaseClient.from('profil_rs').select('*').eq('id',1).maybeSingle();
+      if(error){if(status)status.textContent='Profil belum dapat dimuat. Pastikan tabel profil telah disiapkan oleh administrator.';return;}
+      window.applyProfilBranding(data);
+      Object.entries(profilFields).forEach(([key,id])=>{const el=document.getElementById(id);if(el)el.value=data?.[key]??'';});
+      const logoPreview=document.getElementById('profil-logo-preview');if(logoPreview&&data?.logo_url){logoPreview.src=data.logo_url;logoPreview.classList.remove('hidden');}else if(logoPreview){logoPreview.removeAttribute('src');logoPreview.classList.add('hidden');}
+      const logoInput=document.getElementById('profil-logo-file');if(logoInput)logoInput.value='';
+      if(status)status.textContent=data?'Profil berhasil dimuat.':'Belum ada profil. Silakan lengkapi identitas rumah sakit.';
+      const canEdit=window.currentAppRole==='superadmin';
+      Object.values(profilFields).forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=!canEdit;});
+      const logoInputControl=document.getElementById('profil-logo-file');if(logoInputControl)logoInputControl.disabled=!canEdit;
+      const btn=document.getElementById('profil-save-btn');if(btn)btn.classList.toggle('hidden',!canEdit);
+    };
+    window.saveProfilRS = async function(){
+      if(window.currentAppRole!=='superadmin'){alert('Hanya Superadmin yang dapat mengubah Profil Rumah Sakit.');return;}
+      if(!supabaseClient){alert('Koneksi data belum tersedia.');return;}
+      const btn=document.getElementById('profil-save-btn'),status=document.getElementById('profil-status');
+      const payload={id:1,updated_at:new Date().toISOString()};
+      Object.entries(profilFields).forEach(([key,id])=>{payload[key]=(document.getElementById(id)?.value||'').trim()||null;});
+      const logoFile=document.getElementById('profil-logo-file')?.files?.[0];
+      if(logoFile){if(logoFile.type!=='image/png'||!/\.png$/i.test(logoFile.name)||logoFile.size>2*1024*1024){alert('Logo harus PNG dan maksimal 2 MB.');return;}}
+      if(logoFile){
+        const {error:uploadError}=await supabaseClient.storage.from('rs-assets').upload('profil/logo-rs.png',logoFile,{upsert:true,contentType:'image/png',cacheControl:'3600'});
+        if(uploadError){alert('Upload logo gagal. Pastikan bucket rs-assets sudah dibuat dan akses upload tersedia.');return;}
+        const {data:publicData}=supabaseClient.storage.from('rs-assets').getPublicUrl('profil/logo-rs.png');
+        payload.logo_url=publicData?.publicUrl||null;
+      }else{
+        const {data:existing}=await supabaseClient.from('profil_rs').select('logo_url').eq('id',1).maybeSingle();
+        payload.logo_url=existing?.logo_url||null;
+      }
+      if(!payload.nama_rs){alert('Nama resmi rumah sakit wajib diisi.');return;}
+      if(btn){btn.disabled=true;btn.textContent='Menyimpan…';}if(status)status.textContent='Menyimpan profil…';
+      try{const {error}=await supabaseClient.from('profil_rs').upsert(payload,{onConflict:'id'});if(error)throw error;window.applyProfilBranding(payload);if(status)status.textContent='Profil berhasil disimpan.';alert('Profil Rumah Sakit berhasil disimpan.');}
+      catch(e){if(status)status.textContent='Profil belum berhasil disimpan. Periksa konfigurasi tabel dan hak akses.';alert('Profil belum berhasil disimpan. Pastikan tabel profil_rs dan kebijakan akses sudah dibuat di Supabase.');}
+      finally{if(btn){btn.disabled=false;btn.textContent='Simpan Profil';}}
+    };
 
     async function loadSupabaseData() {
       if (!window.supabase || !window.supabase.createClient) {
@@ -4567,15 +4728,25 @@
       document.getElementById('auth-user-bar').classList.add('flex');
       document.getElementById('auth-user-label').textContent=user.email||'Pengguna terautentikasi';
       document.body.classList.remove('overflow-hidden');
-      const role=String(user.app_metadata?.role||'').toLowerCase();
-      const canManage=role==='superadmin';
-      const canInputManual=role==='admin'||role==='superadmin';
-      const pejabatNav=document.getElementById('nav-master-user'); if(pejabatNav){if(!canManage)pejabatNav.classList.add('hidden');else pejabatNav.classList.remove('hidden');}
+      const role=String(user.app_metadata?.role||'').trim().toLowerCase();
+      const isAdmin=['superadmin','admin'].includes(role);
+      const canManage=isAdmin;
+      const canInputManual=isAdmin || role==='pptk';
       window.currentAppRole=role;
       window.canManagePejabat=canManage;
       window.canInputManual=canInputManual;
+      const access={
+        'nav-profil':isAdmin,'nav-master-data':isAdmin,'nav-master-user':isAdmin,
+        'nav-input-realisasi':isAdmin||role==='pptk','nav-pt-verifikasi':isAdmin||role==='verifikator'||role==='ppk-blud',
+        'nav-pt-pembayaran':isAdmin||role==='bendahara','nav-pt-spj':isAdmin||role==='bendahara'||role==='ppk-blud',
+        'nav-monitoring':true,'nav-abk':isAdmin||role==='ppk-blud',
+        'nav-tren-tahunan':true,'nav-prognosis':true,
+        'nav-laporan':isAdmin||role==='ppk-blud','nav-buku-besar-blud':isAdmin||role==='ppk-blud',
+        'nav-ai-decision':isAdmin||role==='ppk-blud','nav-spp-ls':isAdmin||role==='bendahara'
+      };
+      Object.entries(access).forEach(([id,allowed])=>document.getElementById(id)?.classList.toggle('hidden',!allowed));
       const paguButton=document.querySelector('button[onclick="openMasterModal()"]');
-      if(paguButton) paguButton.classList.toggle('hidden',!canInputManual);
+      if(paguButton) paguButton.classList.toggle('hidden',!isAdmin);
       const realisasiButton=document.querySelector('button[onclick="toggleFormInputRealisasi(true)"]');
       if(realisasiButton) realisasiButton.classList.toggle('hidden',!canInputManual);
       renderUserTable();
@@ -4591,16 +4762,16 @@
         const msg=document.getElementById('auth-login-message'); msg.classList.add('hidden');
         try { const {data,error}=await supabaseClient.auth.signInWithPassword({email,password}); if(error) throw error;
           const role=String(data.user?.app_metadata?.role||'').toLowerCase();
-          if(!['superadmin','admin','kpa','ppk','pptk','viewer'].includes(role)){ await supabaseClient.auth.signOut(); throw new Error('Akun belum diberi peran akses oleh administrator.'); }
-          unlockApplication(data.user); await loadSupabaseData();
+          if(!['superadmin','admin','verifikator','pptk','bendahara','ppk-blud'].includes(role)){ await supabaseClient.auth.signOut(); throw new Error('Akun belum diberi peran akses oleh administrator.'); }
+          unlockApplication(data.user); await loadSupabaseData(); await window.loadProfilRS();
         } catch(err) { authMessage(err.message==='Akun belum diberi peran akses oleh administrator.'?err.message:'Email atau kata sandi tidak valid, atau akun belum diaktifkan.'); }
         finally { button.disabled=false; button.textContent='Masuk ke Aplikasi'; }
       });
       const {data:{session},error}=await supabaseClient.auth.getSession();
       if(error||!session){lockApplication();return;}
       const role=String(session.user?.app_metadata?.role||'').toLowerCase();
-      if(!['superadmin','admin','kpa','ppk','pptk','viewer'].includes(role)){await supabaseClient.auth.signOut();lockApplication();authMessage('Akun belum diberi peran akses oleh administrator.');return;}
-      unlockApplication(session.user); await loadSupabaseData();
+      if(!['superadmin','admin','verifikator','pptk','bendahara','ppk-blud'].includes(role)){await supabaseClient.auth.signOut();lockApplication();authMessage('Akun belum diberi peran akses oleh administrator.');return;}
+      unlockApplication(session.user); await loadSupabaseData(); await window.loadProfilRS();
       supabaseClient.auth.onAuthStateChange((_event,newSession)=>{ if(!newSession){currentAuthUser=null;lockApplication();} else if(currentAuthUser?.id!==newSession.user.id){unlockApplication(newSession.user);} });
     });
   </script>
@@ -4761,10 +4932,11 @@ deleteMasterData=async function(id){
   showDatabaseStatus(msg,'error');alert(msg);
  }
 };
-function openUserModal(id=null){if(!window.canManagePejabat){alert('Data Pejabat hanya dapat diakses oleh Superadmin.');return;}document.getElementById('form-user-crud').reset();document.getElementById('u-id').value='';if(id){const u=userList.find(x=>Number(x.id)===Number(id));if(!u)return;document.getElementById('u-id').value=u.id;document.getElementById('u-nama').value=u.nama_lengkap||'';document.getElementById('u-nip').value=u.nip||'';document.getElementById('u-jabatan').value=u.jabatan||'';document.getElementById('u-email').value=u.email||'';document.getElementById('u-role').value=u.role||'PPTK';document.getElementById('user-modal-title').textContent='Ubah Data Pejabat';}else document.getElementById('user-modal-title').textContent='Tambah Pejabat';document.getElementById('modal-master-user').style.display='flex';}
+function openUserModal(id=null){if(!window.canManagePejabat){alert('Pengelolaan pengguna hanya dapat diakses ADMIN atau SUPERADMIN.');return;}document.getElementById('form-user-crud').reset();document.getElementById('u-id').value='';const invite=document.getElementById('u-invite-account');const help=document.getElementById('u-account-help');if(invite)invite.classList.add('hidden');if(help)help.textContent='Simpan data pejabat terlebih dahulu untuk mengaktifkan akun.';if(id){const u=userList.find(x=>Number(x.id)===Number(id));if(!u)return;document.getElementById('u-id').value=u.id;document.getElementById('u-nama').value=u.nama_lengkap||'';document.getElementById('u-nip').value=u.nip||'';document.getElementById('u-jabatan').value=u.jabatan||'';document.getElementById('u-email').value=u.email||'';document.getElementById('u-role').value=u.role||'PPTK';document.getElementById('user-modal-title').textContent='Ubah Data Pejabat';if(invite)invite.classList.toggle('hidden',!u.email);if(help)help.textContent=u.email?'Akun dibuat/diaktifkan melalui undangan email. Perubahan role disinkronkan saat tombol ditekan.':'Tambahkan email lalu simpan data pejabat.';}else document.getElementById('user-modal-title').textContent='Tambah Pejabat';document.getElementById('modal-master-user').style.display='flex';}
 function closeUserModal(){document.getElementById('modal-master-user').style.display='none';}
-async function saveUserData(e){e.preventDefault();if(!window.canManagePejabat){alert('Akses ditolak. Hanya Superadmin yang dapat mengubah data pejabat.');return;}if(!supabaseClient||!supabaseReady){alert('Database belum terhubung.');return;}const id=document.getElementById('u-id').value;const payload={nama_lengkap:document.getElementById('u-nama').value.trim(),nip:document.getElementById('u-nip').value.trim()||null,jabatan:document.getElementById('u-jabatan').value.trim(),email:document.getElementById('u-email').value.trim()||null,role:document.getElementById('u-role').value};try{const {data,error}=await (id?supabaseClient.from('master_users_blud').update(payload).eq('id',Number(id)).select('*').single():supabaseClient.from('master_users_blud').insert(payload).select('*').single());if(error)throw error;if(id)userList=userList.map(u=>Number(u.id)===Number(id)?data:u);else userList.push(data);closeUserModal();renderUserTable();showDatabaseStatus('Data pejabat tersimpan.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Simpan pejabat'),'error');alert('Data pejabat belum berhasil disimpan. Periksa data dan hak akses.');}}
-async function deleteUserData(id){if(!window.canManagePejabat){alert('Akses ditolak. Hanya Superadmin yang dapat menghapus data pejabat.');return;}if(!confirm('Hapus data pejabat ini?'))return;try{const {error}=await supabaseClient.from('master_users_blud').delete().eq('id',Number(id));if(error)throw error;userList=userList.filter(u=>Number(u.id)!==Number(id));renderUserTable();showDatabaseStatus('Data pejabat dihapus.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Hapus pejabat'),'error');alert('Operasi belum berhasil. Periksa data dan hak akses, lalu coba kembali.');}}
+async function saveUserData(e){e.preventDefault();if(!window.canManagePejabat){alert('Akses ditolak. Hanya ADMIN atau SUPERADMIN yang dapat mengubah pengguna.');return;}if(!supabaseClient||!supabaseReady){alert('Database belum terhubung.');return;}const id=document.getElementById('u-id').value;const payload={nama_lengkap:document.getElementById('u-nama').value.trim(),nip:document.getElementById('u-nip').value.trim()||null,jabatan:document.getElementById('u-jabatan').value.trim(),email:document.getElementById('u-email').value.trim()||null,role:document.getElementById('u-role').value};try{const {data,error}=await (id?supabaseClient.from('master_users_blud').update(payload).eq('id',Number(id)).select('*').single():supabaseClient.from('master_users_blud').insert(payload).select('*').single());if(error)throw error;if(id)userList=userList.map(u=>Number(u.id)===Number(id)?data:u);else userList.push(data);closeUserModal();renderUserTable();showDatabaseStatus('Data pejabat tersimpan.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Simpan pejabat'),'error');alert('Data pejabat belum berhasil disimpan. Periksa data dan hak akses.');}}
+window.invitePejabatAccount=async function(){if(!window.canManagePejabat){alert('Akses ditolak.');return;}const id=Number(document.getElementById('u-id').value);const u=userList.find(x=>Number(x.id)===id);if(!id||!u){alert('Simpan data pejabat terlebih dahulu.');return;}if(!u.email){alert('Email pejabat wajib diisi.');return;}if(!confirm('Kirim undangan aktivasi ke '+u.email+' dan tetapkan role '+u.role+'?'))return;const btn=document.getElementById('u-invite-account');if(btn){btn.disabled=true;btn.textContent='Memproses…';}try{const {data,error}=await supabaseClient.functions.invoke('admin-manage-user',{body:{action:'invite_or_sync',email:u.email,nama_lengkap:u.nama_lengkap,nip:u.nip,role:u.role,redirectTo:location.origin+location.pathname}});if(error)throw error;const msg=data?.message||'Permintaan akun berhasil diproses.';showDatabaseStatus(msg,'ok');alert(msg);}catch(err){console.error('Aktivasi akun gagal:',err);const msg=err?.message||'Undangan belum berhasil dikirim. Pastikan Edge Function admin-manage-user sudah dipasang dan konfigurasi SMTP Supabase aktif.';alert(msg);showDatabaseStatus(msg,'error');}finally{if(btn){btn.disabled=false;btn.textContent='Kirim Undangan Aktivasi / Sinkronkan Role';}}};
+async function deleteUserData(id){if(!window.canManagePejabat){alert('Akses ditolak. Hanya ADMIN atau SUPERADMIN yang dapat menghapus pengguna.');return;}if(!confirm('Hapus data pejabat ini?'))return;try{const {error}=await supabaseClient.from('master_users_blud').delete().eq('id',Number(id));if(error)throw error;userList=userList.filter(u=>Number(u.id)!==Number(id));renderUserTable();showDatabaseStatus('Data pejabat dihapus.','ok');}catch(err){showDatabaseStatus(supabaseErrorMessage(err,'Hapus pejabat'),'error');alert('Operasi belum berhasil. Periksa data dan hak akses, lalu coba kembali.');}}
 renderUserTable=function(){const tbody=document.getElementById('user-table-body');if(!tbody)return;const canEdit=!!window.canManagePejabat;tbody.innerHTML=userList.map(u=>`<tr><td class="py-3 px-4"><b>${safeText(u.nama_lengkap)}</b><div class="text-slate-400">NIP: ${safeText(u.nip||'-')}</div></td><td class="py-3 px-4">${safeText(u.jabatan||'-')}</td><td class="py-3 px-4">${safeText(u.email||'-')}</td><td class="py-3 px-4">${safeText(u.role||'-')}</td><td class="py-3 px-4">${canEdit?`<div class="flex gap-1"><button onclick="openUserModal(${Number(u.id)})" class="px-2 py-1 bg-amber-50 text-amber-800 rounded">Edit</button><button onclick="deleteUserData(${Number(u.id)})" class="px-2 py-1 bg-rose-50 text-rose-700 rounded">Hapus</button></div>`:'-'}</td></tr>`).join('');const add=document.querySelector('#win-master-user button[onclick="openUserModal()"]');if(add)add.style.display=canEdit?'':'none';};
 const _applyLRAFilters=applyLRAFilters;
 applyLRAFilters=function(){
@@ -4790,11 +4962,21 @@ applyLRAFilters=function(){
   });
   const detailRows=Array.from(detailMap.values()).map(d=>{
     const ids=new Set(d.master_ids);
-    const base=realisasiList.filter(r=>ids.has(Number(r.master_id))&&(yr==='ALL'||String(r.tahun||2026)===yr)&&(fPptk==='ALL'||r.pptk===fPptk));
-    const cum=base.filter(r=>Number(r.bulan||1)<=monthNo);
-    const selected=mo==='ALL'?base:base.filter(r=>Number(r.bulan||1)===monthNo);
-    d.realKumulatif=cum.reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0);
-    d.real=(cakupan==='bulan'&&mo!=='ALL'?selected:cum).reduce((a,r)=>a+Number(r.nilai_kegiatan||0),0);
+    // Samakan basis realisasi LRA dengan Monitoring Realisasi Belanja:
+    // hanya transaksi Lunas, memakai nilai_pembayaran aktual, dan periode
+    // ditentukan dari tanggal_spm_bku (fallback tahun/bulan transaksi).
+    const base=realisasiList.filter(r=>{
+      if(!ids.has(Number(r.master_id))) return false;
+      if(String(r.status_pembayaran||'').trim().toLowerCase()!=='lunas') return false;
+      if(fPptk!=='ALL' && String(r.pptk||'').trim()!==fPptk) return false;
+      const paidDate=reportPaymentDateParts(r);
+      return yr==='ALL' || paidDate.year===Number(yr);
+    });
+    const cum=base.filter(r=>reportPaymentDateParts(r).month<=monthNo);
+    const selected=mo==='ALL'?base:base.filter(r=>reportPaymentDateParts(r).month===monthNo);
+    const paidValue=r=>Number(r.nilai_pembayaran??r.nilai_kegiatan??0);
+    d.realKumulatif=cum.reduce((a,r)=>a+paidValue(r),0);
+    d.real=(cakupan==='bulan'&&mo!=='ALL'?selected:cum).reduce((a,r)=>a+paidValue(r),0);
     d.sisa=d.pagu-d.realKumulatif;d.persen_serap=d.pagu?d.real/d.pagu*100:0;return d;
   });
   const activityMap=new Map();detailRows.forEach(d=>{const k=d.program+'|'+d.kegiatan;if(!activityMap.has(k))activityMap.set(k,{program:d.program,kegiatan:d.kegiatan,pagu:0,realisasi:0,sisa:0,persen_serap:0});const a=activityMap.get(k);a.pagu+=d.pagu;a.realisasi+=d.real;a.sisa+=d.sisa;});
@@ -5178,7 +5360,7 @@ function renderSPPLSList(){const body=document.getElementById('spp-ls-list-body'
 
 function openSPPLSModal(id){const r=(realisasiList||[]).find(x=>Number(x.id)===Number(id));if(!r){alert('Data register tidak ditemukan.');return;}const m=(masterList||[]).find(x=>Number(x.id)===Number(r.master_id))||{};const put=(k,v)=>{const el=document.getElementById('spp-'+k);if(el)el.value=v??'';};
  if(!sppGetRegister(r)){alert('Nomor register belum tersedia atau tidak valid. Periksa Pengajuan Pembayaran terlebih dahulu.');return;}put('record-id',r.id);put('register',sppGetRegister(r));put('tanggal-cetak',new Date().toISOString().slice(0,10));put('penyedia',r.penyedia);put('pptk',r.pptk);put('uraian',r.pekerjaan);put('kode-rekening',m.kode_sub_kegiatan||m.kode_rekening||'');put('jumlah',sppMoney(r.nilai_kegiatan));
- put('program',m.nama_program||'');put('kegiatan',m.nama_kegiatan||'');put('deskripsi',r.pekerjaan||m.uraian_kegiatan||'');put('ttd-pptk',r.pptk||'');put('ttd-bendahara',userList.find(u=>String(u.jabatan||'').toLowerCase().includes('bendahara'))?.nama_lengkap||'');
+ put('program',m.nama_program||'');put('kegiatan',m.nama_kegiatan||'');put('dpa',[document.getElementById('profil-dpa-nomor')?.value,document.getElementById('profil-dpa-tanggal')?.value?new Date(document.getElementById('profil-dpa-tanggal').value+'T00:00:00').toLocaleDateString('id-ID'):null].filter(Boolean).join(' , Tanggal '));put('deskripsi',r.pekerjaan||m.uraian_kegiatan||'');put('ttd-pptk',r.pptk||'');put('ttd-bendahara',userList.find(u=>String(u.jabatan||'').toLowerCase().includes('bendahara'))?.nama_lengkap||'');
  const modal=document.getElementById('spp-ls-modal');modal.classList.remove('hidden');modal.classList.add('flex');}
 function closeSPPLSModal(){const m=document.getElementById('spp-ls-modal');m.classList.add('hidden');m.classList.remove('flex');}
 function printSPPLSDocument(e){e.preventDefault();const v=id=>document.getElementById('spp-'+id)?.value||'';const r=(realisasiList||[]).find(x=>Number(x.id)===Number(v('record-id')));if(!r){alert('Register tidak ditemukan.');return;}const m=(masterList||[]).find(x=>Number(x.id)===Number(r.master_id))||{};const jumlah=sppNum(r.nilai_kegiatan),dpa=sppNum(v('dpa-jumlah')),spd=sppNum(v('spd-jumlah')),gu=sppNum(v('belanja-gu')),tu=sppNum(v('belanja-tu')),ls=sppNum(v('belanja-ls')),total=gu+tu+ls,sisaSPD=spd-total,sisaDPA=dpa-spd;const date=v('tanggal-cetak')?new Date(v('tanggal-cetak')+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'';const esc=sppEsc;
@@ -5199,7 +5381,7 @@ window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();initRealisasi
    <div class="md:col-span-2 font-extrabold text-slate-800 border-b pb-1">RINGKASAN KEGIATAN — LENGKAPI DATA</div>
    <label class="font-bold">Program<input id="spp-program" class="w-full mt-1 p-2 border rounded-lg" placeholder="Nama program"></label>
    <label class="font-bold">Kegiatan<input id="spp-kegiatan" class="w-full mt-1 p-2 border rounded-lg" placeholder="Nama kegiatan"></label>
-   <label class="font-bold">Nomor dan Tanggal DPA<input id="spp-dpa" class="w-full mt-1 p-2 border rounded-lg" placeholder="Contoh: 1.02... , Tgl. 30/12/2025"></label>
+
    <label class="font-bold">Nama Perusahaan/Bendahara<input id="spp-nama-bendahara" class="w-full mt-1 p-2 border rounded-lg" value="Bendahara Pengeluaran BLUD"></label>
    <label class="font-bold">Bentuk Perusahaan/Bendahara<input id="spp-bentuk" class="w-full mt-1 p-2 border rounded-lg"></label>
    <label class="font-bold">Alamat Perusahaan/Bendahara<input id="spp-alamat" class="w-full mt-1 p-2 border rounded-lg"></label>
@@ -5241,4 +5423,3 @@ window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();initRealisasi
 </script>
 </body>
 </html>
-
