@@ -4830,13 +4830,19 @@ function normalizeMasterPart(value){
 // Bulan bukan bagian dari identitas rekening; bulan menentukan versi pagu yang
 // berlaku pada periode terpilih. Tanpa filter bulan, ambil versi terakhir setahun.
 function masterAccountKey(m){
-  // Kunci rekening efektif: tahun anggaran + kode subkegiatan + uraian objek belanja.
-  // Bulan/jenis anggaran adalah versi, bukan bagian identitas. Dengan demikian,
-  // pagu Januari dan pagu perubahan Oktober untuk objek Gas Medis yang sama
-  // menjadi satu rekening efektif; objek berbeda di subkegiatan yang sama tetap terpisah.
-  const subCode = normalizeMasterPart(m.kode_sub_kegiatan || m.nama_sub_kegiatan || '');
-  const uraian = normalizeMasterPart(m.uraian_kegiatan || m.nama_rekening || '');
-  return String(Number(m.tahun || 2026)) + '|' + subCode + '|' + uraian;
+  // Identitas rekening efektif harus membedakan rekening yang sama pada kegiatan berbeda.
+  // Tahun + kode program + kode kegiatan + kode rekening adalah identitas master.
+  // Bulan dan jenis anggaran tetap menjadi penanda versi, bukan bagian identitas.
+  // Pada skema V31, kode rekening disimpan di kolom kode_sub_kegiatan.
+  const programCode = normalizeMasterPart(m.kode_program || m.nama_program || '');
+  const activityCode = normalizeMasterPart(m.kode_kegiatan || m.nama_kegiatan || '');
+  const accountCode = normalizeMasterPart(m.kode_sub_kegiatan || m.nama_sub_kegiatan || '');
+  return [
+    String(Number(m.tahun || 2026)),
+    programCode,
+    activityCode,
+    accountCode
+  ].join('|');
 }
 function effectiveMasterPagu(rows, asOfMonth='ALL'){
   const cutoff = asOfMonth === 'ALL' ? 12 : Number(asOfMonth);
@@ -5497,3 +5503,4 @@ window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();initRealisasi
 </script>
 </body>
 </html>
+
