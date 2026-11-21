@@ -4721,6 +4721,42 @@
       document.body.classList.add('overflow-hidden');
       supabaseReady=false;
     }
+    async function validateMasterUser(user) {
+      if (!user || !user.email) throw new Error('Identitas akun tidak lengkap.');
+      const email = String(user.email).trim().toLowerCase();
+      const { data, error } = await supabaseClient
+        .from('master_users_blud')
+        .select('id,email,role')
+        .ilike('email', email)
+        .maybeSingle();
+      if (error) {
+        console.error('Validasi master pengguna gagal:', error);
+        throw new Error('Validasi akun ke master pengguna gagal. Periksa kebijakan SELECT RLS tabel master_users_blud.');
+      }
+      if (!data) throw new Error('Akun tidak terdaftar pada master Pengguna & Role. Hubungi administrator.');
+      const masterRole = String(data.role || '').trim().toLowerCase();
+      const authRole = String(user.app_metadata?.role || '').trim().toLowerCase();
+      if (!masterRole || masterRole !== authRole) {
+        throw new Error('Role akun tidak sesuai dengan master Pengguna & Role. Hubungi administrator.');
+      }
+      return data;
+    }
+    async function establishValidatedSession(user) {
+      try {
+        await validateMasterUser(user);
+        unlockApplication(user);
+        await loadSupabaseData();
+        await window.loadProfilRS();
+        return true;
+      } catch (err) {
+        console.warn('Akses aplikasi ditolak:', err);
+        await supabaseClient.auth.signOut();
+        currentAuthUser = null;
+        lockApplication();
+        authMessage(err.message || 'Akun tidak terdaftar atau role tidak sesuai.');
+        return false;
+      }
+    }
     function unlockApplication(user) {
       currentAuthUser=user;
       document.getElementById('auth-gate').style.display='none';
@@ -4763,16 +4799,19 @@
         try { const {data,error}=await supabaseClient.auth.signInWithPassword({email,password}); if(error) throw error;
           const role=String(data.user?.app_metadata?.role||'').toLowerCase();
           if(!['superadmin','admin','verifikator','pptk','bendahara','ppk-blud'].includes(role)){ await supabaseClient.auth.signOut(); throw new Error('Akun belum diberi peran akses oleh administrator.'); }
-          unlockApplication(data.user); await loadSupabaseData(); await window.loadProfilRS();
-        } catch(err) { authMessage(err.message==='Akun belum diberi peran akses oleh administrator.'?err.message:'Email atau kata sandi tidak valid, atau akun belum diaktifkan.'); }
+          await establishValidatedSession(data.user);
+        } catch(err) { authMessage(err.message==='Akun belum diberi peran akses oleh administrator.'?err.message:(err.message||'Email atau kata sandi tidak valid, atau akun belum diaktifkan.')); }
         finally { button.disabled=false; button.textContent='Masuk ke Aplikasi'; }
       });
       const {data:{session},error}=await supabaseClient.auth.getSession();
       if(error||!session){lockApplication();return;}
       const role=String(session.user?.app_metadata?.role||'').toLowerCase();
       if(!['superadmin','admin','verifikator','pptk','bendahara','ppk-blud'].includes(role)){await supabaseClient.auth.signOut();lockApplication();authMessage('Akun belum diberi peran akses oleh administrator.');return;}
-      unlockApplication(session.user); await loadSupabaseData(); await window.loadProfilRS();
-      supabaseClient.auth.onAuthStateChange((_event,newSession)=>{ if(!newSession){currentAuthUser=null;lockApplication();} else if(currentAuthUser?.id!==newSession.user.id){unlockApplication(newSession.user);} });
+      await establishValidatedSession(session.user);
+      supabaseClient.auth.onAuthStateChange((_event,newSession)=>{ 
+        if(!newSession){currentAuthUser=null;lockApplication();}
+        else if(currentAuthUser?.id!==newSession.user.id){establishValidatedSession(newSession.user);}
+      });
     });
   </script>
 
