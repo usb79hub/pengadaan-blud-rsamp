@@ -2029,7 +2029,7 @@
       return rows.filter(r => {
         if (!ids.has(Number(r.master_id))) return false;
         if (fPen !== 'ALL' && (r.penyedia || '').trim() !== fPen) return false;
-        if (fPptk !== 'ALL' && (r.pptk || '').trim() !== fPptk) return false;
+        if (fPptk !== 'ALL' && normalizePptkIdentity(r.pptk) !== normalizePptkIdentity(fPptk)) return false;
         if (fRegister && !String(r.kode_unik_realisasi || '').trim().toLowerCase().includes(fRegister)) return false;
         return true;
       });
@@ -2049,7 +2049,7 @@
       if (!sel) return;
       const current = sel.value || 'ALL';
       const rows = getCascadingScopedRows(false, true);
-      const names = [...new Set(rows.map(r => (r.pptk || '').trim()).filter(Boolean))].sort();
+      const names = [...new Map(rows.map(r => [normalizePptkIdentity(r.pptk), canonicalPptkName(r.pptk)]).filter(([key,name]) => key && name)).values()].sort((a,b) => a.localeCompare(b, 'id'));
       setCascadingOptions(sel, 'Semua PPTK', names, current);
     }
 
@@ -2142,7 +2142,7 @@
         }
 
         if (fPen !== 'ALL' && (r.penyedia || '').trim() !== fPen) return false;
-        if (fPptk !== 'ALL' && (r.pptk || '').trim() !== fPptk) return false;
+        if (fPptk !== 'ALL' && normalizePptkIdentity(r.pptk) !== normalizePptkIdentity(fPptk)) return false;
 
         if (searchTerms.length) {
           const master = masterList.find(m => Number(m.id) === Number(r.master_id)) || {};
@@ -3301,9 +3301,8 @@
         }
         const {data:inserted,error}=await supabaseClient.from('realisasi_kegiatan_blud').insert(payloads).select('*');
         if(error) throw error;
-        const {data:refreshed,error:refreshError}=await supabaseClient.from('realisasi_kegiatan_blud').select('*').order('id',{ascending:false});
-        if(refreshError) throw refreshError;
-        realisasiList=(refreshed||inserted||[]).map(row=>({...row,id:Number(row.id),master_id:row.master_id==null?null:Number(row.master_id),tahun:Number(row.tahun||2026),bulan:Number(row.bulan||1),nilai_kegiatan:Number(row.nilai_kegiatan||0)}));
+        const refreshed=await fetchAllSupabaseRows('realisasi_kegiatan_blud','id',false);
+        realisasiList=(refreshed.length?refreshed:(inserted||[])).map(row=>({...row,id:Number(row.id),master_id:row.master_id==null?null:Number(row.master_id),tahun:Number(row.tahun||2026),bulan:Number(row.bulan||1),nilai_kegiatan:Number(row.nilai_kegiatan||0)}));
         updateDashboardMetrics(); applyCascadingFilter();
         showDatabaseStatus('Upload Pengajuan Pembayaran berhasil.','ok');
         let message=`Berhasil mengimpor ${inserted.length} pengajuan.`;
@@ -3451,6 +3450,23 @@
       return effectiveMasterPagu(yearMasters, month);
     }
 
+    // Satukan variasi penulisan nama PPTK pada filter; nilai sumber database tetap utuh.
+    function normalizePptkIdentity(value) {
+      return String(value ?? '').toLocaleLowerCase('id-ID')
+        .replace(/(^|\\s)ns\\.?(?=\\s|$)/gi, ' ')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .replace(/\\s+/g, ' ')
+        .trim();
+    }
+    function canonicalPptkName(value) {
+      const raw = String(value ?? '').trim();
+      const key = normalizePptkIdentity(raw);
+      if (key === 'suwoko tya wicaksono s kep') {
+        return 'Suwoko Tya Wicaksono, S.Kep., Ns.';
+      }
+      return raw;
+    }
+
     function setMonitoringSelectOptions(select, allLabel, values, previousValue = 'ALL') {
       if (!select) return;
       const unique = [...new Set(values.map(v => String(v ?? '').trim()).filter(Boolean))].sort((a,b) => a.localeCompare(b, 'id'));
@@ -3558,7 +3574,7 @@
       setMonitoringSelectOptions(
         pptkSelect,
         'Semua PPTK',
-        pptkRows.map(r => r.pptk || ''),
+        pptkRows.map(r => canonicalPptkName(r.pptk || '')),
         resetChildren ? 'ALL' : previousPptk
       );
 
@@ -3642,7 +3658,7 @@
       const ids = historicalMasterIds(effectiveRows, yearRows);
       const filteredRealisasi = realisasiList.filter(r => {
         if (!ids.has(Number(r.master_id))) return false;
-        if (fPptk !== 'ALL' && (r.pptk || '').trim() !== fPptk) return false;
+        if (fPptk !== 'ALL' && normalizePptkIdentity(r.pptk) !== normalizePptkIdentity(fPptk)) return false;
         if (String(r.status_pembayaran || '').trim().toLowerCase() !== 'lunas') {
           // Pengajuan line remains based on original transaction month/year.
           return (yr === 'ALL' || String(r.tahun || 2026) === yr) &&
@@ -3812,7 +3828,7 @@
       const paidTransactions = realisasiList.filter(r => {
         if (!isPaidReportTransaction(r) || !selectedIds.has(Number(r.master_id))) return false;
         if (year !== 'ALL' && String(r.tahun || 2026) !== year) return false;
-        if (fPptk !== 'ALL' && (r.pptk || '').trim() !== fPptk) return false;
+        if (fPptk !== 'ALL' && normalizePptkIdentity(r.pptk) !== normalizePptkIdentity(fPptk)) return false;
         const dt = reportPaymentDateParts(r);
         if (year !== 'ALL' && dt.year !== Number(year)) return false;
         return month === 'ALL' || (cakupan === 'bulan' ? dt.month === monthNo : dt.month <= monthNo);
@@ -4370,6 +4386,27 @@
       finally{if(btn){btn.disabled=false;btn.textContent='Simpan Profil';}}
     };
 
+    // Ambil seluruh baris Supabase secara bertahap agar tidak terpotong
+    // oleh batas maksimum baris PostgREST (misalnya 1.000 baris).
+    async function fetchAllSupabaseRows(tableName, orderColumn='id', ascending=true, pageSize=500) {
+      const allRows = [];
+      let from = 0;
+      while (true) {
+        const to = from + pageSize - 1;
+        const { data, error } = await supabaseClient
+          .from(tableName)
+          .select('*')
+          .order(orderColumn, { ascending })
+          .range(from, to);
+        if (error) throw error;
+        const page = Array.isArray(data) ? data : [];
+        allRows.push(...page);
+        if (page.length < pageSize) break;
+        from += pageSize;
+      }
+      return allRows;
+    }
+
     async function loadSupabaseData() {
       if (!window.supabase || !window.supabase.createClient) {
         showDatabaseStatus('Layanan data belum tersedia.', 'error');
@@ -4381,17 +4418,14 @@
       showDatabaseStatus('Memuat data aplikasi…', 'info');
 
       try {
-        const [masterResult, realisasiResult] = await Promise.all([
-          supabaseClient.from('master_kegiatan_blud').select('*').order('id', { ascending: true }),
-          supabaseClient.from('realisasi_kegiatan_blud').select('*').order('id', { ascending: false })
+        const [masterRows, realisasiRows] = await Promise.all([
+          fetchAllSupabaseRows('master_kegiatan_blud', 'id', true),
+          fetchAllSupabaseRows('realisasi_kegiatan_blud', 'id', false)
         ]);
 
-        // Master dan realisasi adalah data inti. Jika gagal, jangan berpura-pura sudah terhubung.
-        if (masterResult.error) throw new Error('MASTER_READ_FAILED');
-        if (realisasiResult.error) throw new Error('REALIZATION_READ_FAILED');
-
-        masterList = (masterResult.data || []).map(row => ({ ...row, id: Number(row.id), pagu: Number(row.pagu || 0) }));
-        realisasiList = (realisasiResult.data || []).map(row => ({
+        // Master dan realisasi dimuat seluruhnya melalui paginasi.
+        masterList = masterRows.map(row => ({ ...row, id: Number(row.id), pagu: Number(row.pagu || 0) }));
+        realisasiList = realisasiRows.map(row => ({
           ...row,
           id: Number(row.id),
           master_id: row.master_id == null ? null : Number(row.master_id),
@@ -5503,4 +5537,3 @@ window.addEventListener('DOMContentLoaded',()=>{initAddedFilters();initRealisasi
 </script>
 </body>
 </html>
-
